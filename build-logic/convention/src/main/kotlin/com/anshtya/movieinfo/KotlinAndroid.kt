@@ -13,21 +13,21 @@ internal fun Project.configureKotlinAndroid(
     pluginManager.apply("org.jetbrains.kotlin.android")
 
     commonExtension.apply {
-        compileSdk = 34
+        compileSdk = 35
 
         defaultConfig {
-            minSdk = 24
+            minSdk = 28
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+            sourceCompatibility = JavaVersion.VERSION_23
+            targetCompatibility = JavaVersion.VERSION_23
         }
     }
 
     extensions.configure<KotlinAndroidProjectExtension> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_23)
         }
     }
 }

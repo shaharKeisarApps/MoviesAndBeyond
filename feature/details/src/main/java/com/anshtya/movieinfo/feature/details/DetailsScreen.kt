@@ -118,7 +118,7 @@ internal fun DetailsScreen(
                 ModalBottomSheet(
                     onDismissRequest = onHideBottomSheet,
                     sheetState = bottomSheetState,
-                    windowInsets = WindowInsets.navigationBars,
+//                    windowInsets = WindowInsets.navigationBars,
                     modifier = Modifier.semantics {
                         contentDescription = signInSheetContentDescription
                     }

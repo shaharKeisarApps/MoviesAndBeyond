@@ -36,10 +36,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +47,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -112,7 +110,7 @@ internal fun YouScreen(
     onRefresh: () -> Unit,
     onErrorShown: () -> Unit
 ) {
-    val pullToRefreshState = rememberPullToRefreshState(enabled = { isLoggedIn == true })
+    val pullToRefreshState = rememberPullToRefreshState()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -174,7 +172,7 @@ internal fun YouScreen(
         Box(
             modifier = Modifier
                 .padding(paddingValues)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .pullToRefresh(isRefreshing = uiState.isRefreshing, state = pullToRefreshState, onRefresh = onRefresh)
         ) {
             Column(Modifier.fillMaxSize()) {
                 isLoggedIn?.let {
@@ -198,7 +196,7 @@ internal fun YouScreen(
                 }
             }
 
-            PullToRefreshContainer(
+          /*  PullToRefreshContainer(
                 state = pullToRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
             )
@@ -213,7 +211,7 @@ internal fun YouScreen(
                 } else {
                     pullToRefreshState.endRefresh()
                 }
-            }
+            }*/
         }
     }
 }
