@@ -25,6 +25,12 @@ dependencies {
     implementation(projects.core.model)
 
     api(libs.retrofit)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android) // or ktor.client.android/ktor.client.ios
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.moshi)
     implementation(libs.okhttp.logging.interceptor)
     ksp(libs.moshi.kotlin.codegen)

@@ -55,7 +55,8 @@ fun MovieInfoApp(
                 )
             }
         },
-        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
+        modifier = Modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
     ) { padding ->
         Column(
             modifier = Modifier
