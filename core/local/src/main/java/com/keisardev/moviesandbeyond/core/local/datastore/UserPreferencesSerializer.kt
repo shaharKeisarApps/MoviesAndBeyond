@@ -2,8 +2,8 @@ package com.keisardev.moviesandbeyond.core.local.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import com.google.protobuf.InvalidProtocolBufferException
+import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import java.io.InputStream
 import java.io.OutputStream
 

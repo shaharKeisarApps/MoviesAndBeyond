@@ -40,7 +40,7 @@ fun MoviesAndBeyondApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val showBottomBar = bottomBarDestinations.any { destination ->
-        currentDestination?.route?.contains(destination.name, true) ?: false
+        currentDestination?.route?.contains(destination.name, true) == true
     }
 
     Scaffold(
@@ -97,8 +97,8 @@ fun MoviesAndBeyondNavigationBar(
 
 private fun NavDestination?.isDestinationInHierarchy(destination: MoviesAndBeyondDestination): Boolean {
     return this?.hierarchy?.any {
-        it.route?.contains(destination.name, true) ?: false
-    } ?: false
+        it.route?.contains(destination.name, true) == true
+    } == true
 }
 
 private fun NavController.navigateToBottomBarDestination(destination: MoviesAndBeyondDestination) {

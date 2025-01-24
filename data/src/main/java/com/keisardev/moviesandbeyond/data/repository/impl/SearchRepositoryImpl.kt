@@ -1,7 +1,7 @@
 package com.keisardev.moviesandbeyond.data.repository.impl
 
-import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.network.model.search.asModel
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.SearchRepository
