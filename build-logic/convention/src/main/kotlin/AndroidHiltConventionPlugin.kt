@@ -1,7 +1,7 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-import com.anshtya.movieinfo.findLibrary
+import com.keisardev.moviesandbeyond.findLibrary
 
 class AndroidHiltConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {

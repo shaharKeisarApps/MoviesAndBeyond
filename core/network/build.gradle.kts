@@ -1,12 +1,12 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id("movieinfo.android.library")
-    id("movieinfo.android.hilt")
+    id("moviesandbeyond.android.library")
+    id("moviesandbeyond.android.hilt")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.core.network"
+    namespace = "com.keisardev.moviesandbeyond.core.network"
 
     buildFeatures {
         buildConfig = true

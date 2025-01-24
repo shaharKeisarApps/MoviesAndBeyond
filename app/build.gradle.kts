@@ -1,18 +1,18 @@
 plugins {
-    id("movieinfo.android.application")
-    id("movieinfo.android.application.compose")
-    id("movieinfo.android.hilt")
+    id("moviesandbeyond.android.application")
+    id("moviesandbeyond.android.application.compose")
+    id("moviesandbeyond.android.hilt")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo"
+    namespace = "com.keisardev.moviesandbeyond"
 
     buildFeatures {
         buildConfig = true
     }
 
     defaultConfig {
-        applicationId = "com.anshtya.movieinfo"
+        applicationId = "com.keisardev.moviesandbeyond"
         versionCode = 10
         versionName = "2.2.5"
 

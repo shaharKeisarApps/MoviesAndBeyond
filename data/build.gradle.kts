@@ -1,10 +1,10 @@
 plugins {
-    id("movieinfo.android.library")
-    id("movieinfo.android.hilt")
+    id("moviesandbeyond.android.library")
+    id("moviesandbeyond.android.hilt")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.data"
+    namespace = "com.keisardev.moviesandbeyond.data"
 }
 
 dependencies {

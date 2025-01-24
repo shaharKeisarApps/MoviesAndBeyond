@@ -1,9 +1,9 @@
 plugins {
-    id("movieinfo.android.feature")
+    id("moviesandbeyond.android.feature")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.feature.you"
+    namespace = "com.keisardev.moviesandbeyond.feature.you"
 }
 
 dependencies {

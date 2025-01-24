@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".MovieInfoApplication"
+        android:name=".MoviesAndBeyondApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MovieInfo.Splash"
+        android:theme="@style/Theme.MoviesAndBeyond.Splash"
         tools:targetApi="tiramisu">
         <profileable
             android:shell="true"

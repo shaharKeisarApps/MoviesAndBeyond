@@ -1,9 +1,9 @@
 plugins {
-    id("movieinfo.android.library")
+    id("moviesandbeyond.android.library")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.core.testing"
+    namespace = "com.keisardev.moviesandbeyond.core.testing"
 }
 
 dependencies {
