@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-rootProject.name = "MovieInfo"
+rootProject.name = "MoviesAndBeyond"
 include(":app")
 include(":core:local")
 include(":core:model")

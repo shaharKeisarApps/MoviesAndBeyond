@@ -24,27 +24,27 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "movieinfo.android.application"
+            id = "moviesandbeyond.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidApplicationCompose") {
-            id = "movieinfo.android.application.compose"
+            id = "moviesandbeyond.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidLibrary") {
-            id = "movieinfo.android.library"
+            id = "moviesandbeyond.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidLibraryCompose") {
-            id = "movieinfo.android.library.compose"
+            id = "moviesandbeyond.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
         register("androidHilt") {
-            id = "movieinfo.android.hilt"
+            id = "moviesandbeyond.android.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
         }
         register("androidFeature") {
-            id = "movieinfo.android.feature"
+            id = "moviesandbeyond.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
     }

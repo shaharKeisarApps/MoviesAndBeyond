@@ -1,10 +1,10 @@
 plugins {
-    id("movieinfo.android.library")
-    id("movieinfo.android.library.compose")
+    id("moviesandbeyond.android.library")
+    id("moviesandbeyond.android.library.compose")
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.core.ui"
+    namespace = "com.keisardev.moviesandbeyond.core.ui"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -14,6 +14,9 @@ android {
 dependencies {
     api(libs.compose.material.iconsExtended)
     implementation(libs.coil.kt.compose)
+    api(libs.haze)
+    api(libs.haze.materials)
+
 
     androidTestImplementation(projects.core.testing)
 }

@@ -1,4 +1,4 @@
-# MovieInfo
+# moviesandbeyond
 Provides movies, tv shows and person information from [TMDB API](https://api.tmdb.org/).
 
 ## 📸 Screenshots
@@ -20,7 +20,7 @@ Provides movies, tv shows and person information from [TMDB API](https://api.tmd
 To clone the project, run
 
 ```
-git clone git@github.com:anshtya/MovieInfo.git
+git clone git@github.com:keisardev/moviesandbeyond.git
 ```
 Open the project in Android Studio.
 

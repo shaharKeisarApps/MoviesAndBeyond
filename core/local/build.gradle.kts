@@ -1,14 +1,14 @@
 import com.google.protobuf.gradle.GenerateProtoTask
 
 plugins {
-    id("movieinfo.android.library")
-    id("movieinfo.android.hilt")
+    id("moviesandbeyond.android.library")
+    id("moviesandbeyond.android.hilt")
     alias(libs.plugins.ksp)
     alias(libs.plugins.protobuf)
 }
 
 android {
-    namespace = "com.anshtya.movieinfo.core.local"
+    namespace = "com.keisardev.moviesandbeyond.core.local"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

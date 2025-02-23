@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movie Info</string>
+    <string name="app_name">Movies And Beyond</string>
     <string name="movies">Movies</string>
     <string name="search">Search</string>
     <string name="my_library">My Library</string>
