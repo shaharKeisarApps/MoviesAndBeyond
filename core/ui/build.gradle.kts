@@ -14,6 +14,9 @@ android {
 dependencies {
     api(libs.compose.material.iconsExtended)
     implementation(libs.coil.kt.compose)
+    api(libs.haze)
+    api(libs.haze.materials)
+
 
     androidTestImplementation(projects.core.testing)
 }

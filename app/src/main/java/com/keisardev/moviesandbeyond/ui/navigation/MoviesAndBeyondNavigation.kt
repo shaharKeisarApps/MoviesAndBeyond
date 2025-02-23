@@ -19,7 +19,7 @@ import com.keisardev.moviesandbeyond.ui.onboardingNavigationRoute
 @Composable
 fun MoviesAndBeyondNavigation(
     hideOnboarding: Boolean,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val startDestination = if (hideOnboarding) {
         moviesNavigationRoute
@@ -29,7 +29,7 @@ fun MoviesAndBeyondNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
         composable(
             route = onboardingNavigationRoute

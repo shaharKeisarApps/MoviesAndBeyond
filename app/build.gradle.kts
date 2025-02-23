@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "com.keisardev.moviesandbeyond"
-        versionCode = 10
-        versionName = "2.2.5"
+        versionCode = 1
+        versionName = "1.0.0"
 
         vectorDrawables {
             useSupportLibrary = true
