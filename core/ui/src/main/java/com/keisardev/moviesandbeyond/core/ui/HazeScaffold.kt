@@ -3,6 +3,13 @@
 
 package com.keisardev.moviesandbeyond.core.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,40 +39,90 @@ fun HazeScaffold(
   containerColor: Color = MaterialTheme.colorScheme.background,
   contentColor: Color = contentColorFor(containerColor),
   contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-  hazeState: HazeState,//= remember { HazeState() },
+  hazeState: HazeState,
   hazeStyle: HazeStyle = CupertinoMaterials.ultraThin(MaterialTheme.colorScheme.surface),
   blurTopBar: Boolean = true,
   blurBottomBar: Boolean = true,
   content: @Composable (PaddingValues) -> Unit,
 ) {
-
   NestedScaffold(
     modifier = modifier,
     topBar = {
-      if (blurTopBar) {
-        // We explicitly only want to add a Box if we are blurring.
-        // Scaffold has logic which changes based on whether `bottomBar` contains a layout node.
+      AnimatedVisibility(
+        visible = blurTopBar,
+        enter = slideInVertically(
+          initialOffsetY = { -it / 3 }, // Start slightly off-screen for subtlety
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy, // Subtle overshoot
+            stiffness = Spring.StiffnessMediumLow // Smooth but snappy
+          )
+        ) + fadeIn(
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+          )
+        ),
+        exit = slideOutVertically(
+          targetOffsetY = { -it / 3 }, // Exit slightly off-screen
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+          )
+        ) + fadeOut(
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+          )
+        )
+      ) {
         Box(
           modifier = Modifier
             .hazeEffect(state = hazeState, style = hazeStyle),
         ) {
           topBar()
         }
-      } else {
+      }
+      if (!blurTopBar) {
         topBar()
       }
     },
     bottomBar = {
-      if (blurBottomBar) {
-        // We explicitly only want to add a Box if we are blurring.
-        // Scaffold has logic which changes based on whether `bottomBar` contains a layout node.
+      AnimatedVisibility(
+        visible = blurBottomBar,
+        enter = slideInVertically(
+          initialOffsetY = { it / 2 }, // Start from below for a grounded feel
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy, // Gentle bounce
+            stiffness = Spring.StiffnessLow // Slower, more deliberate
+          )
+        ) + fadeIn(
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = 0.01f // Ensure fade completes naturally
+          )
+        ),
+        exit = slideOutVertically(
+          targetOffsetY = { it / 2 }, // Exit downward
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+          )
+        ) + fadeOut(
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
+          )
+        )
+      ) {
         Box(
           modifier = Modifier
             .hazeEffect(state = hazeState, style = hazeStyle),
         ) {
           bottomBar()
         }
-      } else {
+      }
+      if (!blurBottomBar) {
         bottomBar()
       }
     },
