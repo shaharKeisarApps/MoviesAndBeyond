@@ -1,18 +1,29 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "gradle": {
     "enabled": true,
-    "fileMatch": ["(^|/)gradle/libs\\.versions\\.toml$"]
+    "fileMatch": [
+      "(^|/)gradle/libs\\.versions\\.toml$"
+    ]
   },
-  "labels": ["dependencies", "renovate"],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Updates",
   "automerge": false,
   "packageRules": [
     {
-      "matchManagers": ["gradle"],
-      "matchFiles": ["gradle/libs.versions.toml"],
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchFileNames": [
+        "gradle/libs.versions.toml"
+      ],
       "groupName": "Gradle Version Catalog Updates",
       "groupSlug": "gradle-version-catalog",
       "description": "Group all Gradle Version Catalog updates into a single PR"
