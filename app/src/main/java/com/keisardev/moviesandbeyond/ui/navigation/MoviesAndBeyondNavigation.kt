@@ -1,6 +1,9 @@
 package com.keisardev.moviesandbeyond.ui.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,6 +23,7 @@ import com.keisardev.moviesandbeyond.ui.onboardingNavigationRoute
 fun MoviesAndBeyondNavigation(
     hideOnboarding: Boolean,
     navController: NavHostController,
+    paddingValues: PaddingValues
 ) {
     val startDestination = if (hideOnboarding) {
         moviesNavigationRoute
@@ -28,6 +32,7 @@ fun MoviesAndBeyondNavigation(
     }
 
     NavHost(
+        modifier = Modifier.padding(paddingValues),
         navController = navController,
         startDestination = startDestination,
     ) {

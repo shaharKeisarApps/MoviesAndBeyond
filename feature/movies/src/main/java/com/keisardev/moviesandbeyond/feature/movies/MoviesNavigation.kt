@@ -14,7 +14,7 @@ const val moviesNavigationRoute = "movies"
 
 fun NavGraphBuilder.moviesScreen(
     navController: NavController,
-    navigateToDetails: (String) -> Unit
+    navigateToDetails: (String) -> Unit,
 ) {
     navigation(
         route = moviesNavigationRoute,

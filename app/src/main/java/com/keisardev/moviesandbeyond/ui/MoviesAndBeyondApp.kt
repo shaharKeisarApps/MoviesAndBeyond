@@ -1,6 +1,8 @@
 package com.keisardev.moviesandbeyond.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -69,10 +71,13 @@ fun MoviesAndBeyondApp(
                     .hazeEffect(state = hazeState, style = style)
                     .fillMaxWidth()
             )
-        }) { padding ->
+        },
+        contentWindowInsets = WindowInsets.safeDrawing
+    ) { padding ->
         MoviesAndBeyondNavigation(
             hideOnboarding = hideOnboarding,
             navController = navController,
+            paddingValues = padding
         )
     }
 }

@@ -3,16 +3,17 @@ package com.keisardev.moviesandbeyond.feature.movies
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +37,8 @@ private val horizontalPadding = 8.dp
 internal fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
-    viewModel: MoviesViewModel
+    viewModel: MoviesViewModel,
+    modifier: Modifier = Modifier
 ) {
     val nowPlayingMovies by viewModel.nowPlayingMovies.collectAsStateWithLifecycle()
     val popularMovies by viewModel.popularMovies.collectAsStateWithLifecycle()
@@ -53,7 +55,8 @@ internal fun FeedRoute(
         appendItems = viewModel::appendItems,
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
-        onErrorShown = viewModel::onErrorShown
+        onErrorShown = viewModel::onErrorShown,
+        modifier = modifier
     )
 }
 
@@ -67,7 +70,8 @@ internal fun FeedScreen(
     appendItems: (MovieListCategory) -> Unit,
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -76,15 +80,57 @@ internal fun FeedScreen(
         scope.launch { snackbarState.showSnackbar(it) }
         onErrorShown()
     }
-
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarState) }
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(WindowInsets.safeDrawing.asPaddingValues()),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        item {
+            ContentSection(
+                content = nowPlayingMovies,
+                sectionName = stringResource(id = R.string.now_playing),
+                appendItems = appendItems,
+                onItemClick = onItemClick,
+                onSeeAllClick = onSeeAllClick
+            )
+        }
+        item {
+            ContentSection(
+                content = popularMovies,
+                sectionName = stringResource(id = R.string.popular),
+                appendItems = appendItems,
+                onItemClick = onItemClick,
+                onSeeAllClick = onSeeAllClick
+            )
+        }
+        item {
+            ContentSection(
+                content = topRatedMovies,
+                sectionName = stringResource(id = R.string.top_rated),
+                appendItems = appendItems,
+                onItemClick = onItemClick,
+                onSeeAllClick = onSeeAllClick
+            )
+        }
+        item {
+            ContentSection(
+                content = upcomingMovies,
+                sectionName = stringResource(id = R.string.upcoming),
+                appendItems = appendItems,
+                onItemClick = onItemClick,
+                onSeeAllClick = onSeeAllClick
+            )
+        }
+    }
+    /*Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbarState) },
     ) { paddingValues ->
         LazyColumn(
-            contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
+            contentPadding = paddingValues,
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
@@ -124,7 +170,7 @@ internal fun FeedScreen(
                 )
             }
         }
-    }
+    }*/
 }
 
 @Composable
