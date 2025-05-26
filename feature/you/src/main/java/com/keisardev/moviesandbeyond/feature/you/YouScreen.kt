@@ -267,11 +267,11 @@ private fun LoggedOutView(
     Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(0.6f)
                 .padding(horizontal = 12.dp)
                 .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
@@ -531,6 +531,44 @@ private fun SettingsDialogChooserRow(
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
 fun supportsDynamicColorTheme() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+@Preview(showBackground = true)
+@Composable
+private fun YouScreenPreview() {
+    YouScreen(
+        uiState = YouUiState(
+            accountDetails = AccountDetails(
+                id = 1,
+                name = "John Doe",
+                username = "johndoe",
+                avatar = "",
+                includeAdult = false,
+                gravatar = "null",
+                iso6391 = "null",
+                iso31661 = "null",
+            ),
+            isLoading = false,
+            isRefreshing = false,
+            isLoggingOut = false,
+            errorMessage = null
+        ),
+        isLoggedIn = true,
+        userSettings = UserSettings(
+            useDynamicColor = true,
+            includeAdultResults = false,
+            darkMode = SYSTEM
+        ),
+        onChangeTheme = {},
+        onChangeDarkMode = {},
+        onChangeIncludeAdult = {},
+        onNavigateToAuth = {},
+        onLibraryItemClick = {},
+        onReloadAccountDetailsClick = {},
+        onRefresh = {},
+        onLogOutClick = {},
+        onErrorShown = {}
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
