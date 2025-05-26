@@ -13,12 +13,14 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
+
 
         consumerProguardFiles("consumer-proguard-rules.pro")
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 protobuf {
@@ -48,9 +50,8 @@ androidComponents {
 
             project.tasks.getByName("ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
                 dependsOn(protoTask)
-                (this as org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool<*>).setSource(
-                    protoTask.outputBaseDir
-                )
+                // Remove the casting and use a different approach to set source
+                inputs.files(protoTask.outputBaseDir)
             }
         }
     }
