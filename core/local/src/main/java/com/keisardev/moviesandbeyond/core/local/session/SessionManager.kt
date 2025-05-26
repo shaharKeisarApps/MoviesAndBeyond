@@ -1,6 +1,7 @@
 package com.keisardev.moviesandbeyond.core.local.session
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -28,9 +29,9 @@ class SessionManager @Inject constructor(
     }
 
     fun storeSessionId(sessionId: String) {
-        sharedPreferences.edit()
-            .putString(USER_SESSION_ID, sessionId)
-            .apply()
+        sharedPreferences.edit {
+            putString(USER_SESSION_ID, sessionId)
+        }
     }
 
     fun getSessionId(): String? {
@@ -38,8 +39,8 @@ class SessionManager @Inject constructor(
     }
 
     fun deleteSessionId() {
-        sharedPreferences.edit()
-            .putString(USER_SESSION_ID, null)
-            .apply()
+        sharedPreferences.edit {
+            putString(USER_SESSION_ID, null)
+        }
     }
 }
