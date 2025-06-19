@@ -45,13 +45,16 @@ import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.you.R
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
 import kotlinx.coroutines.launch
 
+// This LibraryItemsRoute is assumed to be called from NavDisplay when LibraryItemsKey is active
 @Composable
 internal fun LibraryItemsRoute(
-    onBackClick: () -> Unit,
-    navigateToDetails: (String) -> Unit,
-    viewModel: LibraryItemsViewModel = hiltViewModel()
+    // onBackClick: () -> Unit, // Removed
+    // navigateToDetails: (String) -> Unit, // Removed
+    viewModel: LibraryItemsViewModel = hiltViewModel() // type is obtained from SavedStateHandle via ViewModel
 ) {
     val movieItems by viewModel.movieItems.collectAsStateWithLifecycle()
     val tvItems by viewModel.tvItems.collectAsStateWithLifecycle()
@@ -64,8 +67,7 @@ internal fun LibraryItemsRoute(
         libraryItemType = libraryItemType,
         errorMessage = errorMessage,
         onDeleteItem = viewModel::deleteItem,
-        onBackClick = onBackClick,
-        onItemClick = navigateToDetails,
+        // onBackClick and onItemClick are handled directly now
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -78,8 +80,8 @@ internal fun LibraryItemsScreen(
     libraryItemType: LibraryItemType?,
     errorMessage: String?,
     onDeleteItem: (LibraryItem) -> Unit,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit,
+    // onItemClick: (String) -> Unit, // Removed
+    // onBackClick: () -> Unit, // Removed
     onErrorShown: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -102,7 +104,7 @@ internal fun LibraryItemsScreen(
                 title = {
                     libraryItemTitle?.let { Text(text = it) }
                 },
-                onBackClick = onBackClick
+                onBackClick = { NavManager.navigateUp() } // Use NavManager
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -147,7 +149,7 @@ internal fun LibraryItemsScreen(
                         LibraryMediaType.MOVIE -> {
                             LibraryContent(
                                 content = movieItems,
-                                onItemClick = onItemClick,
+                                // onItemClick = onItemClick, // Handled in LibraryItem
                                 onDeleteClick = onDeleteItem
                             )
                         }
@@ -155,7 +157,7 @@ internal fun LibraryItemsScreen(
                         LibraryMediaType.TV -> {
                             LibraryContent(
                                 content = tvItems,
-                                onItemClick = onItemClick,
+                                // onItemClick = onItemClick, // Handled in LibraryItem
                                 onDeleteClick = onDeleteItem
                             )
                         }
@@ -169,7 +171,7 @@ internal fun LibraryItemsScreen(
 @Composable
 private fun LibraryContent(
     content: List<LibraryItem>,
-    onItemClick: (String) -> Unit,
+    // onItemClick: (String) -> Unit, // Removed
     onDeleteClick: (LibraryItem) -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
@@ -191,7 +193,7 @@ private fun LibraryContent(
                     LibraryItem(
                         posterPath = it.imagePath,
                         onItemClick = {
-                            onItemClick("${it.id},${it.mediaType.uppercase()}")
+                            NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = it.mediaType.uppercase())) // Use NavManager
                         },
                         onDeleteClick = { onDeleteClick(it) }
                     )

@@ -1,18 +1,22 @@
 package com.keisardev.moviesandbeyond.feature.search
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
+import androidx.compose.runtime.Composable
+// import androidx.navigation.NavController // Removed
+// import androidx.navigation.NavGraphBuilder // Removed
+// import androidx.navigation.NavOptions // Removed
+// import androidx.navigation.compose.composable // Removed
 
-const val searchNavigationRoute = "search"
+// const val searchNavigationRoute = "search" // Removed
 
-fun NavGraphBuilder.searchScreen(navigateToDetail: (String) -> Unit) {
-    composable(route = searchNavigationRoute) {
-        SearchRoute(navigateToDetail = navigateToDetail)
-    }
+// This is the main entry composable for the Search feature,
+// called from NavDisplay when SearchKey is active.
+@Composable
+fun searchScreen(
+    // navigateToDetail: (String) -> Unit // Removed, SearchRoute will use NavManager
+) {
+    SearchRoute(/*navigateToDetail is handled within SearchRoute/SearchScreenInternal now*/)
 }
 
-fun NavController.navigateToSearch(navOptions: NavOptions) {
-    navigate(searchNavigationRoute, navOptions)
-}
+// fun NavController.navigateToSearch(navOptions: NavOptions) { // Removed
+//    navigate(searchNavigationRoute, navOptions)
+// }

@@ -33,10 +33,13 @@ import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
 
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+
 @Composable
 internal fun FeedRoute(
-    navigateToDetails: (String) -> Unit,
-    navigateToItems: (String) -> Unit,
+    // navigateToDetails: (String) -> Unit, // Removed
+    navigateToItems: (String) -> Unit, // This is for navigating to MoviesItemsScreen, kept for now from moviesScreen
     viewModel: MoviesViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -53,8 +56,8 @@ internal fun FeedRoute(
         upcomingMovies = upcomingMovies,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        onItemClick = navigateToDetails,
-        onSeeAllClick = navigateToItems,
+        // onItemClick is now handled directly in ContentSection using NavManager
+        onSeeAllClick = navigateToItems, // This is for navigating to MoviesItemsScreen
         onErrorShown = viewModel::onErrorShown,
         modifier = modifier
     )
@@ -68,8 +71,8 @@ internal fun FeedScreen(
     upcomingMovies: ContentUiState,
     errorMessage: String?,
     appendItems: (MovieListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit,
+    // onItemClick: (String) -> Unit, // Removed from signature, handled in ContentSection
+    onSeeAllClick: (String) -> Unit, // This is for navigating to MoviesItemsScreen
     onErrorShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -138,7 +141,7 @@ internal fun FeedScreen(
                     content = nowPlayingMovies,
                     sectionName = stringResource(id = R.string.now_playing),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -147,7 +150,7 @@ internal fun FeedScreen(
                     content = popularMovies,
                     sectionName = stringResource(id = R.string.popular),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -156,7 +159,7 @@ internal fun FeedScreen(
                     content = topRatedMovies,
                     sectionName = stringResource(id = R.string.top_rated),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -165,7 +168,7 @@ internal fun FeedScreen(
                     content = upcomingMovies,
                     sectionName = stringResource(id = R.string.upcoming),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -178,8 +181,8 @@ private fun ContentSection(
     content: ContentUiState,
     sectionName: String,
     appendItems: (MovieListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit
+    // onItemClick: (String) -> Unit, // Removed, handled directly below
+    onSeeAllClick: (String) -> Unit // This is for navigating to MoviesItemsScreen
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -203,7 +206,8 @@ private fun ContentSection(
                 MediaItemCard(
                     posterPath = it.imagePath,
                     onItemClick = {
-                        onItemClick("${it.id},${MediaType.MOVIE}")
+                        // Directly use NavManager here
+                        NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.MOVIE.name))
                     }
                 )
             }

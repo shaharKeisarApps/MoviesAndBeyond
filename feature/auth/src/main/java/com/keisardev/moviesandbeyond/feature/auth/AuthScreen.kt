@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.ui.AnnotatedClickableText
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Added NavManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,9 +83,9 @@ internal fun AuthRoute(
 internal fun AuthScreen(
     uiState: AuthUiState,
     hideOnboarding: Boolean?,
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit, // This is NavManager.navigateUp() from AuthNavigation.kt
     onLogInClick: () -> Unit,
-    onContinueWithoutSignInClick: () -> Unit,
+    onContinueWithoutSignInClick: () -> Unit, // Will be modified to also call NavManager.navigateUp()
     onUsernameChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onErrorShown: () -> Unit,
@@ -234,7 +235,10 @@ internal fun AuthScreen(
                     Spacer(Modifier.height(10.dp))
 
                     Button(
-                        onClick = onContinueWithoutSignInClick,
+                        onClick = {
+                            onContinueWithoutSignInClick() // Calls viewModel.setHideOnboarding()
+                            NavManager.navigateUp()        // Explicitly navigate up
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp)

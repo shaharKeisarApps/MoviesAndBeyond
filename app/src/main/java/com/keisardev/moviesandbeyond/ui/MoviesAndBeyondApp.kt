@@ -14,21 +14,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
+import androidx.compose.runtime.collectAsState
+// import androidx.navigation.NavController // Not needed
+// import androidx.navigation.NavDestination // Not needed
+// import androidx.navigation.NavDestination.Companion.hierarchy // Not needed
+// import androidx.navigation.NavGraph.Companion.findStartDestination // Not needed
+// import androidx.navigation.NavHostController // Not needed
+// import androidx.navigation.compose.currentBackStackEntryAsState // Not needed
+// import androidx.navigation.compose.rememberNavController // Not needed
+// import androidx.navigation.navOptions // Not needed
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
-import com.keisardev.moviesandbeyond.feature.movies.navigateToMovies
-import com.keisardev.moviesandbeyond.feature.search.navigateToSearch
-import com.keisardev.moviesandbeyond.feature.tv.navigateToTvShows
-import com.keisardev.moviesandbeyond.feature.you.navigateToYou
+// Feature imports for navigateToMovies etc. are removed as NavManager handles navigation with keys
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNavigation
+// Import NavManager and Keys
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys // Assuming this is where all keys are
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesKey
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvShowsKey
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.SearchKey
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.YouKey
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -41,20 +46,32 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
     ExperimentalHazeApi::class, ExperimentalHazeMaterialsApi::class,
     ExperimentalMaterial3Api::class
 )
+// Hypothetical extension property/function to map enum to key
+// This would ideally be in NavigationKeys.kt or a similar utility file.
+// For now, conceptualizing it here for the purpose of refactoring MoviesAndBeyondApp.
+val MoviesAndBeyondDestination.navigationKey: Any
+    get() = when (this) {
+        MoviesAndBeyondDestination.MOVIES -> MoviesKey
+        MoviesAndBeyondDestination.TV_SHOWS -> TvShowsKey
+        MoviesAndBeyondDestination.SEARCH -> SearchKey
+        MoviesAndBeyondDestination.YOU -> YouKey
+    }
+
 @Composable
 fun MoviesAndBeyondApp(
     hideOnboarding: Boolean,
-    navController: NavHostController = rememberNavController()
+    // navController: NavHostController = rememberNavController() // Removed
 ) {
     val hazeState = remember { HazeState() }
     val inputScale: HazeInputScale = HazeInputScale.Auto
     val style = CupertinoMaterials.ultraThin()
 
     val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentBackStack by NavManager.backStack.collectAsState()
+    val currentKey = currentBackStack.lastOrNull()
+
     val showBottomBar = bottomBarDestinations.any { destination ->
-        currentDestination?.route?.contains(destination.name, true) == true
+        currentKey == destination.navigationKey
     }
 
     HazeScaffold(
@@ -63,9 +80,10 @@ fun MoviesAndBeyondApp(
             if (showBottomBar)
             MoviesAndBeyondNavigationBar(
                 destinations = bottomBarDestinations,
-                currentDestination = currentDestination,
+                currentKey = currentKey, // Pass currentKey
                 onNavigateToDestination = { destination ->
-                    navController.navigateToBottomBarDestination(destination)
+                    // Use replaceAll for bottom bar navigation as per prompt
+                    NavManager.replaceAll(destination.navigationKey)
                 },
                 modifier = Modifier
                     .hazeEffect(state = hazeState, style = style)
@@ -76,7 +94,7 @@ fun MoviesAndBeyondApp(
     ) { padding ->
         MoviesAndBeyondNavigation(
             hideOnboarding = hideOnboarding,
-            navController = navController,
+            // navController = navController, // Removed
             paddingValues = padding
         )
     }
@@ -85,13 +103,13 @@ fun MoviesAndBeyondApp(
 @Composable
 fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
-    currentDestination: NavDestination?,
+    currentKey: Any?, // Changed from NavDestination
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(modifier = modifier, containerColor = Color.Transparent) {
         destinations.forEach { destination ->
-            val selected = currentDestination.isDestinationInHierarchy(destination)
+            val selected = currentKey == destination.navigationKey // Compare keys
             NavigationBarItem(
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
@@ -107,25 +125,5 @@ fun MoviesAndBeyondNavigationBar(
     }
 }
 
-private fun NavDestination?.isDestinationInHierarchy(destination: MoviesAndBeyondDestination): Boolean {
-    return this?.hierarchy?.any {
-        it.route?.contains(destination.name, true) == true
-    } == true
-}
-
-private fun NavController.navigateToBottomBarDestination(destination: MoviesAndBeyondDestination) {
-    val navOptions = navOptions {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
-    }
-
-    when (destination) {
-        MoviesAndBeyondDestination.MOVIES -> navigateToMovies(navOptions)
-        MoviesAndBeyondDestination.TV_SHOWS -> navigateToTvShows(navOptions)
-        MoviesAndBeyondDestination.SEARCH -> navigateToSearch(navOptions)
-        MoviesAndBeyondDestination.YOU -> navigateToYou(navOptions)
-    }
-}
+// Removed private fun NavDestination?.isDestinationInHierarchy
+// Removed private fun NavController.navigateToBottomBarDestination

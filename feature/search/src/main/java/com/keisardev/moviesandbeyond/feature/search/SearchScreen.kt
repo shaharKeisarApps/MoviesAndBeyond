@@ -26,13 +26,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.ui.MoviesAndBeyondSearchBar
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
 import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
 
 @Composable
 internal fun SearchRoute(
-    navigateToDetail: (String) -> Unit,
+    // navigateToDetail: (String) -> Unit, // Removed
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -44,8 +46,8 @@ internal fun SearchRoute(
         errorMessage = errorMessage,
         searchSuggestions = searchSuggestions,
         onSearchQueryChange = viewModel::changeSearchQuery,
-        onBack = viewModel::onBack,
-        onSearchResultClick = navigateToDetail,
+        onBack = viewModel::onBack, // This is for clearing search, not screen navigation up
+        // onSearchResultClick = navigateToDetail, // Removed, handled directly
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -56,8 +58,8 @@ internal fun SearchScreen(
     errorMessage: String?,
     searchSuggestions: List<SearchItem>,
     onSearchQueryChange: (String) -> Unit,
-    onBack: () -> Unit,
-    onSearchResultClick: (String) -> Unit,
+    onBack: () -> Unit, // This is for clearing search, not screen navigation up
+    // onSearchResultClick: (String) -> Unit, // Removed
     onErrorShown: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -105,7 +107,7 @@ internal fun SearchScreen(
                             imagePath = it.imagePath,
                             onItemClick = {
                                 // Converting type to uppercase for [MediaType]
-                                onSearchResultClick("${it.id},${it.mediaType.uppercase()}")
+                                NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = it.mediaType.uppercase()))
                             }
                         )
                     }

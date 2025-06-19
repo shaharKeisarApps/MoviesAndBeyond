@@ -30,28 +30,31 @@ import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
 
+
+// CreditsRoute is assumed to be called from NavDisplay when the key is CreditsKey(itemId, itemType)
 @Composable
 internal fun CreditsRoute(
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit,
-    viewModel: DetailsViewModel
+    // onItemClick: (String) -> Unit, // Removed
+    // onBackClick: () -> Unit, // Removed
+    viewModel: DetailsViewModel // ViewModel provides the data based on itemId/itemType from CreditsKey
 ) {
     val details by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
 
     CreditsScreen(
-        details = details,
-        onItemClick = onItemClick,
-        onBackClick = onBackClick
+        details = details
+        // onItemClick and onBackClick are handled directly now
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreditsScreen(
-    details: ContentDetailUiState,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    details: ContentDetailUiState
+    // onItemClick: (String) -> Unit, // Removed
+    // onBackClick: () -> Unit // Removed
 ) {
     Scaffold(
         topBar = {
@@ -62,7 +65,7 @@ private fun CreditsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                 },
-                onBackClick = onBackClick
+                onBackClick = { NavManager.navigateUp() } // Use NavManager
             )
         }
     ) { paddingValues ->
@@ -70,15 +73,15 @@ private fun CreditsScreen(
             when (details) {
                 is ContentDetailUiState.Movie -> {
                     CreditsLazyColumn(
-                        credits = details.data.credits,
-                        onItemClick = onItemClick
+                        credits = details.data.credits
+                        // onItemClick is handled in CreditsLazyColumn
                     )
                 }
 
                 is ContentDetailUiState.TV -> {
                     CreditsLazyColumn(
-                        credits = details.data.credits,
-                        onItemClick = onItemClick
+                        credits = details.data.credits
+                        // onItemClick is handled in CreditsLazyColumn
                     )
                 }
 
@@ -91,8 +94,8 @@ private fun CreditsScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CreditsLazyColumn(
-    credits: Credits,
-    onItemClick: (String) -> Unit
+    credits: Credits
+    // onItemClick: (String) -> Unit // Removed, handled in CreditsItem
 ) {
     LazyColumn(
         modifier = Modifier
@@ -111,7 +114,7 @@ private fun CreditsLazyColumn(
                 role = it.character,
                 imagePath = it.profilePath,
                 onItemClick = {
-                    onItemClick("${it.id},${MediaType.PERSON}")
+                    NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.PERSON.name)) // Use NavManager
                 }
             )
         }
@@ -135,7 +138,7 @@ private fun CreditsLazyColumn(
                         role = it.job,
                         imagePath = it.profilePath,
                         onItemClick = {
-                            onItemClick("${it.id},${MediaType.PERSON}")
+                            NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.PERSON.name)) // Use NavManager
                         }
                     )
                 }

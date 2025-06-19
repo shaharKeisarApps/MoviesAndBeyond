@@ -24,14 +24,17 @@ import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
 
 private val horizontalPadding = 8.dp
 
+// This ItemsRoute is assumed to be called from NavDisplay when the key is TvItemsKey(categoryName)
 @Composable
 fun ItemsRoute(
     categoryName: String,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit,
+    // onItemClick: (String) -> Unit, // Removed
+    // onBackClick: () -> Unit, // Removed
     viewModel: TvShowsViewModel
 ) {
     val category = enumValueOf<TvShowListCategory>(categoryName)
@@ -50,9 +53,8 @@ fun ItemsRoute(
     ItemsScreen(
         content = content,
         categoryDisplayName = categoryDisplayName,
-        appendItems = viewModel::appendItems,
-        onItemClick = { onItemClick("$it,${MediaType.TV}") },
-        onBackClick = onBackClick
+        appendItems = viewModel::appendItems
+        // onItemClick and onBackClick are handled directly
     )
 }
 
@@ -61,9 +63,9 @@ fun ItemsRoute(
 internal fun ItemsScreen(
     content: ContentUiState,
     categoryDisplayName: String,
-    appendItems: (TvShowListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    appendItems: (TvShowListCategory) -> Unit
+    // onItemClick: (String) -> Unit, // Removed
+    // onBackClick: () -> Unit // Removed
 ) {
     Scaffold(
         topBar = {
@@ -74,7 +76,7 @@ internal fun ItemsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                 },
-                onBackClick = onBackClick
+                onBackClick = { NavManager.navigateUp() } // Use NavManager
             )
         }
     ) { paddingValues ->
@@ -97,7 +99,7 @@ internal fun ItemsScreen(
                 ) {
                     MediaItemCard(
                         posterPath = it.imagePath,
-                        onItemClick = { onItemClick("${it.id},${MediaType.TV}") },
+                        onItemClick = { NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) }, // Use NavManager
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)

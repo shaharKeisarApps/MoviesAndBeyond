@@ -26,6 +26,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
+import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import kotlinx.coroutines.launch
@@ -34,8 +36,8 @@ private val horizontalPadding = 8.dp
 
 @Composable
 internal fun FeedRoute(
-    navigateToDetails: (String) -> Unit,
-    navigateToItems: (String) -> Unit,
+    // navigateToDetails: (String) -> Unit, // Removed
+    navigateToItems: (String) -> Unit, // For TvItemsScreen, kept from tvShowsScreen
     viewModel: TvShowsViewModel
 ) {
     val airingTodayTvShows by viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
@@ -51,8 +53,8 @@ internal fun FeedRoute(
         popularTvShows = popularTvShows,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        onItemClick = navigateToDetails,
-        onSeeAllClick = navigateToItems,
+        // onItemClick is now handled directly in ContentSection using NavManager
+        onSeeAllClick = navigateToItems, // For TvItemsScreen
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -65,8 +67,8 @@ internal fun FeedScreen(
     popularTvShows: ContentUiState,
     errorMessage: String?,
     appendItems: (TvShowListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit,
+    // onItemClick: (String) -> Unit, // Removed
+    onSeeAllClick: (String) -> Unit, // For TvItemsScreen
     onErrorShown: () -> Unit
 ) {
     val snackbarState = remember { SnackbarHostState() }
@@ -92,7 +94,7 @@ internal fun FeedScreen(
                     content = airingTodayTvShows,
                     sectionName = stringResource(id = R.string.airing_today),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -101,7 +103,7 @@ internal fun FeedScreen(
                     content = onAirTvShows,
                     sectionName = stringResource(id = R.string.on_air),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -110,7 +112,7 @@ internal fun FeedScreen(
                     content = topRatedTvShows,
                     sectionName = stringResource(id = R.string.top_rated),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -119,7 +121,7 @@ internal fun FeedScreen(
                     content = popularTvShows,
                     sectionName = stringResource(id = R.string.popular),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -132,8 +134,8 @@ private fun ContentSection(
     content: ContentUiState,
     sectionName: String,
     appendItems: (TvShowListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit
+    // onItemClick: (String) -> Unit, // Removed
+    onSeeAllClick: (String) -> Unit // For TvItemsScreen
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -157,7 +159,7 @@ private fun ContentSection(
                 MediaItemCard(
                     posterPath = it.imagePath,
                     onItemClick = {
-                        onItemClick("${it.id},${MediaType.TV}")
+                        NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) // Use NavManager
                     }
                 )
             }
