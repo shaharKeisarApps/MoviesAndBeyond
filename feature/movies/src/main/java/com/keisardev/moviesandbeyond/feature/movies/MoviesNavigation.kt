@@ -12,9 +12,9 @@ import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fi
 // import androidx.navigation.navArgument
 // import androidx.navigation.navigation
 
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey // Assuming this key
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey // For lambda signature
 
 // const val moviesNavigationRoute = "movies" // No longer used
 
@@ -24,19 +24,15 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey
 // Internal navigation is handled by NavManager.
 @Composable
 fun moviesScreen(
-    // navController: NavController, // Removed
-    // navigateToDetails: (itemId: String, itemType: String) -> Unit // Removed, will use NavManager from within
-    // The Hilt ViewModel can be injected here or within FeedRoute/ItemsRoute directly
-    viewModel: MoviesViewModel = hiltViewModel() // ViewModel can be hoisted or directly used in sub-composables
+    viewModel: MoviesViewModel = hiltViewModel(),
+    navigateToDetails: (DetailsKey) -> Unit,
+    navigateToItems: (MoviesItemsKey) -> Unit
 ) {
     // For this refactor, moviesScreen will directly show FeedRoute.
-    // If MoviesKey was meant to show a screen that then allows navigation to Feed or Items,
-    // that logic would be here.
-    // The original navigation graph had FEED as the start destination for the "movies" route.
     FeedRoute(
-        // navigateToDetails is handled by NavManager from where the click occurs
-        navigateToItems = { category ->
-            NavManager.navigateTo(MoviesItemsKey(category = category))
+        navigateToDetails = navigateToDetails, // Pass lambda down
+        navigateToItems = { category ->        // Adapt to create MoviesItemsKey
+            navigateToItems(MoviesItemsKey(category = category))
         },
         viewModel = viewModel
     )

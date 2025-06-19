@@ -24,8 +24,8 @@ import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 
 private val horizontalPadding = 8.dp
 
@@ -33,8 +33,8 @@ private val horizontalPadding = 8.dp
 @Composable
 fun ItemsRoute(
     categoryName: String,
-    // onItemClick: (String) -> Unit, // Removed
-    // onBackClick: () -> Unit, // Removed
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onBackClick: () -> Unit, // Added
     viewModel: TvShowsViewModel
 ) {
     val category = enumValueOf<TvShowListCategory>(categoryName)
@@ -53,8 +53,9 @@ fun ItemsRoute(
     ItemsScreen(
         content = content,
         categoryDisplayName = categoryDisplayName,
-        appendItems = viewModel::appendItems
-        // onItemClick and onBackClick are handled directly
+        appendItems = viewModel::appendItems,
+        onItemClick = onItemClick, // Pass down
+        onBackClick = onBackClick  // Pass down
     )
 }
 
@@ -63,9 +64,9 @@ fun ItemsRoute(
 internal fun ItemsScreen(
     content: ContentUiState,
     categoryDisplayName: String,
-    appendItems: (TvShowListCategory) -> Unit
-    // onItemClick: (String) -> Unit, // Removed
-    // onBackClick: () -> Unit // Removed
+    appendItems: (TvShowListCategory) -> Unit,
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onBackClick: () -> Unit // Added
 ) {
     Scaffold(
         topBar = {
@@ -76,7 +77,7 @@ internal fun ItemsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                 },
-                onBackClick = { NavManager.navigateUp() } // Use NavManager
+                onBackClick = onBackClick // Use passed lambda
             )
         }
     ) { paddingValues ->
@@ -99,7 +100,7 @@ internal fun ItemsScreen(
                 ) {
                     MediaItemCard(
                         posterPath = it.imagePath,
-                        onItemClick = { NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) }, // Use NavManager
+                        onItemClick = { onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) }, // Use passed lambda
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)

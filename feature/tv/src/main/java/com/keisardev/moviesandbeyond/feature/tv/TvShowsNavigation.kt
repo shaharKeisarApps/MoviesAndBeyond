@@ -11,9 +11,9 @@ import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fi
 // import androidx.navigation.navArgument
 // import androidx.navigation.navigation
 
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvItemsKey // Assuming this key
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvItemsKey // For lambda signature
 
 // private const val tvShowsNavigationRoute = "tv_shows" // No longer used
 
@@ -21,15 +21,15 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvItemsKey // 
 // called from the app's NavDisplay.
 @Composable
 fun tvShowsScreen(
-    // navigateToDetails: (itemId: String, itemType: String) -> Unit, // Removed, will use NavManager from within
-    viewModel: TvShowsViewModel = hiltViewModel()
+    viewModel: TvShowsViewModel = hiltViewModel(),
+    navigateToDetails: (DetailsKey) -> Unit, // Added
+    navigateToItems: (TvItemsKey) -> Unit // Added
 ) {
     // Similar to moviesScreen, tvShowsScreen will directly show FeedRoute.
-    // The original navigation graph had FEED as the start destination for "tv_shows" route.
     FeedRoute(
-        // navigateToDetails is handled by NavManager from where the click occurs
-        navigateToItems = { category ->
-            NavManager.navigateTo(TvItemsKey(category = category)) // Use TvItemsKey
+        navigateToDetails = navigateToDetails, // Pass down
+        navigateToItems = { category ->      // Adapt to create TvItemsKey
+            navigateToItems(TvItemsKey(category = category))
         },
         viewModel = viewModel
     )

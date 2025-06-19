@@ -26,8 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvItemsKey // For lambda signature
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import kotlinx.coroutines.launch
@@ -36,8 +37,8 @@ private val horizontalPadding = 8.dp
 
 @Composable
 internal fun FeedRoute(
-    // navigateToDetails: (String) -> Unit, // Removed
-    navigateToItems: (String) -> Unit, // For TvItemsScreen, kept from tvShowsScreen
+    navigateToDetails: (DetailsKey) -> Unit, // Added
+    navigateToItems: (TvItemsKey) -> Unit, // Changed to TvItemsKey
     viewModel: TvShowsViewModel
 ) {
     val airingTodayTvShows by viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
@@ -53,8 +54,8 @@ internal fun FeedRoute(
         popularTvShows = popularTvShows,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        // onItemClick is now handled directly in ContentSection using NavManager
-        onSeeAllClick = navigateToItems, // For TvItemsScreen
+        onItemClick = navigateToDetails, // Pass down
+        onSeeAllClick = navigateToItems, // Pass down
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -67,8 +68,8 @@ internal fun FeedScreen(
     popularTvShows: ContentUiState,
     errorMessage: String?,
     appendItems: (TvShowListCategory) -> Unit,
-    // onItemClick: (String) -> Unit, // Removed
-    onSeeAllClick: (String) -> Unit, // For TvItemsScreen
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onSeeAllClick: (TvItemsKey) -> Unit, // Changed to TvItemsKey
     onErrorShown: () -> Unit
 ) {
     val snackbarState = remember { SnackbarHostState() }
@@ -134,8 +135,8 @@ private fun ContentSection(
     content: ContentUiState,
     sectionName: String,
     appendItems: (TvShowListCategory) -> Unit,
-    // onItemClick: (String) -> Unit, // Removed
-    onSeeAllClick: (String) -> Unit // For TvItemsScreen
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onSeeAllClick: (TvItemsKey) -> Unit // Changed to TvItemsKey
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -147,7 +148,7 @@ private fun ContentSection(
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(content.category.name) },
+                onSeeAllClick = { onSeeAllClick(TvItemsKey(content.category.name)) }, // Use lambda
                 modifier = Modifier.padding(horizontal = horizontalPadding)
             )
         },
@@ -159,7 +160,7 @@ private fun ContentSection(
                 MediaItemCard(
                     posterPath = it.imagePath,
                     onItemClick = {
-                        NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) // Use NavManager
+                        onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) // Use lambda
                     }
                 )
             }

@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.runtime.collectAsState
+// import androidx.compose.runtime.collectAsState // May not be needed if backStack properties are states
 // import androidx.navigation.NavController // Not needed
 // import androidx.navigation.NavDestination // Not needed
 // import androidx.navigation.NavDestination.Companion.hierarchy // Not needed
@@ -28,12 +28,17 @@ import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNavigation
 // Import NavManager and Keys
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavKey // Added
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys // Assuming this is where all keys are
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesKey
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.OnboardingKey // Added
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvShowsKey
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.SearchKey
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.YouKey
+// Assuming rememberNavBackStack is from this package or similar
+import androidx.navigation3.ui.rememberNavBackStack
+import androidx.navigation3.NavBackStack // Assuming this is the type
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -49,7 +54,8 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 // Hypothetical extension property/function to map enum to key
 // This would ideally be in NavigationKeys.kt or a similar utility file.
 // For now, conceptualizing it here for the purpose of refactoring MoviesAndBeyondApp.
-val MoviesAndBeyondDestination.navigationKey: Any
+// This should ideally live with NavigationKeys or MoviesAndBeyondDestination
+val MoviesAndBeyondDestination.navigationKey: NavKey
     get() = when (this) {
         MoviesAndBeyondDestination.MOVIES -> MoviesKey
         MoviesAndBeyondDestination.TV_SHOWS -> TvShowsKey
@@ -60,15 +66,16 @@ val MoviesAndBeyondDestination.navigationKey: Any
 @Composable
 fun MoviesAndBeyondApp(
     hideOnboarding: Boolean,
-    // navController: NavHostController = rememberNavController() // Removed
 ) {
     val hazeState = remember { HazeState() }
     val inputScale: HazeInputScale = HazeInputScale.Auto
     val style = CupertinoMaterials.ultraThin()
 
+    val initialKey: NavKey = if (hideOnboarding) MoviesKey else OnboardingKey
+    val backStack = rememberNavBackStack(initialKey = initialKey) // Use new NavBackStack
+
     val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
-    val currentBackStack by NavManager.backStack.collectAsState()
-    val currentKey = currentBackStack.lastOrNull()
+    val currentKey = backStack.lastOrNull() // Get current key from new backStack
 
     val showBottomBar = bottomBarDestinations.any { destination ->
         currentKey == destination.navigationKey
@@ -80,10 +87,9 @@ fun MoviesAndBeyondApp(
             if (showBottomBar)
             MoviesAndBeyondNavigationBar(
                 destinations = bottomBarDestinations,
-                currentKey = currentKey, // Pass currentKey
+                currentKey = currentKey,
                 onNavigateToDestination = { destination ->
-                    // Use replaceAll for bottom bar navigation as per prompt
-                    NavManager.replaceAll(destination.navigationKey)
+                    backStack.replaceAll(destination.navigationKey) // Use new backStack for navigation
                 },
                 modifier = Modifier
                     .hazeEffect(state = hazeState, style = style)
@@ -92,10 +98,13 @@ fun MoviesAndBeyondApp(
         },
         contentWindowInsets = WindowInsets.safeDrawing
     ) { padding ->
+        // MoviesAndBeyondNavigation needs to accept NavBackStack and paddingValues
+        // hideOnboarding is used for initialKey, so might not be needed by MoviesAndBeyondNavigation directly
+        // for start destination logic anymore.
         MoviesAndBeyondNavigation(
-            hideOnboarding = hideOnboarding,
-            // navController = navController, // Removed
+            backStack = backStack,
             paddingValues = padding
+            // hideOnboarding = hideOnboarding, // Potentially remove if only used for start dest
         )
     }
 }
@@ -103,7 +112,7 @@ fun MoviesAndBeyondApp(
 @Composable
 fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
-    currentKey: Any?, // Changed from NavDestination
+    currentKey: NavKey?, // Changed to NavKey?
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {

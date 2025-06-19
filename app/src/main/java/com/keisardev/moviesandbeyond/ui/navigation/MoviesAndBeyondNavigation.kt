@@ -2,94 +2,134 @@ package com.keisardev.moviesandbeyond.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-// Assuming NavDisplay and entry are from androidx.navigation3.ui
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.entry
+// import androidx.navigation3.NavBackStack // To be replaced with SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateList // Import for backStack type
 import com.keisardev.moviesandbeyond.feature.auth.authScreen
-// import com.keisardev.moviesandbeyond.feature.auth.navigateToAuth // Will use NavManager
 import com.keisardev.moviesandbeyond.feature.details.detailsScreen
-// import com.keisardev.moviesandbeyond.feature.details.navigateToDetails // Will use NavManager
-// import com.keisardev.moviesandbeyond.feature.movies.moviesNavigationRoute // Routes are now keys
+// Import hiltViewModel for cases where ViewModel is instantiated here
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.keisardev.moviesandbeyond.feature.movies.moviesScreen
 import com.keisardev.moviesandbeyond.feature.search.searchScreen
 import com.keisardev.moviesandbeyond.feature.tv.tvShowsScreen
 import com.keisardev.moviesandbeyond.feature.you.youScreen
 import com.keisardev.moviesandbeyond.ui.OnboardingScreen
-// import com.keisardev.moviesandbeyond.ui.onboardingNavigationRoute // Routes are now keys
 
 // Import NavManager and assumed keys
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.OnboardingKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvShowsKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.SearchKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.YouKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavKey
+import com.keisardev.moviesandbeyond.ui.navigation.OnboardingKey
+import com.keisardev.moviesandbeyond.ui.navigation.AuthKey
+// Ensure all necessary keys are imported
+import com.keisardev.moviesandbeyond.ui.navigation.MoviesKey
+import com.keisardev.moviesandbeyond.ui.navigation.MoviesItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.TvShowsKey
+import com.keisardev.moviesandbeyond.ui.navigation.TvItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.SearchKey
+import com.keisardev.moviesandbeyond.ui.navigation.YouKey
+import com.keisardev.moviesandbeyond.ui.navigation.LibraryItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.MoviesKey
+import com.keisardev.moviesandbeyond.ui.navigation.MoviesItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.TvShowsKey
+import com.keisardev.moviesandbeyond.ui.navigation.TvItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.SearchKey
+import com.keisardev.moviesandbeyond.ui.navigation.YouKey
+import com.keisardev.moviesandbeyond.ui.navigation.LibraryItemsKey
+import com.keisardev.moviesandbeyond.ui.navigation.DetailsKey
+import com.keisardev.moviesandbeyond.ui.navigation.CreditsKey
+// Assuming backStack manipulation extensions are in a runtime package
+// For example: import androidx.navigation3.runtime.*
 
 @Composable
 fun MoviesAndBeyondNavigation(
-    hideOnboarding: Boolean,
-    // navController: NavHostController, // Removed
+    backStack: SnapshotStateList<NavKey>, // Changed parameter type
     paddingValues: PaddingValues
 ) {
-    // Initialize NavManager based on hideOnboarding.
-    // This is a temporary placement as per prompt. Ideally, this is done once in a ViewModel or app init.
-    LaunchedEffect(hideOnboarding) {
-        if (hideOnboarding) {
-            NavManager.replaceAll(MoviesKey)
-        } else {
-            NavManager.replaceAll(OnboardingKey)
-        }
-    }
-
-    val backStackEntries by NavManager.backStack.collectAsState()
-
     NavDisplay(
         modifier = Modifier.padding(paddingValues),
-        backStack = backStackEntries, // Pass collected back stack
+        navBackStack = backStack, // Pass SnapshotStateList
         entryProvider = {
             entry<OnboardingKey> {
-                OnboardingScreen(navigateToAuth = { NavManager.navigateTo(AuthKey) })
+                OnboardingScreen(navigateToAuth = { backStack.add(AuthKey) })
             }
             entry<AuthKey> {
-                authScreen(onBackClick = { NavManager.navigateUp() })
+                authScreen(onBackClick = { backStack.removeLastOrNull() }) // Pass lambda
             }
             entry<MoviesKey> {
                 moviesScreen(
-                    navController = null, // Or refactor moviesScreen
-                    navigateToDetails = { itemId, itemType -> NavManager.navigateTo(DetailsKey(itemId = itemId, itemType = itemType)) }
+                    navigateToDetails = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) },
+                    navigateToItems = { category -> backStack.add(MoviesItemsKey(category)) }
+                )
+            }
+            entry<MoviesItemsKey> { key ->
+                com.keisardev.moviesandbeyond.feature.movies.ItemsRoute(
+                    categoryName = key.category,
+                    // Lambdas for navigation from MoviesItemsScreen
+                    onItemClick = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) },
+                    onBackClick = { backStack.removeLastOrNull() }
+                    // viewModel = hiltViewModel() // ViewModel is often instantiated within the Route itself
                 )
             }
             entry<TvShowsKey> {
                 tvShowsScreen(
-                    navController = null, // Or refactor tvShowsScreen
-                    navigateToDetails = { itemId, itemType -> NavManager.navigateTo(DetailsKey(itemId = itemId, itemType = itemType)) }
+                    navigateToDetails = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) },
+                    navigateToItems = { category -> backStack.add(TvItemsKey(category)) }
+                )
+            }
+            entry<TvItemsKey> { key ->
+                com.keisardev.moviesandbeyond.feature.tv.ItemsRoute(
+                    categoryName = key.category,
+                    // Lambdas for navigation from TvItemsScreen
+                    onItemClick = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) },
+                    onBackClick = { backStack.removeLastOrNull() }
+                    // viewModel = hiltViewModel()
                 )
             }
             entry<SearchKey> {
                 searchScreen(
-                    navigateToDetail = { itemId, itemType -> NavManager.navigateTo(DetailsKey(itemId = itemId, itemType = itemType)) }
+                    navigateToDetail = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) }
                 )
             }
             entry<YouKey> {
                 youScreen(
-                    navController = null, // Or refactor youScreen
-                    navigateToAuth = { NavManager.navigateTo(AuthKey) },
-                    navigateToDetails = { itemId, itemType -> NavManager.navigateTo(DetailsKey(itemId = itemId, itemType = itemType)) }
+                    navigateToAuth = { backStack.add(AuthKey) },
+                    navigateToLibraryItem = { type -> backStack.add(LibraryItemsKey(type)) }
+                    // navigateToDetails is likely handled within LibraryItemsScreen
                 )
             }
-            entry<DetailsKey> { key -> // The key itself is available
+            entry<LibraryItemsKey> { key ->
+                com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute(
+                    // type is usually from key, ViewModel gets it from SavedStateHandle
+                    // Lambdas for navigation from LibraryItemsScreen
+                    onBackClick = { backStack.removeLastOrNull() },
+                    navigateToDetails = { itemId, itemType -> backStack.add(DetailsKey(itemId, itemType)) }
+                    // viewModel = hiltViewModel()
+                )
+            }
+            entry<DetailsKey> { key ->
                 detailsScreen(
-                    navController = null, // Or refactor detailsScreen
-                    navigateToAuth = { NavManager.navigateTo(AuthKey) },
                     itemId = key.itemId,
-                    itemType = key.itemType
+                    itemType = key.itemType,
+                    // Lambdas for navigation from DetailsScreen
+                    onBackClick = { backStack.removeLastOrNull() },
+                    navigateToDetails = { newDetailsKey -> backStack.add(newDetailsKey) },
+                    navigateToCredits = { creditsKey -> backStack.add(creditsKey) },
+                    navigateToAuth = { backStack.add(AuthKey) }
+                    // viewModel = hiltViewModel()
+                )
+            }
+            entry<CreditsKey> { key ->
+                com.keisardev.moviesandbeyond.feature.details.CreditsRoute(
+                    // itemId = key.itemId, itemType = key.itemType are usually for ViewModel via SavedStateHandle
+                    // Lambdas for navigation from CreditsScreen
+                    onBackClick = { backStack.removeLastOrNull() },
+                    navigateToPersonDetails = { detailsKey -> backStack.add(detailsKey) }
+                    // viewModel = hiltViewModel()
                 )
             }
         }

@@ -44,10 +44,10 @@ import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.details.content.MovieDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.PersonDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.TvShowDetailsContent
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.CreditsKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.CreditsKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 import kotlinx.coroutines.launch
 
 internal val horizontalPadding = 8.dp
@@ -55,11 +55,12 @@ internal val verticalPadding = 4.dp
 
 @Composable
 internal fun DetailsRoute(
-    // onItemClick: (String) -> Unit, // Removed
-    // onSeeAllCastClick: () -> Unit, // Removed
-    // navigateToAuth: () -> Unit, // Removed
-    // onBackClick: () -> Unit, // Removed
-    viewModel: DetailsViewModel // itemId and itemType are in ViewModel via SavedStateHandle
+    viewModel: DetailsViewModel, // itemId and itemType are in ViewModel via SavedStateHandle
+    // Navigation lambdas passed from detailsScreen (in DetailsNavigation.kt)
+    onBackClick: () -> Unit,
+    onItemClick: (DetailsKey) -> Unit, // For person details, related media
+    onSeeAllCastClick: (CreditsKey) -> Unit,
+    navigateToAuth: (AuthKey) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val contentDetailsUiState by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
@@ -67,12 +68,16 @@ internal fun DetailsRoute(
     DetailsScreen(
         uiState = uiState,
         contentDetailsUiState = contentDetailsUiState,
-        viewModel = viewModel, // Pass ViewModel to access itemId and itemType if needed for navigation
+        viewModel = viewModel,
         onHideBottomSheet = viewModel::onHideBottomSheet,
         onErrorShown = viewModel::onErrorShown,
         onFavoriteClick = viewModel::addOrRemoveFavorite,
-        onWatchlistClick = viewModel::addOrRemoveFromWatchlist
-        // onItemClick, onSeeAllCastClick, onSignInClick, onBackClick are now handled by NavManager
+        onWatchlistClick = viewModel::addOrRemoveFromWatchlist,
+        // Pass navigation lambdas down
+        onBackClick = onBackClick,
+        onItemClick = onItemClick,
+        onSeeAllCastClick = onSeeAllCastClick,
+        onSignInClick = navigateToAuth
     )
 }
 
@@ -81,15 +86,16 @@ internal fun DetailsRoute(
 internal fun DetailsScreen(
     uiState: DetailsUiState,
     contentDetailsUiState: ContentDetailUiState,
-    viewModel: DetailsViewModel, // To get current itemId and itemType for CreditsKey and others
+    viewModel: DetailsViewModel,
     onHideBottomSheet: () -> Unit,
     onErrorShown: () -> Unit,
     onFavoriteClick: (LibraryItem) -> Unit,
-    onWatchlistClick: (LibraryItem) -> Unit
-    // onItemClick: (String) -> Unit, // Removed
-    // onSeeAllCastClick: () -> Unit, // Removed
-    // onSignInClick: () -> Unit, // Removed
-    // onBackClick: () -> Unit // Removed
+    onWatchlistClick: (LibraryItem) -> Unit,
+    // Navigation Lambdas
+    onBackClick: () -> Unit,
+    onItemClick: (DetailsKey) -> Unit,
+    onSeeAllCastClick: (CreditsKey) -> Unit,
+    onSignInClick: (AuthKey) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -145,7 +151,7 @@ internal fun DetailsScreen(
                                 }.invokeOnCompletion {
                                     onHideBottomSheet()
                                 }
-                                NavManager.navigateTo(AuthKey) // Use NavManager
+                                onSignInClick(AuthKey) // Use passed lambda
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -192,9 +198,9 @@ internal fun DetailsScreen(
                         isAddedToWatchList = uiState.savedInWatchlist,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = { NavManager.navigateTo(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
-                        onCastClick = { actorId -> NavManager.navigateTo(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
-                        onRecommendationClick = { mediaId -> NavManager.navigateTo(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
+                        onSeeAllCastClick = { onSeeAllCastClick(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
+                        onCastClick = { actorId -> onItemClick(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
+                        onRecommendationClick = { mediaId -> onItemClick(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
                         onBackdropCollapse = {
                             isBackdropImageCollapsed = it
                         }
@@ -208,9 +214,9 @@ internal fun DetailsScreen(
                         isAddedToWatchList = uiState.savedInWatchlist,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = { NavManager.navigateTo(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
-                        onCastClick = { actorId -> NavManager.navigateTo(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
-                        onRecommendationClick = { mediaId -> NavManager.navigateTo(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
+                        onSeeAllCastClick = { onSeeAllCastClick(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
+                        onCastClick = { actorId -> onItemClick(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
+                        onRecommendationClick = { mediaId -> onItemClick(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
                         onBackdropCollapse = {
                             isBackdropImageCollapsed = it
                         }
@@ -220,7 +226,7 @@ internal fun DetailsScreen(
                 is ContentDetailUiState.Person -> {
                     PersonDetailsContent(
                         personDetails = contentDetailsUiState.data,
-                        onBackClick = { NavManager.navigateUp() }, // Use NavManager
+                        onBackClick = onBackClick, // Use passed lambda
                         modifier = Modifier.padding(
                             horizontal = horizontalPadding,
                             vertical = 6.dp
@@ -237,7 +243,7 @@ internal fun DetailsScreen(
                         is ContentDetailUiState.TV -> contentDetailsUiState.data.name
                         else -> ""
                     },
-                    onBackClick = { NavManager.navigateUp() } // Use NavManager
+                    onBackClick = onBackClick // Use passed lambda
                 )
             }
         }
@@ -249,7 +255,7 @@ internal fun DetailsScreen(
 private fun DetailsTopAppBar(
     showTitle: Boolean,
     title: String,
-    onBackClick: () -> Unit // This will be NavManager.navigateUp()
+    onBackClick: () -> Unit // This will be the passed onBackClick lambda
 ) {
     TopAppBarWithBackButton(
         title = {
@@ -265,7 +271,7 @@ private fun DetailsTopAppBar(
             containerColor = Color.Black.copy(alpha = 0.5f),
             contentColor = Color.White
         ),
-        onBackClick = onBackClick // This is already a lambda, will be NavManager.navigateUp()
+        onBackClick = onBackClick // Use passed lambda
     )
 }
 

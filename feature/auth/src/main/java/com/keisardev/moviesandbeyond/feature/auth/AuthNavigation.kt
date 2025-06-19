@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 // import androidx.navigation.NavController // Removed
 // import androidx.navigation.NavGraphBuilder // Removed
 // import androidx.navigation.compose.composable // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 
 // private const val authScreenNavigationRoute = "auth" // Removed
 
@@ -12,10 +12,9 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavManager
 // called from NavDisplay when AuthKey is active.
 @Composable
 fun authScreen(
-    // onBackClick: () -> Unit, // Replaced by direct NavManager call in AuthRoute/AuthScreen
+    onNavigateUp: () -> Unit // Changed to accept lambda
 ) {
-    // AuthRoute will now handle its own back navigation via NavManager
-    AuthRoute(onBackClick = { NavManager.navigateUp() })
+    AuthRoute(onBackClick = onNavigateUp) // Pass lambda to AuthRoute
 }
 
 // fun NavController.navigateToAuth() { // Removed

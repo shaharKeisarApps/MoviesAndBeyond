@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 // import androidx.navigation.navigation
 // import com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute // This will be handled by NavDisplay
 
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.LibraryItemsKey // Assuming this key
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.LibraryItemsKey // For lambda signature
 
 // Old route constants are no longer needed here
 // private const val youNavigationGraphRoute = "you_nav_graph"
@@ -25,11 +25,12 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.LibraryItemsKe
 // called from NavDisplay when YouKey is active.
 @Composable
 fun youScreen(
-    // navigateToAuth and navigateToDetails are handled by NavManager from within YouRoute
+    navigateToAuth: (AuthKey) -> Unit, // Added parameter
+    navigateToLibraryItem: (LibraryItemsKey) -> Unit // Added parameter
 ) {
     YouRoute(
-        navigateToAuth = { NavManager.navigateTo(AuthKey) },
-        navigateToLibraryItem = { itemType -> NavManager.navigateTo(LibraryItemsKey(type = itemType)) }
+        navigateToAuth = { navigateToAuth(AuthKey) }, // Call passed lambda
+        navigateToLibraryItem = { itemType -> navigateToLibraryItem(LibraryItemsKey(type = itemType)) } // Call passed lambda
         // navigateToDetails is handled within LibraryItemsScreen or directly if YouScreen shows items
     )
 }

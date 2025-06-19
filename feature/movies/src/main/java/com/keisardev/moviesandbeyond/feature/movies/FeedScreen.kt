@@ -29,17 +29,20 @@ import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey // For lambda signature
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
 
-import com.keisardev.moviesandbeyond.ui.navigation.NavManager
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Already removed in previous visualization
+// import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // Already present
 
 @Composable
 internal fun FeedRoute(
-    // navigateToDetails: (String) -> Unit, // Removed
-    navigateToItems: (String) -> Unit, // This is for navigating to MoviesItemsScreen, kept for now from moviesScreen
+    navigateToDetails: (DetailsKey) -> Unit, // Added
+    navigateToItems: (MoviesItemsKey) -> Unit, // Changed to MoviesItemsKey
     viewModel: MoviesViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -56,8 +59,8 @@ internal fun FeedRoute(
         upcomingMovies = upcomingMovies,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        // onItemClick is now handled directly in ContentSection using NavManager
-        onSeeAllClick = navigateToItems, // This is for navigating to MoviesItemsScreen
+        onItemClick = navigateToDetails, // Pass down
+        onSeeAllClick = navigateToItems, // Pass down
         onErrorShown = viewModel::onErrorShown,
         modifier = modifier
     )
@@ -71,8 +74,8 @@ internal fun FeedScreen(
     upcomingMovies: ContentUiState,
     errorMessage: String?,
     appendItems: (MovieListCategory) -> Unit,
-    // onItemClick: (String) -> Unit, // Removed from signature, handled in ContentSection
-    onSeeAllClick: (String) -> Unit, // This is for navigating to MoviesItemsScreen
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onSeeAllClick: (MoviesItemsKey) -> Unit, // Changed to MoviesItemsKey
     onErrorShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -181,8 +184,8 @@ private fun ContentSection(
     content: ContentUiState,
     sectionName: String,
     appendItems: (MovieListCategory) -> Unit,
-    // onItemClick: (String) -> Unit, // Removed, handled directly below
-    onSeeAllClick: (String) -> Unit // This is for navigating to MoviesItemsScreen
+    onItemClick: (DetailsKey) -> Unit, // Added
+    onSeeAllClick: (MoviesItemsKey) -> Unit // Changed to MoviesItemsKey
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -194,7 +197,7 @@ private fun ContentSection(
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(content.category.name) },
+                onSeeAllClick = { onSeeAllClick(MoviesItemsKey(content.category.name)) }, // Use lambda
                 modifier = Modifier.padding(horizontal = horizontalPadding)
             )
         },
@@ -206,8 +209,7 @@ private fun ContentSection(
                 MediaItemCard(
                     posterPath = it.imagePath,
                     onItemClick = {
-                        // Directly use NavManager here
-                        NavManager.navigateTo(DetailsKey(itemId = it.id.toString(), itemType = MediaType.MOVIE.name))
+                        onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.MOVIE.name)) // Use lambda
                     }
                 )
             }
