@@ -1,9 +1,7 @@
-package com.keisardev.moviesandbeyond.ui.navigation
+package com.keisardev.moviesandbeyond.core.model
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-
-@Serializable
-sealed interface NavKey
 
 @Serializable
 object OnboardingKey : NavKey
@@ -33,7 +31,7 @@ object YouKey : NavKey // Main entry for You/Profile feature
 data class LibraryItemsKey(val type: String) : NavKey // e.g., "favorites" or "watchlist"
 
 @Serializable
-data class DetailsKey(val itemId: String, val itemType: String) : NavKey
+data class DetailsKey(val itemId: String) : NavKey
 
 @Serializable
-data class CreditsKey(val itemId: String, val itemType: String) : NavKey
+data class CreditsKey(val itemId: String) : NavKey

@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.tv
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,14 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 
 private val horizontalPadding = 8.dp
 
@@ -33,9 +33,9 @@ private val horizontalPadding = 8.dp
 @Composable
 fun ItemsRoute(
     categoryName: String,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onBackClick: () -> Unit, // Added
-    viewModel: TvShowsViewModel
+    onItemClick: (String) -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: TvShowsViewModel = hiltViewModel()
 ) {
     val category = enumValueOf<TvShowListCategory>(categoryName)
     val content by when (category) {
@@ -54,8 +54,9 @@ fun ItemsRoute(
         content = content,
         categoryDisplayName = categoryDisplayName,
         appendItems = viewModel::appendItems,
-        onItemClick = onItemClick, // Pass down
-        onBackClick = onBackClick  // Pass down
+        onItemClick = { onItemClick("$it,${MediaType.TV}") },
+        onBackClick = onBackClick
+
     )
 }
 
@@ -65,8 +66,8 @@ internal fun ItemsScreen(
     content: ContentUiState,
     categoryDisplayName: String,
     appendItems: (TvShowListCategory) -> Unit,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onBackClick: () -> Unit // Added
+    onItemClick: (String) -> Unit,
+    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -100,7 +101,7 @@ internal fun ItemsScreen(
                 ) {
                     MediaItemCard(
                         posterPath = it.imagePath,
-                        onItemClick = { onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.TV.name)) }, // Use passed lambda
+                        onItemClick = { onItemClick("${it.id},${MediaType.TV}") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)

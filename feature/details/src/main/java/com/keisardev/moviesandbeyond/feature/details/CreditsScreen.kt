@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.details
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,20 +25,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 
 
 // CreditsRoute is assumed to be called from NavDisplay when the key is CreditsKey(itemId, itemType)
 @Composable
-internal fun CreditsRoute(
-    viewModel: DetailsViewModel, // ViewModel provides the data based on itemId/itemType from CreditsKey
+ fun CreditsRoute(
+    viewModel: DetailsViewModel = hiltViewModel(), // ViewModel provides the data based on itemId/itemType from CreditsKey
     onBackClick: () -> Unit, // Added
     navigateToPersonDetails: (DetailsKey) -> Unit // Added
 ) {
@@ -115,7 +115,7 @@ private fun CreditsLazyColumn(
                 role = it.character,
                 imagePath = it.profilePath,
                 onItemClick = {
-                    navigateToPersonDetails(DetailsKey(itemId = it.id.toString(), itemType = MediaType.PERSON.name)) // Use lambda
+                    navigateToPersonDetails(DetailsKey(itemId = it.id.toString())) // Use lambda
                 }
             )
         }
@@ -139,7 +139,7 @@ private fun CreditsLazyColumn(
                         role = it.job,
                         imagePath = it.profilePath,
                         onItemClick = {
-                            navigateToPersonDetails(DetailsKey(itemId = it.id.toString(), itemType = MediaType.PERSON.name)) // Use lambda
+                            navigateToPersonDetails(DetailsKey(itemId = it.id.toString())) // Use lambda
                         }
                     )
                 }

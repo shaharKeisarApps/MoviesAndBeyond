@@ -1,6 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.you
 
-import androidx.compose.runtime.Composable
 // NavController and related imports are removed
 // import androidx.navigation.NavController
 // import androidx.navigation.NavGraphBuilder
@@ -12,14 +11,15 @@ import androidx.compose.runtime.Composable
 // import com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute // This will be handled by NavDisplay
 
 // import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.LibraryItemsKey // For lambda signature
+import androidx.compose.runtime.Composable
+import com.keisardev.moviesandbeyond.core.model.AuthKey
+import com.keisardev.moviesandbeyond.core.model.LibraryItemsKey
 
 // Old route constants are no longer needed here
 // private const val youNavigationGraphRoute = "you_nav_graph"
 // private const val youNavigationRoute = "you"
 // private const val libraryItemsNavigationRoute = "library_items"
-// const val libraryItemTypeNavigationArgument = "type" // ViewModel may use this for SavedStateHandle
+ const val libraryItemTypeNavigationArgument = "type" // ViewModel may use this for SavedStateHandle
 
 // This is the main entry composable for the You feature,
 // called from NavDisplay when YouKey is active.

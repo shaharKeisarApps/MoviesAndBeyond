@@ -1,7 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.details
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fine
 // NavController and related imports are removed
 // import androidx.navigation.NavController
 // import androidx.navigation.NavGraphBuilder
@@ -9,14 +7,16 @@ import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fi
 // import androidx.navigation.navigation
 
 // import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.CreditsKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.keisardev.moviesandbeyond.core.model.AuthKey
+import com.keisardev.moviesandbeyond.core.model.CreditsKey
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 
 // Old route constants are no longer used by this file for defining navigation graph structure
 // private const val detailsNavigationRoute = "details"
 // private const val creditsNavigationRoute = "credits"
-// internal const val idNavigationArgument = "id" // ViewModel uses this for SavedStateHandle
+ internal const val idNavigationArgument = "id" // ViewModel uses this for SavedStateHandle
 // private const val detailsNavigationRouteWithArg = "$detailsNavigationRoute/{$idNavigationArgument}"
 
 
@@ -25,23 +25,22 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // 
 @Composable
 fun detailsScreen(
     itemId: String, // From DetailsKey
-    itemType: String, // From DetailsKey
     detailsViewModel: DetailsViewModel = hiltViewModel(),
     // Navigation Lambdas passed from NavDisplay entry
-    onNavigateUp: () -> Unit,
-    onNavigateToDetails: (DetailsKey) -> Unit,
-    onNavigateToCredits: (CreditsKey) -> Unit,
-    onNavigateToAuth: (AuthKey) -> Unit
+    onBackClick: () -> Unit,
+    navigateToDetails: (DetailsKey) -> Unit,
+    navigateToCredits: (CreditsKey) -> Unit,
+    navigateToAuth: (AuthKey) -> Unit
 ) {
     DetailsRoute(
         viewModel = detailsViewModel, // ViewModel gets itemId, itemType from SavedStateHandle
-        onBackClick = onNavigateUp,
-        onItemClick = { id, type -> onNavigateToDetails(DetailsKey(itemId = id, itemType = type)) },
+        onBackClick = onBackClick,
+        onItemClick = { id -> navigateToDetails(DetailsKey(itemId = id)) },
         onSeeAllCastClick = {
             // Use current itemId and itemType for CreditsKey context
-            onNavigateToCredits(CreditsKey(itemId = itemId, itemType = itemType))
+            navigateToCredits(CreditsKey(itemId = itemId))
         },
-        navigateToAuth = { onNavigateToAuth(AuthKey) } // Pass AuthKey directly
+        navigateToAuth = { navigateToAuth(AuthKey) } // Pass AuthKey directly
     )
 }
 
@@ -55,6 +54,4 @@ fun detailsScreen(
 //    navigate("$detailsNavigationRoute/$id")
 // }
 
-// private fun NavController.navigateToCredits() {
-//    navigate(creditsNavigationRoute)
-// }
+

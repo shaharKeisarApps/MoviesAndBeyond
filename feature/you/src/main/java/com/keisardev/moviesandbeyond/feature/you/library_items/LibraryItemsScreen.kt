@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
@@ -46,12 +47,11 @@ import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.you.R
 // import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 import kotlinx.coroutines.launch
 
 // This LibraryItemsRoute is assumed to be called from NavDisplay when LibraryItemsKey is active
 @Composable
-internal fun LibraryItemsRoute(
+fun LibraryItemsRoute(
     viewModel: LibraryItemsViewModel = hiltViewModel(), // type is obtained from SavedStateHandle via ViewModel
     onBackClick: () -> Unit, // Added
     navigateToDetails: (DetailsKey) -> Unit // Added
@@ -194,7 +194,7 @@ private fun LibraryContent(
                     LibraryItem(
                         posterPath = it.imagePath,
                         onItemClick = {
-                            onItemClick(DetailsKey(itemId = it.id.toString(), itemType = it.mediaType.uppercase())) // Use lambda
+                            onItemClick(DetailsKey(itemId = it.id.toString())) // Use lambda
                         },
                         onDeleteClick = { onDeleteClick(it) }
                     )

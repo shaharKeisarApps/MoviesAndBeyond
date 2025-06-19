@@ -37,17 +37,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.ui.AnimatedText
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.details.content.MovieDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.PersonDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.TvShowDetailsContent
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.CreditsKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 import kotlinx.coroutines.launch
 
 internal val horizontalPadding = 8.dp
@@ -58,9 +53,9 @@ internal fun DetailsRoute(
     viewModel: DetailsViewModel, // itemId and itemType are in ViewModel via SavedStateHandle
     // Navigation lambdas passed from detailsScreen (in DetailsNavigation.kt)
     onBackClick: () -> Unit,
-    onItemClick: (DetailsKey) -> Unit, // For person details, related media
-    onSeeAllCastClick: (CreditsKey) -> Unit,
-    navigateToAuth: (AuthKey) -> Unit
+    onItemClick: (String) -> Unit,
+    onSeeAllCastClick: () -> Unit,
+    navigateToAuth: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val contentDetailsUiState by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
@@ -68,7 +63,6 @@ internal fun DetailsRoute(
     DetailsScreen(
         uiState = uiState,
         contentDetailsUiState = contentDetailsUiState,
-        viewModel = viewModel,
         onHideBottomSheet = viewModel::onHideBottomSheet,
         onErrorShown = viewModel::onErrorShown,
         onFavoriteClick = viewModel::addOrRemoveFavorite,
@@ -86,16 +80,15 @@ internal fun DetailsRoute(
 internal fun DetailsScreen(
     uiState: DetailsUiState,
     contentDetailsUiState: ContentDetailUiState,
-    viewModel: DetailsViewModel,
     onHideBottomSheet: () -> Unit,
     onErrorShown: () -> Unit,
     onFavoriteClick: (LibraryItem) -> Unit,
     onWatchlistClick: (LibraryItem) -> Unit,
     // Navigation Lambdas
-    onBackClick: () -> Unit,
-    onItemClick: (DetailsKey) -> Unit,
-    onSeeAllCastClick: (CreditsKey) -> Unit,
-    onSignInClick: (AuthKey) -> Unit
+    onItemClick: (String) -> Unit,
+    onSeeAllCastClick: () -> Unit,
+    onSignInClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -151,7 +144,7 @@ internal fun DetailsScreen(
                                 }.invokeOnCompletion {
                                     onHideBottomSheet()
                                 }
-                                onSignInClick(AuthKey) // Use passed lambda
+                                onSignInClick()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,9 +191,9 @@ internal fun DetailsScreen(
                         isAddedToWatchList = uiState.savedInWatchlist,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = { onSeeAllCastClick(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
-                        onCastClick = { actorId -> onItemClick(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
-                        onRecommendationClick = { mediaId -> onItemClick(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
+                        onSeeAllCastClick = onSeeAllCastClick,
+                        onCastClick = onItemClick,
+                        onRecommendationClick = onItemClick,
                         onBackdropCollapse = {
                             isBackdropImageCollapsed = it
                         }
@@ -214,9 +207,9 @@ internal fun DetailsScreen(
                         isAddedToWatchList = uiState.savedInWatchlist,
                         onFavoriteClick = onFavoriteClick,
                         onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = { onSeeAllCastClick(CreditsKey(itemId = viewModel.itemId, itemType = viewModel.itemType)) },
-                        onCastClick = { actorId -> onItemClick(DetailsKey(itemId = actorId, itemType = MediaType.PERSON.name)) },
-                        onRecommendationClick = { mediaId -> onItemClick(DetailsKey(itemId = mediaId, itemType = viewModel.itemType /*or determine based on recommendation type*/)) },
+                        onSeeAllCastClick = onSeeAllCastClick,
+                        onCastClick = onItemClick,
+                        onRecommendationClick = onItemClick,
                         onBackdropCollapse = {
                             isBackdropImageCollapsed = it
                         }
@@ -226,7 +219,7 @@ internal fun DetailsScreen(
                 is ContentDetailUiState.Person -> {
                     PersonDetailsContent(
                         personDetails = contentDetailsUiState.data,
-                        onBackClick = onBackClick, // Use passed lambda
+                        onBackClick = onBackClick,
                         modifier = Modifier.padding(
                             horizontal = horizontalPadding,
                             vertical = 6.dp

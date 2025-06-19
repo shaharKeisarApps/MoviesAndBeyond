@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,8 +25,6 @@ import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 
 private val horizontalPadding = 8.dp
 
@@ -33,8 +32,8 @@ private val horizontalPadding = 8.dp
 @Composable
 fun ItemsRoute(
     categoryName: String,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onBackClick: () -> Unit, // Added
+    onItemClick: (String) -> Unit,
+    onBackClick: () -> Unit,
     viewModel: MoviesViewModel
 ) {
     val category = enumValueOf<MovieListCategory>(categoryName)
@@ -67,8 +66,8 @@ internal fun ItemsScreen(
     content: ContentUiState,
     categoryDisplayName: String,
     appendItems: (MovieListCategory) -> Unit,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onBackClick: () -> Unit // Added
+    onItemClick: (String) -> Unit,
+    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -102,7 +101,7 @@ internal fun ItemsScreen(
                 ) {
                     MediaItemCard(
                         posterPath = it.imagePath,
-                        onItemClick = { onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.MOVIE.name)) }, // Use passed lambda
+                        onItemClick = { onItemClick("${it.id},${MediaType.MOVIE}") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)

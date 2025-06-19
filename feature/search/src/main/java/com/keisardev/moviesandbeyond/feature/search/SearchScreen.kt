@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.search
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,15 +27,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.ui.MoviesAndBeyondSearchBar
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
 import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
 
 @Composable
 internal fun SearchRoute(
-    navigateToDetail: (DetailsKey) -> Unit, // Added
+    navigateToDetail: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -47,7 +46,7 @@ internal fun SearchRoute(
         searchSuggestions = searchSuggestions,
         onSearchQueryChange = viewModel::changeSearchQuery,
         onBack = viewModel::onBack,
-        navigateToDetail = navigateToDetail, // Pass down
+        onSearchResultClick = navigateToDetail, // Pass down
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -59,7 +58,7 @@ internal fun SearchScreen(
     searchSuggestions: List<SearchItem>,
     onSearchQueryChange: (String) -> Unit,
     onBack: () -> Unit,
-    navigateToDetail: (DetailsKey) -> Unit, // Added
+    onSearchResultClick: (String) -> Unit,
     onErrorShown: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -107,7 +106,7 @@ internal fun SearchScreen(
                             imagePath = it.imagePath,
                             onItemClick = {
                                 // Converting type to uppercase for [MediaType]
-                                navigateToDetail(DetailsKey(itemId = it.id.toString(), itemType = it.mediaType.uppercase())) // Use lambda
+                                onSearchResultClick("${it.id},${it.mediaType.uppercase()}")
                             }
                         )
                     }

@@ -1,19 +1,5 @@
 package com.keisardev.moviesandbeyond.ui
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 // import androidx.compose.runtime.collectAsState // May not be needed if backStack properties are states
 // import androidx.navigation.NavController // Not needed
 // import androidx.navigation.NavDestination // Not needed
@@ -23,22 +9,30 @@ import androidx.compose.ui.res.stringResource
 // import androidx.navigation.compose.currentBackStackEntryAsState // Not needed
 // import androidx.navigation.compose.rememberNavController // Not needed
 // import androidx.navigation.navOptions // Not needed
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import com.keisardev.moviesandbeyond.core.model.MoviesKey
+import com.keisardev.moviesandbeyond.core.model.OnboardingKey
+import com.keisardev.moviesandbeyond.core.model.SearchKey
+import com.keisardev.moviesandbeyond.core.model.TvShowsKey
+import com.keisardev.moviesandbeyond.core.model.YouKey
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
-// Feature imports for navigateToMovies etc. are removed as NavManager handles navigation with keys
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNavigation
-// Import NavManager and Keys
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavKey // Added
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys // Assuming this is where all keys are
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.OnboardingKey // Added
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvShowsKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.SearchKey
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.YouKey
-// Assuming rememberNavBackStack is from this package or similar
-import androidx.navigation3.ui.rememberNavBackStack
-import androidx.navigation3.NavBackStack // Assuming this is the type
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -72,7 +66,7 @@ fun MoviesAndBeyondApp(
     val style = CupertinoMaterials.ultraThin()
 
     val initialKey: NavKey = if (hideOnboarding) MoviesKey else OnboardingKey
-    val backStack = rememberNavBackStack(initialKey = initialKey) // Use new NavBackStack
+    val backStack: NavBackStack = rememberNavBackStack(initialKey) // Use new NavBackStack
 
     val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
     val currentKey = backStack.lastOrNull() // Get current key from new backStack
@@ -89,7 +83,7 @@ fun MoviesAndBeyondApp(
                 destinations = bottomBarDestinations,
                 currentKey = currentKey,
                 onNavigateToDestination = { destination ->
-                    backStack.replaceAll(destination.navigationKey) // Use new backStack for navigation
+//                    backStack.replaceAll(destination.navigationKey) // Use new backStack for navigation
                 },
                 modifier = Modifier
                     .hazeEffect(state = hazeState, style = style)

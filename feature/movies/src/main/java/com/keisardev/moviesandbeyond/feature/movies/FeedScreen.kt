@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,9 +30,6 @@ import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey // For lambda signature
-// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
@@ -41,8 +39,8 @@ private val horizontalPadding = 8.dp
 
 @Composable
 internal fun FeedRoute(
-    navigateToDetails: (DetailsKey) -> Unit, // Added
-    navigateToItems: (MoviesItemsKey) -> Unit, // Changed to MoviesItemsKey
+    navigateToDetails: (String) -> Unit,
+    navigateToItems: (String) -> Unit,
     viewModel: MoviesViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -74,8 +72,8 @@ internal fun FeedScreen(
     upcomingMovies: ContentUiState,
     errorMessage: String?,
     appendItems: (MovieListCategory) -> Unit,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onSeeAllClick: (MoviesItemsKey) -> Unit, // Changed to MoviesItemsKey
+    onItemClick: (String) -> Unit,
+    onSeeAllClick: (String) -> Unit,
     onErrorShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -184,8 +182,8 @@ private fun ContentSection(
     content: ContentUiState,
     sectionName: String,
     appendItems: (MovieListCategory) -> Unit,
-    onItemClick: (DetailsKey) -> Unit, // Added
-    onSeeAllClick: (MoviesItemsKey) -> Unit // Changed to MoviesItemsKey
+    onItemClick: (String) -> Unit,
+    onSeeAllClick: (String) -> Unit
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -197,7 +195,7 @@ private fun ContentSection(
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(MoviesItemsKey(content.category.name)) }, // Use lambda
+                onSeeAllClick = { onSeeAllClick(content.category.name) },
                 modifier = Modifier.padding(horizontal = horizontalPadding)
             )
         },
@@ -209,7 +207,7 @@ private fun ContentSection(
                 MediaItemCard(
                     posterPath = it.imagePath,
                     onItemClick = {
-                        onItemClick(DetailsKey(itemId = it.id.toString(), itemType = MediaType.MOVIE.name)) // Use lambda
+                        onItemClick("${it.id},${MediaType.MOVIE}")
                     }
                 )
             }

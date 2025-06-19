@@ -1,8 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
-import androidx.compose.runtime.Composable
 // import androidx.compose.runtime.remember // Might not be needed for NavController specific remember
-import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fine
 // NavController and related imports are removed
 // import androidx.navigation.NavController
 // import androidx.navigation.NavGraphBuilder
@@ -13,8 +11,10 @@ import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fi
 // import androidx.navigation.navigation
 
 // import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.MoviesItemsKey // For lambda signature
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
+import com.keisardev.moviesandbeyond.core.model.MoviesItemsKey
 
 // const val moviesNavigationRoute = "movies" // No longer used
 
@@ -30,7 +30,9 @@ fun moviesScreen(
 ) {
     // For this refactor, moviesScreen will directly show FeedRoute.
     FeedRoute(
-        navigateToDetails = navigateToDetails, // Pass lambda down
+        navigateToDetails = {
+            navigateToDetails(DetailsKey(itemId = it))
+        }, // Pass lambda down
         navigateToItems = { category ->        // Adapt to create MoviesItemsKey
             navigateToItems(MoviesItemsKey(category = category))
         },

@@ -67,14 +67,12 @@ import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.SYSTEM
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.AuthKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.LibraryItemsKey // For lambda signature
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun YouRoute(
-    navigateToAuth: (AuthKey) -> Unit, // Changed signature
-    navigateToLibraryItem: (LibraryItemsKey) -> Unit, // Changed signature
+    navigateToAuth: () -> Unit,
+    navigateToLibraryItem: (String) -> Unit,
     viewModel: YouViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -105,8 +103,8 @@ internal fun YouScreen(
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
-    onNavigateToAuth: (AuthKey) -> Unit, // Changed signature
-    onLibraryItemClick: (LibraryItemsKey) -> Unit, // Changed signature
+    onNavigateToAuth: () -> Unit,
+    onLibraryItemClick: (String) -> Unit,
     onReloadAccountDetailsClick: () -> Unit,
     onLogOutClick: () -> Unit,
     onRefresh: () -> Unit,
@@ -222,7 +220,7 @@ internal fun YouScreen(
 private fun LoggedInView(
     accountDetails: AccountDetails,
     isLoggingOut: Boolean,
-    onLibraryItemClick: (LibraryItemsKey) -> Unit, // Changed signature
+    onLibraryItemClick: (String) -> Unit,
     onLogOutClick: () -> Unit
 ) {
     Column(
@@ -264,7 +262,7 @@ private fun LoggedInView(
 
 @Composable
 private fun LoggedOutView(
-    onNavigateToAuth: (AuthKey) -> Unit // Changed signature
+    onNavigateToAuth: () -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -286,7 +284,7 @@ private fun LoggedOutView(
                 style = MaterialTheme.typography.bodyLarge
             )
             Button(
-                onClick = { onNavigateToAuth(AuthKey) }, // Call with AuthKey
+                onClick = onNavigateToAuth,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(id = R.string.log_in))
@@ -319,7 +317,7 @@ private fun LoadAccountDetails(
 
 @Composable
 private fun LibrarySection(
-    onLibraryItemClick: (LibraryItemsKey) -> Unit // Changed signature
+    onLibraryItemClick: (String) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -332,11 +330,11 @@ private fun LibrarySection(
         )
         LibraryItemOption(
             optionName = stringResource(id = R.string.favorites),
-            onClick = { onLibraryItemClick(LibraryItemsKey(type = LibraryItemType.FAVORITE.name)) } // Call with LibraryItemsKey
+            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) }
         )
         LibraryItemOption(
             optionName = stringResource(id = R.string.watchlist),
-            onClick = { onLibraryItemClick(LibraryItemsKey(type = LibraryItemType.WATCHLIST.name)) } // Call with LibraryItemsKey
+            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) }
         )
     }
 }

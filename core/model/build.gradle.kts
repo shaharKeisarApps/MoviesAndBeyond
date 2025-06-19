@@ -1,5 +1,7 @@
 plugins {
     id("moviesandbeyond.android.library")
+    alias(libs.plugins.kotlinSerialization)
+
 }
 
 android {
@@ -7,5 +9,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.navigation3.runtime)
 }

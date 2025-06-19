@@ -1,7 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.tv
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fine
 // NavController and related imports are removed
 // import androidx.navigation.NavController
 // import androidx.navigation.NavGraphBuilder
@@ -12,8 +10,10 @@ import androidx.hilt.navigation.compose.hiltViewModel // Hilt ViewModel still fi
 // import androidx.navigation.navigation
 
 // import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // For lambda signature
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.TvItemsKey // For lambda signature
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
+import com.keisardev.moviesandbeyond.core.model.TvItemsKey
 
 // private const val tvShowsNavigationRoute = "tv_shows" // No longer used
 
@@ -27,7 +27,9 @@ fun tvShowsScreen(
 ) {
     // Similar to moviesScreen, tvShowsScreen will directly show FeedRoute.
     FeedRoute(
-        navigateToDetails = navigateToDetails, // Pass down
+        navigateToDetails = {
+            navigateToDetails(DetailsKey(itemId = it)) // Pass down
+        }, // Pass down
         navigateToItems = { category ->      // Adapt to create TvItemsKey
             navigateToItems(TvItemsKey(category = category))
         },

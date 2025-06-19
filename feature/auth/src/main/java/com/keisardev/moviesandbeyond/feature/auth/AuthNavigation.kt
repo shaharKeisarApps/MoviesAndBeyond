@@ -12,9 +12,9 @@ import androidx.compose.runtime.Composable
 // called from NavDisplay when AuthKey is active.
 @Composable
 fun authScreen(
-    onNavigateUp: () -> Unit // Changed to accept lambda
+    onBackClick: () -> Unit // Changed to accept lambda
 ) {
-    AuthRoute(onBackClick = onNavigateUp) // Pass lambda to AuthRoute
+    AuthRoute(onBackClick = onBackClick) // Pass lambda to AuthRoute
 }
 
 // fun NavController.navigateToAuth() { // Removed
