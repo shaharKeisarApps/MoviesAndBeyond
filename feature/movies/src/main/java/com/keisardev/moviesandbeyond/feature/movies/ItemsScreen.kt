@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
@@ -34,7 +35,7 @@ fun ItemsRoute(
     categoryName: String,
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: MoviesViewModel
+    viewModel: MoviesViewModel = hiltViewModel()
 ) {
     val category = enumValueOf<MovieListCategory>(categoryName)
     val content by when (category) {
