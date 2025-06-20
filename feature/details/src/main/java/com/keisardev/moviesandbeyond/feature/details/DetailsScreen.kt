@@ -50,11 +50,12 @@ internal val verticalPadding = 4.dp
 
 @Composable
 internal fun DetailsRoute(
+    viewModel: DetailsViewModel, // itemId and itemType are in ViewModel via SavedStateHandle
+    // Navigation lambdas passed from detailsScreen (in DetailsNavigation.kt)
+    onBackClick: () -> Unit,
     onItemClick: (String) -> Unit,
     onSeeAllCastClick: () -> Unit,
     navigateToAuth: () -> Unit,
-    onBackClick: () -> Unit,
-    viewModel: DetailsViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val contentDetailsUiState by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
@@ -66,10 +67,11 @@ internal fun DetailsRoute(
         onErrorShown = viewModel::onErrorShown,
         onFavoriteClick = viewModel::addOrRemoveFavorite,
         onWatchlistClick = viewModel::addOrRemoveFromWatchlist,
+        // Pass navigation lambdas down
+        onBackClick = onBackClick,
         onItemClick = onItemClick,
         onSeeAllCastClick = onSeeAllCastClick,
-        onSignInClick = navigateToAuth,
-        onBackClick = onBackClick
+        onSignInClick = navigateToAuth
     )
 }
 
@@ -82,6 +84,7 @@ internal fun DetailsScreen(
     onErrorShown: () -> Unit,
     onFavoriteClick: (LibraryItem) -> Unit,
     onWatchlistClick: (LibraryItem) -> Unit,
+    // Navigation Lambdas
     onItemClick: (String) -> Unit,
     onSeeAllCastClick: () -> Unit,
     onSignInClick: () -> Unit,
@@ -233,7 +236,7 @@ internal fun DetailsScreen(
                         is ContentDetailUiState.TV -> contentDetailsUiState.data.name
                         else -> ""
                     },
-                    onBackClick = onBackClick
+                    onBackClick = onBackClick // Use passed lambda
                 )
             }
         }
@@ -245,7 +248,7 @@ internal fun DetailsScreen(
 private fun DetailsTopAppBar(
     showTitle: Boolean,
     title: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit // This will be the passed onBackClick lambda
 ) {
     TopAppBarWithBackButton(
         title = {
@@ -261,7 +264,7 @@ private fun DetailsTopAppBar(
             containerColor = Color.Black.copy(alpha = 0.5f),
             contentColor = Color.White
         ),
-        onBackClick = onBackClick
+        onBackClick = onBackClick // Use passed lambda
     )
 }
 

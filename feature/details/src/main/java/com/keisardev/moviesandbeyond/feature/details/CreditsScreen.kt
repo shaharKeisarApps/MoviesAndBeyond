@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.details
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,25 +25,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 
+
+// CreditsRoute is assumed to be called from NavDisplay when the key is CreditsKey(itemId, itemType)
 @Composable
-internal fun CreditsRoute(
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit,
-    viewModel: DetailsViewModel
+ fun CreditsRoute(
+    viewModel: DetailsViewModel = hiltViewModel(), // ViewModel provides the data based on itemId/itemType from CreditsKey
+    onBackClick: () -> Unit, // Added
+    navigateToPersonDetails: (DetailsKey) -> Unit // Added
 ) {
     val details by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
 
     CreditsScreen(
         details = details,
-        onItemClick = onItemClick,
-        onBackClick = onBackClick
+        onBackClick = onBackClick, // Pass down
+        navigateToPersonDetails = navigateToPersonDetails // Pass down
     )
 }
 
@@ -50,8 +54,8 @@ internal fun CreditsRoute(
 @Composable
 private fun CreditsScreen(
     details: ContentDetailUiState,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit, // Added
+    navigateToPersonDetails: (DetailsKey) -> Unit // Added
 ) {
     Scaffold(
         topBar = {
@@ -62,7 +66,7 @@ private fun CreditsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                 },
-                onBackClick = onBackClick
+                onBackClick = onBackClick // Use passed lambda
             )
         }
     ) { paddingValues ->
@@ -71,14 +75,14 @@ private fun CreditsScreen(
                 is ContentDetailUiState.Movie -> {
                     CreditsLazyColumn(
                         credits = details.data.credits,
-                        onItemClick = onItemClick
+                        navigateToPersonDetails = navigateToPersonDetails // Pass down
                     )
                 }
 
                 is ContentDetailUiState.TV -> {
                     CreditsLazyColumn(
                         credits = details.data.credits,
-                        onItemClick = onItemClick
+                        navigateToPersonDetails = navigateToPersonDetails // Pass down
                     )
                 }
 
@@ -92,7 +96,7 @@ private fun CreditsScreen(
 @Composable
 private fun CreditsLazyColumn(
     credits: Credits,
-    onItemClick: (String) -> Unit
+    navigateToPersonDetails: (DetailsKey) -> Unit // Added
 ) {
     LazyColumn(
         modifier = Modifier
@@ -111,7 +115,7 @@ private fun CreditsLazyColumn(
                 role = it.character,
                 imagePath = it.profilePath,
                 onItemClick = {
-                    onItemClick("${it.id},${MediaType.PERSON}")
+                    navigateToPersonDetails(DetailsKey(itemId = it.id.toString())) // Use lambda
                 }
             )
         }
@@ -135,7 +139,7 @@ private fun CreditsLazyColumn(
                         role = it.job,
                         imagePath = it.profilePath,
                         onItemClick = {
-                            onItemClick("${it.id},${MediaType.PERSON}")
+                            navigateToPersonDetails(DetailsKey(itemId = it.id.toString())) // Use lambda
                         }
                     )
                 }

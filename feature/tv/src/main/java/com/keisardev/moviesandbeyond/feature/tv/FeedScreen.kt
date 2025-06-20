@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.tv
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -51,8 +52,8 @@ internal fun FeedRoute(
         popularTvShows = popularTvShows,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        onItemClick = navigateToDetails,
-        onSeeAllClick = navigateToItems,
+        onItemClick = navigateToDetails, // Pass down
+        onSeeAllClick = navigateToItems, // Pass down
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -92,7 +93,7 @@ internal fun FeedScreen(
                     content = airingTodayTvShows,
                     sectionName = stringResource(id = R.string.airing_today),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                     onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -101,7 +102,7 @@ internal fun FeedScreen(
                     content = onAirTvShows,
                     sectionName = stringResource(id = R.string.on_air),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                     onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -110,7 +111,7 @@ internal fun FeedScreen(
                     content = topRatedTvShows,
                     sectionName = stringResource(id = R.string.top_rated),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                     onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -119,7 +120,7 @@ internal fun FeedScreen(
                     content = popularTvShows,
                     sectionName = stringResource(id = R.string.popular),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }

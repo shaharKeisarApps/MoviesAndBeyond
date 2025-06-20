@@ -1,63 +1,57 @@
 package com.keisardev.moviesandbeyond.feature.details
 
-import androidx.compose.runtime.remember
+// NavController and related imports are removed
+// import androidx.navigation.NavController
+// import androidx.navigation.NavGraphBuilder
+// import androidx.navigation.compose.composable
+// import androidx.navigation.navigation
+
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import com.keisardev.moviesandbeyond.core.model.AuthKey
+import com.keisardev.moviesandbeyond.core.model.CreditsKey
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 
-private const val detailsNavigationRoute = "details"
-private const val creditsNavigationRoute = "credits"
-internal const val idNavigationArgument = "id"
-private const val detailsNavigationRouteWithArg = "$detailsNavigationRoute/{$idNavigationArgument}"
+// Old route constants are no longer used by this file for defining navigation graph structure
+// private const val detailsNavigationRoute = "details"
+// private const val creditsNavigationRoute = "credits"
+ internal const val idNavigationArgument = "id" // ViewModel uses this for SavedStateHandle
+// private const val detailsNavigationRouteWithArg = "$detailsNavigationRoute/{$idNavigationArgument}"
 
-fun NavGraphBuilder.detailsScreen(
-    navController: NavController,
-    navigateToAuth: () -> Unit
+
+// This function is the main entry composable for the Details feature,
+// called from the app's NavDisplay with a DetailsKey.
+@Composable
+fun DetailsScreen(
+    itemId: String, // From DetailsKey
+    detailsViewModel: DetailsViewModel = hiltViewModel(),
+    // Navigation Lambdas passed from NavDisplay entry
+    onBackClick: () -> Unit,
+    navigateToDetails: (DetailsKey) -> Unit,
+    navigateToCredits: (CreditsKey) -> Unit,
+    navigateToAuth: (AuthKey) -> Unit
 ) {
-    navigation(
-        route = detailsNavigationRouteWithArg,
-        startDestination = detailsNavigationRoute
-    ) {
-        composable(
-            route = detailsNavigationRoute
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(detailsNavigationRouteWithArg)
-            }
-            val viewModel = hiltViewModel<DetailsViewModel>(parentEntry)
-
-            DetailsRoute(
-                onBackClick = navController::navigateUp,
-                onItemClick = navController::navigateToDetails,
-                onSeeAllCastClick = navController::navigateToCredits,
-                navigateToAuth = navigateToAuth,
-                viewModel = viewModel
-            )
-        }
-
-        composable(
-            route = creditsNavigationRoute
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(detailsNavigationRouteWithArg)
-            }
-            val viewModel = hiltViewModel<DetailsViewModel>(parentEntry)
-
-            CreditsRoute(
-                viewModel = viewModel,
-                onItemClick = navController::navigateToDetails,
-                onBackClick = navController::navigateUp
-            )
-        }
-    }
+    DetailsRoute(
+        viewModel = detailsViewModel, // ViewModel gets itemId, itemType from SavedStateHandle
+        onBackClick = onBackClick,
+        onItemClick = { id -> navigateToDetails(DetailsKey(itemId = id)) },
+        onSeeAllCastClick = {
+            // Use current itemId and itemType for CreditsKey context
+            navigateToCredits(CreditsKey(itemId = itemId))
+        },
+        navigateToAuth = { navigateToAuth(AuthKey) } // Pass AuthKey directly
+    )
 }
 
-fun NavController.navigateToDetails(id: String) {
-    navigate("$detailsNavigationRoute/$id")
-}
+// CreditsScreenRoute would be defined here or in its own file,
+// and registered with NavDisplay via CreditsKey
+// For now, we assume CreditsScreen.kt contains CreditsRoute.
 
-private fun NavController.navigateToCredits() {
-    navigate(creditsNavigationRoute)
-}
+
+// NavController extensions are no longer needed.
+// fun NavController.navigateToDetails(id: String) {
+//    navigate("$detailsNavigationRoute/$id")
+// }
+
+

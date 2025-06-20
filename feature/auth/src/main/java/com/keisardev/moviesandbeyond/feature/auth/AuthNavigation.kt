@@ -1,21 +1,22 @@
 package com.keisardev.moviesandbeyond.feature.auth
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.compose.runtime.Composable
+// import androidx.navigation.NavController // Removed
+// import androidx.navigation.NavGraphBuilder // Removed
+// import androidx.navigation.compose.composable // Removed
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 
-private const val authScreenNavigationRoute = "auth"
+// private const val authScreenNavigationRoute = "auth" // Removed
 
-fun NavGraphBuilder.authScreen(
-    onBackClick: () -> Unit,
+// This is the main entry composable for the Auth feature,
+// called from NavDisplay when AuthKey is active.
+@Composable
+fun AuthScreen(
+    onBackClick: () -> Unit // Changed to accept lambda
 ) {
-    composable(
-        route = authScreenNavigationRoute
-    ) {
-        AuthRoute(onBackClick = onBackClick)
-    }
+    AuthRoute(onBackClick = onBackClick) // Pass lambda to AuthRoute
 }
 
-fun NavController.navigateToAuth() {
-    navigate(authScreenNavigationRoute)
-}
+// fun NavController.navigateToAuth() { // Removed
+//    navigate(authScreenNavigationRoute)
+// }

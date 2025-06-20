@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +34,9 @@ import kotlinx.coroutines.launch
 
 private val horizontalPadding = 8.dp
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Already removed in previous visualization
+// import com.keisardev.moviesandbeyond.ui.navigation.NavigationKeys.DetailsKey // Already present
+
 @Composable
 internal fun FeedRoute(
     navigateToDetails: (String) -> Unit,
@@ -53,8 +57,8 @@ internal fun FeedRoute(
         upcomingMovies = upcomingMovies,
         errorMessage = errorMessage,
         appendItems = viewModel::appendItems,
-        onItemClick = navigateToDetails,
-        onSeeAllClick = navigateToItems,
+        onItemClick = navigateToDetails, // Pass down
+        onSeeAllClick = navigateToItems, // Pass down
         onErrorShown = viewModel::onErrorShown,
         modifier = modifier
     )
@@ -138,7 +142,7 @@ internal fun FeedScreen(
                     content = nowPlayingMovies,
                     sectionName = stringResource(id = R.string.now_playing),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -147,7 +151,7 @@ internal fun FeedScreen(
                     content = popularMovies,
                     sectionName = stringResource(id = R.string.popular),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -156,7 +160,7 @@ internal fun FeedScreen(
                     content = topRatedMovies,
                     sectionName = stringResource(id = R.string.top_rated),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }
@@ -165,7 +169,7 @@ internal fun FeedScreen(
                     content = upcomingMovies,
                     sectionName = stringResource(id = R.string.upcoming),
                     appendItems = appendItems,
-                    onItemClick = onItemClick,
+                    // onItemClick = onItemClick, // Handled in ContentSection
                     onSeeAllClick = onSeeAllClick
                 )
             }

@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.search
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +46,7 @@ internal fun SearchRoute(
         searchSuggestions = searchSuggestions,
         onSearchQueryChange = viewModel::changeSearchQuery,
         onBack = viewModel::onBack,
-        onSearchResultClick = navigateToDetail,
+        onSearchResultClick = navigateToDetail, // Pass down
         onErrorShown = viewModel::onErrorShown
     )
 }

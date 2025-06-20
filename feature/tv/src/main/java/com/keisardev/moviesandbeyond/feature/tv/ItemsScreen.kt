@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.tv
 
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
@@ -27,12 +29,13 @@ import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 
 private val horizontalPadding = 8.dp
 
+// This ItemsRoute is assumed to be called from NavDisplay when the key is TvItemsKey(categoryName)
 @Composable
 fun ItemsRoute(
     categoryName: String,
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: TvShowsViewModel
+    viewModel: TvShowsViewModel = hiltViewModel()
 ) {
     val category = enumValueOf<TvShowListCategory>(categoryName)
     val content by when (category) {
@@ -53,6 +56,7 @@ fun ItemsRoute(
         appendItems = viewModel::appendItems,
         onItemClick = { onItemClick("$it,${MediaType.TV}") },
         onBackClick = onBackClick
+
     )
 }
 
@@ -74,7 +78,7 @@ internal fun ItemsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                 },
-                onBackClick = onBackClick
+                onBackClick = onBackClick // Use passed lambda
             )
         }
     ) { paddingValues ->

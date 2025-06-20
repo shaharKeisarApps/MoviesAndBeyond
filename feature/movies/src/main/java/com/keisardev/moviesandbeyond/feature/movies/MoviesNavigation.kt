@@ -1,62 +1,63 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
-import androidx.compose.runtime.remember
+// import androidx.compose.runtime.remember // Might not be needed for NavController specific remember
+// NavController and related imports are removed
+// import androidx.navigation.NavController
+// import androidx.navigation.NavGraphBuilder
+// import androidx.navigation.NavOptions
+// import androidx.navigation.NavType
+// import androidx.navigation.compose.composable
+// import androidx.navigation.navArgument
+// import androidx.navigation.navigation
+
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
+import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.NavType
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import androidx.navigation.navigation
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
+import com.keisardev.moviesandbeyond.core.model.MoviesItemsKey
 
-const val moviesNavigationRoute = "movies"
+// const val moviesNavigationRoute = "movies" // No longer used
 
-fun NavGraphBuilder.moviesScreen(
-    navController: NavController,
-    navigateToDetails: (String) -> Unit,
+// This function is now the main entry composable for the Movies feature,
+// called from the app's NavDisplay.
+// It no longer accepts NavController or navigateToDetails lambda directly.
+// Internal navigation is handled by NavManager.
+@Composable
+fun MoviesScreen(
+    viewModel: MoviesViewModel = hiltViewModel(),
+    navigateToDetails: (DetailsKey) -> Unit,
+    navigateToItems: (MoviesItemsKey) -> Unit
 ) {
-    navigation(
-        route = moviesNavigationRoute,
-        startDestination = MoviesScreenRoutes.FEED
-    ) {
-        composable(route = MoviesScreenRoutes.FEED) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(moviesNavigationRoute)
-            }
-            val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
-            FeedRoute(
-                navigateToDetails = navigateToDetails,
-                navigateToItems = { navController.navigate("${MoviesScreenRoutes.ITEMS}/$it") },
-                viewModel = viewModel,
-            )
-        }
-
-        composable(
-            route = "${MoviesScreenRoutes.ITEMS}/{category}",
-            arguments = listOf(
-                navArgument("category") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(moviesNavigationRoute)
-            }
-            val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
-            ItemsRoute(
-                categoryName = backStackEntry.arguments?.getString("category")!!,
-                onItemClick = navigateToDetails,
-                onBackClick = navController::navigateUp,
-                viewModel = viewModel
-            )
-        }
-    }
+    // For this refactor, moviesScreen will directly show FeedRoute.
+    FeedRoute(
+        navigateToDetails = {
+            navigateToDetails(DetailsKey(itemId = it))
+        }, // Pass lambda down
+        navigateToItems = { category ->        // Adapt to create MoviesItemsKey
+            navigateToItems(MoviesItemsKey(category = category))
+        },
+        viewModel = viewModel
+    )
+    // The ItemsRoute would be shown if the current key in NavManager is MoviesItemsKey.
+    // This logic is now part of the main NavDisplay entryProvider.
+    // If MoviesKey is the only key for this feature in NavDisplay, then moviesScreen
+    // would need internal state management to show FeedRoute vs ItemsRoute based on NavManager.backStack.
+    // However, the prompt implies separate entries for distinct screens (e.g. DetailsKey).
+    // So, it's more likely ItemsRoute will be registered with MoviesItemsKey in the main NavDisplay.
+    // For this file, we only provide the composable content.
 }
 
-internal object MoviesScreenRoutes {
-    const val FEED = "movies_feed"
-    const val ITEMS = "movies_items"
-}
+// ItemsScreenRoute composable would be defined here if it's a separate screen
+// registered with NavDisplay via MoviesItemsKey.
+// For now, we assume FeedScreen.kt and ItemsScreen.kt contain FeedRoute and ItemsRoute.
 
-fun NavController.navigateToMovies(navOptions: NavOptions) {
-    navigate(moviesNavigationRoute, navOptions)
-}
+// Screen internal routes are no longer needed here as NavManager uses keys.
+// internal object MoviesScreenRoutes {
+//    const val FEED = "movies_feed"
+//    const val ITEMS = "movies_items"
+// }
+
+// This extension is no longer needed as NavManager handles navigation.
+// fun NavController.navigateToMovies(navOptions: NavOptions) {
+//    navigate(moviesNavigationRoute, navOptions)
+// }

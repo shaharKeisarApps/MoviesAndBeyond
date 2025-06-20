@@ -2,6 +2,7 @@ plugins {
     id("moviesandbeyond.android.application")
     id("moviesandbeyond.android.application.compose")
     id("moviesandbeyond.android.hilt")
+    alias(libs.plugins.kotlinSerialization) // Added Kotlin serialization plugin
 }
 
 android {
@@ -60,7 +61,11 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.hilt.work)
-    implementation(libs.androidx.navigation.compose)
+    // implementation(libs.androidx.navigation.compose) // Corrected comment
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.kt.compose)
     implementation(libs.core.ktx)

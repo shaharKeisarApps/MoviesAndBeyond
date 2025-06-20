@@ -25,6 +25,8 @@ class AndroidFeatureConventionPlugin: Plugin<Project> {
 
                     add("implementation", findLibrary("androidx-lifecycle-runtime-compose"))
                     add("implementation", findLibrary("androidx-hilt-navigation-compose"))
+                    add("implementation", findLibrary("navigation3-runtime"))
+                    add("implementation", findLibrary("androidx-lifecycle-viewmodel-navigation3"))
                 }
             }
         }

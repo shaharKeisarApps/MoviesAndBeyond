@@ -39,19 +39,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.keisardev.moviesandbeyond.core.model.DetailsKey
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.you.R
+// import com.keisardev.moviesandbeyond.ui.navigation.NavManager // Removed
 import kotlinx.coroutines.launch
 
+// This LibraryItemsRoute is assumed to be called from NavDisplay when LibraryItemsKey is active
 @Composable
-internal fun LibraryItemsRoute(
-    onBackClick: () -> Unit,
-    navigateToDetails: (String) -> Unit,
-    viewModel: LibraryItemsViewModel = hiltViewModel()
+fun LibraryItemsRoute(
+    viewModel: LibraryItemsViewModel = hiltViewModel(), // type is obtained from SavedStateHandle via ViewModel
+    onBackClick: () -> Unit, // Added
+    navigateToDetails: (DetailsKey) -> Unit // Added
 ) {
     val movieItems by viewModel.movieItems.collectAsStateWithLifecycle()
     val tvItems by viewModel.tvItems.collectAsStateWithLifecycle()
@@ -64,8 +67,8 @@ internal fun LibraryItemsRoute(
         libraryItemType = libraryItemType,
         errorMessage = errorMessage,
         onDeleteItem = viewModel::deleteItem,
-        onBackClick = onBackClick,
-        onItemClick = navigateToDetails,
+        onBackClick = onBackClick, // Pass down
+        onItemClick = navigateToDetails, // Pass down (renamed for clarity in LibraryScreen)
         onErrorShown = viewModel::onErrorShown
     )
 }
@@ -78,8 +81,8 @@ internal fun LibraryItemsScreen(
     libraryItemType: LibraryItemType?,
     errorMessage: String?,
     onDeleteItem: (LibraryItem) -> Unit,
-    onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit,
+    onItemClick: (DetailsKey) -> Unit, // Changed to DetailsKey
+    onBackClick: () -> Unit, // Added
     onErrorShown: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -102,7 +105,7 @@ internal fun LibraryItemsScreen(
                 title = {
                     libraryItemTitle?.let { Text(text = it) }
                 },
-                onBackClick = onBackClick
+                onBackClick = onBackClick // Use passed lambda
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -147,7 +150,7 @@ internal fun LibraryItemsScreen(
                         LibraryMediaType.MOVIE -> {
                             LibraryContent(
                                 content = movieItems,
-                                onItemClick = onItemClick,
+                                onItemClick = onItemClick, // Pass down
                                 onDeleteClick = onDeleteItem
                             )
                         }
@@ -155,7 +158,7 @@ internal fun LibraryItemsScreen(
                         LibraryMediaType.TV -> {
                             LibraryContent(
                                 content = tvItems,
-                                onItemClick = onItemClick,
+                                onItemClick = onItemClick, // Pass down
                                 onDeleteClick = onDeleteItem
                             )
                         }
@@ -169,7 +172,7 @@ internal fun LibraryItemsScreen(
 @Composable
 private fun LibraryContent(
     content: List<LibraryItem>,
-    onItemClick: (String) -> Unit,
+    onItemClick: (DetailsKey) -> Unit, // Changed to DetailsKey
     onDeleteClick: (LibraryItem) -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
@@ -191,7 +194,7 @@ private fun LibraryContent(
                     LibraryItem(
                         posterPath = it.imagePath,
                         onItemClick = {
-                            onItemClick("${it.id},${it.mediaType.uppercase()}")
+                            onItemClick(DetailsKey(itemId = it.id.toString())) // Use lambda
                         },
                         onDeleteClick = { onDeleteClick(it) }
                     )
