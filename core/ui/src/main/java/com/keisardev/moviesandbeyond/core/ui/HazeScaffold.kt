@@ -76,8 +76,7 @@ fun HazeScaffold(
         )
       ) {
         Box(
-          modifier = Modifier
-            .hazeEffect(state = hazeState, style = hazeStyle),
+          modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
         ) {
           topBar()
         }
@@ -116,8 +115,7 @@ fun HazeScaffold(
         )
       ) {
         Box(
-          modifier = Modifier
-            .hazeEffect(state = hazeState, style = hazeStyle),
+          modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
         ) {
           bottomBar()
         }

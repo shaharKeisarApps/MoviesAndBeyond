@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.keisardev.moviesandbeyond.core.model.AuthKey
 import com.keisardev.moviesandbeyond.core.model.CreditsKey
@@ -20,11 +22,13 @@ import com.keisardev.moviesandbeyond.core.model.TvItemsKey
 import com.keisardev.moviesandbeyond.core.model.TvShowsKey
 import com.keisardev.moviesandbeyond.core.model.YouKey
 import com.keisardev.moviesandbeyond.feature.auth.authScreen
+import com.keisardev.moviesandbeyond.feature.details.CreditsRoute
 import com.keisardev.moviesandbeyond.feature.details.detailsScreen
 import com.keisardev.moviesandbeyond.feature.movies.moviesScreen
 import com.keisardev.moviesandbeyond.feature.search.searchScreen
 import com.keisardev.moviesandbeyond.feature.tv.ItemsRoute
 import com.keisardev.moviesandbeyond.feature.tv.tvShowsScreen
+import com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute
 import com.keisardev.moviesandbeyond.feature.you.youScreen
 import com.keisardev.moviesandbeyond.ui.OnboardingScreen
 
@@ -36,6 +40,10 @@ fun MoviesAndBeyondNavigation(
     NavDisplay(
         modifier = Modifier.padding(paddingValues),
         backStack = backStack,
+        entryDecorators = listOf(
+            rememberSavedStateNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<OnboardingKey> {
@@ -51,7 +59,7 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<MoviesItemsKey> { key ->
-                com.keisardev.moviesandbeyond.feature.movies.ItemsRoute(
+                ItemsRoute(
                     categoryName = key.category,
                     onItemClick = { itemId -> backStack.add(DetailsKey(itemId)) },
                     onBackClick = { backStack.removeLastOrNull() }
@@ -80,7 +88,7 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<LibraryItemsKey> { key ->
-                com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute(
+                LibraryItemsRoute(
                     onBackClick = { backStack.removeLastOrNull() },
                     navigateToDetails = { detailsKey -> backStack.add(detailsKey) }
                 )
@@ -95,7 +103,7 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<CreditsKey> { key ->
-                com.keisardev.moviesandbeyond.feature.details.CreditsRoute(
+                CreditsRoute(
                     onBackClick = { backStack.removeLastOrNull() },
                     navigateToPersonDetails = { detailsKey -> backStack.add(detailsKey) }
                 )

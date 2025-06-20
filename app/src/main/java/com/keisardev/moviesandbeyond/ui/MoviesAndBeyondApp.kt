@@ -83,7 +83,7 @@ fun MoviesAndBeyondApp(
                 destinations = bottomBarDestinations,
                 currentKey = currentKey,
                 onNavigateToDestination = { destination ->
-//                    backStack.replaceAll(destination.navigationKey) // Use new backStack for navigation
+                    backStack.replaceAll { destination.navigationKey }// Use new backStack for navigation
                 },
                 modifier = Modifier
                     .hazeEffect(state = hazeState, style = style)
