@@ -23,7 +23,7 @@ import com.keisardev.moviesandbeyond.core.model.DetailsKey
 // This function is the main entry composable for the Details feature,
 // called from the app's NavDisplay with a DetailsKey.
 @Composable
-fun detailsScreen(
+fun DetailsScreen(
     itemId: String, // From DetailsKey
     detailsViewModel: DetailsViewModel = hiltViewModel(),
     // Navigation Lambdas passed from NavDisplay entry

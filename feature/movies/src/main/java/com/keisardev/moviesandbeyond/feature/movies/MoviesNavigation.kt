@@ -23,7 +23,7 @@ import com.keisardev.moviesandbeyond.core.model.MoviesItemsKey
 // It no longer accepts NavController or navigateToDetails lambda directly.
 // Internal navigation is handled by NavManager.
 @Composable
-fun moviesScreen(
+fun MoviesScreen(
     viewModel: MoviesViewModel = hiltViewModel(),
     navigateToDetails: (DetailsKey) -> Unit,
     navigateToItems: (MoviesItemsKey) -> Unit

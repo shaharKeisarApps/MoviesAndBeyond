@@ -24,7 +24,7 @@ import com.keisardev.moviesandbeyond.core.model.LibraryItemsKey
 // This is the main entry composable for the You feature,
 // called from NavDisplay when YouKey is active.
 @Composable
-fun youScreen(
+fun YouScreen(
     navigateToAuth: (AuthKey) -> Unit, // Added parameter
     navigateToLibraryItem: (LibraryItemsKey) -> Unit // Added parameter
 ) {

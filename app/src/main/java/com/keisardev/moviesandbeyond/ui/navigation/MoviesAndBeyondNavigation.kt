@@ -21,15 +21,15 @@ import com.keisardev.moviesandbeyond.core.model.SearchKey
 import com.keisardev.moviesandbeyond.core.model.TvItemsKey
 import com.keisardev.moviesandbeyond.core.model.TvShowsKey
 import com.keisardev.moviesandbeyond.core.model.YouKey
-import com.keisardev.moviesandbeyond.feature.auth.authScreen
+import com.keisardev.moviesandbeyond.feature.auth.AuthScreen
 import com.keisardev.moviesandbeyond.feature.details.CreditsRoute
-import com.keisardev.moviesandbeyond.feature.details.detailsScreen
-import com.keisardev.moviesandbeyond.feature.movies.moviesScreen
-import com.keisardev.moviesandbeyond.feature.search.searchScreen
+import com.keisardev.moviesandbeyond.feature.details.DetailsScreen
+import com.keisardev.moviesandbeyond.feature.movies.MoviesScreen
+import com.keisardev.moviesandbeyond.feature.search.SearchScreen
 import com.keisardev.moviesandbeyond.feature.tv.ItemsRoute
-import com.keisardev.moviesandbeyond.feature.tv.tvShowsScreen
+import com.keisardev.moviesandbeyond.feature.tv.TvShowsScreen
+import com.keisardev.moviesandbeyond.feature.you.YouScreen
 import com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute
-import com.keisardev.moviesandbeyond.feature.you.youScreen
 import com.keisardev.moviesandbeyond.ui.OnboardingScreen
 
 @Composable
@@ -50,10 +50,10 @@ fun MoviesAndBeyondNavigation(
                 OnboardingScreen(navigateToAuth = { backStack.add(AuthKey) })
             }
             entry<AuthKey> {
-                authScreen(onBackClick = { backStack.removeLastOrNull() })
+                AuthScreen(onBackClick = { backStack.removeLastOrNull() })
             }
             entry<MoviesKey> {
-                moviesScreen(
+                MoviesScreen(
                     navigateToDetails = { detailsKey -> backStack.add(detailsKey) },
                     navigateToItems = { categoryKey -> backStack.add(categoryKey) }
                 )
@@ -66,7 +66,7 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<TvShowsKey> {
-                tvShowsScreen(
+                TvShowsScreen(
                     navigateToDetails = { detailsKey -> backStack.add(detailsKey) },
                     navigateToItems = { categoryKey -> backStack.add(categoryKey) }
                 )
@@ -79,10 +79,10 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<SearchKey> {
-                searchScreen(navigateToDetails = { detailsKey -> backStack.add(detailsKey) })
+                SearchScreen(navigateToDetails = { detailsKey -> backStack.add(detailsKey) })
             }
             entry<YouKey> {
-                youScreen(
+                YouScreen(
                     navigateToAuth = { backStack.add(AuthKey) },
                     navigateToLibraryItem = { libraryItemsKey -> backStack.add(libraryItemsKey) }
                 )
@@ -94,7 +94,7 @@ fun MoviesAndBeyondNavigation(
                 )
             }
             entry<DetailsKey> { key ->
-                detailsScreen(
+                DetailsScreen(
                     itemId = key.itemId,
                     onBackClick = { backStack.removeLastOrNull() },
                     navigateToDetails = { newDetailsKey -> backStack.add(newDetailsKey) },

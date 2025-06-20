@@ -20,7 +20,7 @@ import com.keisardev.moviesandbeyond.core.model.TvItemsKey
 // This function is the main entry composable for the TV Shows feature,
 // called from the app's NavDisplay.
 @Composable
-fun tvShowsScreen(
+fun TvShowsScreen(
     viewModel: TvShowsViewModel = hiltViewModel(),
     navigateToDetails: (DetailsKey) -> Unit, // Added
     navigateToItems: (TvItemsKey) -> Unit // Added

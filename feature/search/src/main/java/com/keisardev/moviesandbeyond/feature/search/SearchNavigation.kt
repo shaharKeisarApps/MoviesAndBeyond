@@ -13,7 +13,7 @@ import com.keisardev.moviesandbeyond.core.model.DetailsKey
 // This is the main entry composable for the Search feature,
 // called from NavDisplay when SearchKey is active.
 @Composable
-fun searchScreen(
+fun SearchScreen(
     navigateToDetails: (DetailsKey) -> Unit // Added parameter
 ) {
     SearchRoute(navigateToDetail = {
