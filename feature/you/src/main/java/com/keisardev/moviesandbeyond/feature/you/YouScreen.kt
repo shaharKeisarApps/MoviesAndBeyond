@@ -73,7 +73,7 @@ import kotlinx.coroutines.launch
 internal fun YouRoute(
     navigateToAuth: () -> Unit,
     navigateToLibraryItem: (String) -> Unit,
-    viewModel: YouViewModel = hiltViewModel()
+    viewModel: YouViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userSettings by viewModel.userSettings.collectAsStateWithLifecycle()
@@ -90,7 +90,7 @@ internal fun YouRoute(
         onReloadAccountDetailsClick = viewModel::getAccountDetails,
         onRefresh = viewModel::onRefresh,
         onLogOutClick = viewModel::logOut,
-        onErrorShown = viewModel::onErrorShown
+        onErrorShown = viewModel::onErrorShown,
     )
 }
 
@@ -108,7 +108,7 @@ internal fun YouScreen(
     onReloadAccountDetailsClick: () -> Unit,
     onLogOutClick: () -> Unit,
     onRefresh: () -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -127,7 +127,7 @@ internal fun YouScreen(
             onChangeTheme = onChangeTheme,
             onChangeDarkMode = onChangeDarkMode,
             onChangeIncludeAdult = onChangeIncludeAdult,
-            onDismissRequest = { showSettingsDialog = !showSettingsDialog }
+            onDismissRequest = { showSettingsDialog = !showSettingsDialog },
         )
     }
 
@@ -139,40 +139,39 @@ internal fun YouScreen(
     }
 
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {},
                 actions = {
-                    IconButton(
-                        onClick = { showAttributionInfoDialog = true }
-                    ) {
+                    IconButton(onClick = { showAttributionInfoDialog = true }) {
                         Icon(
                             imageVector = Icons.Rounded.Info,
-                            contentDescription = stringResource(id = R.string.attribution_info)
+                            contentDescription = stringResource(id = R.string.attribution_info),
                         )
                     }
 
                     userSettings?.let {
-                        IconButton(
-                            onClick = { showSettingsDialog = true }
-                        ) {
+                        IconButton(onClick = { showSettingsDialog = true }) {
                             Icon(
                                 imageVector = Icons.Rounded.Settings,
-                                contentDescription = stringResource(id = R.string.settings_dialog_title)
+                                contentDescription =
+                                    stringResource(id = R.string.settings_dialog_title),
                             )
                         }
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .pullToRefresh(isRefreshing = uiState.isRefreshing, state = pullToRefreshState, onRefresh = onRefresh)
+            modifier =
+                Modifier.padding(paddingValues)
+                    .pullToRefresh(
+                        isRefreshing = uiState.isRefreshing,
+                        state = pullToRefreshState,
+                        onRefresh = onRefresh,
+                    )
         ) {
             Column(Modifier.fillMaxSize()) {
                 isLoggedIn?.let {
@@ -182,21 +181,20 @@ internal fun YouScreen(
                                 accountDetails = it,
                                 isLoggingOut = uiState.isLoggingOut,
                                 onLibraryItemClick = onLibraryItemClick,
-                                onLogOutClick = onLogOutClick
+                                onLogOutClick = onLogOutClick,
                             )
-                        } ?: LoadAccountDetails(
-                            isLoading = uiState.isLoading,
-                            onReloadAccountDetailsClick = onReloadAccountDetailsClick
-                        )
+                        }
+                            ?: LoadAccountDetails(
+                                isLoading = uiState.isLoading,
+                                onReloadAccountDetailsClick = onReloadAccountDetailsClick,
+                            )
                     } else {
-                        LoggedOutView(
-                            onNavigateToAuth = onNavigateToAuth
-                        )
+                        LoggedOutView(onNavigateToAuth = onNavigateToAuth)
                     }
                 }
             }
 
-          /*  PullToRefreshContainer(
+            /*  PullToRefreshContainer(
                 state = pullToRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
             )
@@ -221,39 +219,29 @@ private fun LoggedInView(
     accountDetails: AccountDetails,
     isLoggingOut: Boolean,
     onLibraryItemClick: (String) -> Unit,
-    onLogOutClick: () -> Unit
+    onLogOutClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 4.dp)
+        modifier =
+            Modifier.fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
-        PersonImage(
-            imageUrl = accountDetails.avatar ?: "",
-            modifier = Modifier.size(64.dp)
-        )
+        PersonImage(imageUrl = accountDetails.avatar ?: "", modifier = Modifier.size(64.dp))
         Text(
             text = accountDetails.username,
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
-        Text(
-            text = accountDetails.name,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Text(text = accountDetails.name, style = MaterialTheme.typography.titleMedium)
         LibrarySection(onLibraryItemClick = onLibraryItemClick)
 
         if (isLoggingOut) {
             CircularProgressIndicator()
         } else {
-            Button(
-                onClick = onLogOutClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
+            Button(onClick = onLogOutClick, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(id = R.string.log_out))
             }
         }
@@ -261,32 +249,25 @@ private fun LoggedInView(
 }
 
 @Composable
-private fun LoggedOutView(
-    onNavigateToAuth: () -> Unit
-) {
+private fun LoggedOutView(onNavigateToAuth: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .padding(horizontal = 12.dp)
-                .align(Alignment.Center),
+            modifier =
+                Modifier.fillMaxWidth(0.6f).padding(horizontal = 12.dp).align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
             Text(
                 text = stringResource(id = R.string.log_in_description),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
-            Button(
-                onClick = onNavigateToAuth,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Button(onClick = onNavigateToAuth, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(id = R.string.log_in))
             }
         }
@@ -294,21 +275,12 @@ private fun LoggedOutView(
 }
 
 @Composable
-private fun LoadAccountDetails(
-    isLoading: Boolean,
-    onReloadAccountDetailsClick: () -> Unit
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
+private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
             CircularProgressIndicator()
         } else {
-            Button(
-                onClick = onReloadAccountDetailsClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Button(onClick = onReloadAccountDetailsClick, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(id = R.string.reload_account_details))
             }
         }
@@ -316,52 +288,36 @@ private fun LoadAccountDetails(
 }
 
 @Composable
-private fun LibrarySection(
-    onLibraryItemClick: (String) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
+private fun LibrarySection(onLibraryItemClick: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
         Text(
             text = stringResource(id = R.string.your_library),
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
         LibraryItemOption(
             optionName = stringResource(id = R.string.favorites),
-            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) }
+            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) },
         )
         LibraryItemOption(
             optionName = stringResource(id = R.string.watchlist),
-            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) }
+            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) },
         )
     }
 }
 
 @Composable
-private fun LibraryItemOption(
-    optionName: String,
-    onClick: () -> Unit
-) {
+private fun LibraryItemOption(optionName: String, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .height(42.dp)
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).height(42.dp),
     ) {
-        Text(
-            text = optionName,
-            fontSize = 18.sp,
-        )
+        Text(text = optionName, fontSize = 18.sp)
     }
 }
 
 @Composable
-private fun AttributionInfoDialog(
-    onDismissRequest: () -> Unit
-) {
+private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -369,31 +325,30 @@ private fun AttributionInfoDialog(
                 text = stringResource(R.string.settings_dialog_dismiss_text),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .clickable { onDismissRequest() },
+                modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
             )
         },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .decoderFactory(SvgDecoder.Factory())
-                        .data(R.drawable.tmdb_logo)
-                        .build(),
+                    model =
+                        ImageRequest.Builder(LocalContext.current)
+                            .decoderFactory(SvgDecoder.Factory())
+                            .data(R.drawable.tmdb_logo)
+                            .build(),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(100.dp),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(id = R.string.attribution_text),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
-        }
+        },
     )
 }
 
@@ -403,7 +358,7 @@ private fun SettingsDialog(
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     userSettings?.let {
         AlertDialog(
@@ -418,13 +373,13 @@ private fun SettingsDialog(
                 HorizontalDivider()
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.verticalScroll(rememberScrollState())
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
                 ) {
                     SettingsPanel(
                         settings = userSettings,
                         onChangeTheme = onChangeTheme,
                         onChangeDarkMode = onChangeDarkMode,
-                        onChangeIncludeAdult = onChangeIncludeAdult
+                        onChangeIncludeAdult = onChangeIncludeAdult,
                     )
                 }
             },
@@ -433,9 +388,7 @@ private fun SettingsDialog(
                     text = stringResource(R.string.settings_dialog_dismiss_text),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .clickable { onDismissRequest() },
+                    modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
                 )
             },
         )
@@ -455,12 +408,12 @@ private fun SettingsPanel(
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_default),
                 selected = !settings.useDynamicColor,
-                onClick = { onChangeTheme(false) }
+                onClick = { onChangeTheme(false) },
             )
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_dynamic),
                 selected = settings.useDynamicColor,
-                onClick = { onChangeTheme(true) }
+                onClick = { onChangeTheme(true) },
             )
         }
     }
@@ -469,28 +422,22 @@ private fun SettingsPanel(
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_default),
             selected = settings.darkMode == SYSTEM,
-            onClick = { onChangeDarkMode(SYSTEM) }
+            onClick = { onChangeDarkMode(SYSTEM) },
         )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_yes),
             selected = settings.darkMode == DARK,
-            onClick = { onChangeDarkMode(DARK) }
+            onClick = { onChangeDarkMode(DARK) },
         )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_no),
             selected = settings.darkMode == LIGHT,
-            onClick = { onChangeDarkMode(LIGHT) }
+            onClick = { onChangeDarkMode(LIGHT) },
         )
     }
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
         SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
-        Switch(
-            checked = settings.includeAdultResults,
-            onCheckedChange = onChangeIncludeAdult
-        )
+        Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
     }
 }
 
@@ -504,27 +451,15 @@ private fun SettingsDialogSectionTitle(text: String) {
 }
 
 @Composable
-private fun SettingsDialogChooserRow(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
+private fun SettingsDialogChooserRow(text: String, selected: Boolean, onClick: () -> Unit) {
     Row(
-        Modifier
-            .fillMaxWidth()
-            .selectable(
-                selected = selected,
-                role = Role.RadioButton,
-                onClick = onClick,
-            )
+        Modifier.fillMaxWidth()
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        RadioButton(
-            selected = selected,
-            onClick = null,
-        )
+        RadioButton(selected = selected, onClick = null)
         Text(text)
     }
 }
@@ -536,28 +471,27 @@ fun supportsDynamicColorTheme() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 @Composable
 private fun YouScreenPreview() {
     YouScreen(
-        uiState = YouUiState(
-            accountDetails = AccountDetails(
-                id = 1,
-                name = "John Doe",
-                username = "johndoe",
-                avatar = "",
-                includeAdult = false,
-                gravatar = "null",
-                iso6391 = "null",
-                iso31661 = "null",
+        uiState =
+            YouUiState(
+                accountDetails =
+                    AccountDetails(
+                        id = 1,
+                        name = "John Doe",
+                        username = "johndoe",
+                        avatar = "",
+                        includeAdult = false,
+                        gravatar = "null",
+                        iso6391 = "null",
+                        iso31661 = "null",
+                    ),
+                isLoading = false,
+                isRefreshing = false,
+                isLoggingOut = false,
+                errorMessage = null,
             ),
-            isLoading = false,
-            isRefreshing = false,
-            isLoggingOut = false,
-            errorMessage = null
-        ),
         isLoggedIn = true,
-        userSettings = UserSettings(
-            useDynamicColor = true,
-            includeAdultResults = false,
-            darkMode = SYSTEM
-        ),
+        userSettings =
+            UserSettings(useDynamicColor = true, includeAdultResults = false, darkMode = SYSTEM),
         onChangeTheme = {},
         onChangeDarkMode = {},
         onChangeIncludeAdult = {},
@@ -566,7 +500,7 @@ private fun YouScreenPreview() {
         onReloadAccountDetailsClick = {},
         onRefresh = {},
         onLogOutClick = {},
-        onErrorShown = {}
+        onErrorShown = {},
     )
 }
 
@@ -574,13 +508,10 @@ private fun YouScreenPreview() {
 @Composable
 private fun SettingsDialogPreview() {
     SettingsDialog(
-        userSettings = UserSettings(
-            useDynamicColor = true,
-            includeAdultResults = true,
-            darkMode = SYSTEM
-        ),
+        userSettings =
+            UserSettings(useDynamicColor = true, includeAdultResults = true, darkMode = SYSTEM),
         onChangeTheme = {},
         onChangeDarkMode = {},
-        onChangeIncludeAdult = {}
+        onChangeIncludeAdult = {},
     ) {}
 }

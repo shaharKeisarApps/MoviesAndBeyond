@@ -7,15 +7,11 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
-internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*,*,*,*,*,*>
-) {
+internal fun Project.configureAndroidCompose(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
     commonExtension.apply {
-        buildFeatures {
-            compose = true
-        }
+        buildFeatures { compose = true }
 
         dependencies {
             val bom = findLibrary("compose-bom")

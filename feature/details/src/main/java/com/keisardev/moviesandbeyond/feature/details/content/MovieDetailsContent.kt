@@ -42,10 +42,8 @@ internal fun MovieDetailsContent(
         onWatchlistClick = { onWatchlistClick(movieDetails.asLibraryItem()) },
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
-        onRecommendationClick = { id ->
-            onRecommendationClick("${id},${MediaType.MOVIE}")
-        },
-        onBackdropCollapse = onBackdropCollapse
+        onRecommendationClick = { id -> onRecommendationClick("${id},${MediaType.MOVIE}") },
+        onBackdropCollapse = onBackdropCollapse,
     ) {
         MovieDetailsSection(
             releaseDate = movieDetails.releaseDate,
@@ -53,7 +51,7 @@ internal fun MovieDetailsContent(
             productionCompanies = movieDetails.productionCompanies,
             productionCountries = movieDetails.productionCountries,
             budget = movieDetails.budget,
-            revenue = movieDetails.revenue
+            revenue = movieDetails.revenue,
         )
     }
 }
@@ -65,40 +63,31 @@ private fun MovieDetailsSection(
     productionCompanies: String,
     productionCountries: String,
     budget: String,
-    revenue: String
+    revenue: String,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.padding(bottom = 6.dp)
+        modifier = Modifier.padding(bottom = 6.dp),
     ) {
-        DetailItem(
-            fieldName = stringResource(id = R.string.release_date),
-            value = releaseDate
-        )
+        DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
 
         DetailItem(
             fieldName = stringResource(id = R.string.original_language),
-            value = originalLanguage
+            value = originalLanguage,
         )
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.budget),
-            value = "$${budget}"
-        )
+        DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.revenue),
-            value = "$${revenue}"
-        )
+        DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
 
         DetailItem(
             fieldName = stringResource(id = R.string.production_companies),
-            value = productionCompanies
+            value = productionCompanies,
         )
 
         DetailItem(
             fieldName = stringResource(id = R.string.production_countries),
-            value = productionCountries
+            value = productionCountries,
         )
     }
 }

@@ -23,22 +23,21 @@ import com.keisardev.moviesandbeyond.ui.onboardingNavigationRoute
 fun MoviesAndBeyondNavigation(
     hideOnboarding: Boolean,
     navController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
-    val startDestination = if (hideOnboarding) {
-        moviesNavigationRoute
-    } else {
-        onboardingNavigationRoute
-    }
+    val startDestination =
+        if (hideOnboarding) {
+            moviesNavigationRoute
+        } else {
+            onboardingNavigationRoute
+        }
 
     NavHost(
         modifier = Modifier.padding(paddingValues),
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(
-            route = onboardingNavigationRoute
-        ) {
+        composable(route = onboardingNavigationRoute) {
             OnboardingScreen(navigateToAuth = navController::navigateToAuth)
         }
 
@@ -46,12 +45,12 @@ fun MoviesAndBeyondNavigation(
 
         moviesScreen(
             navController = navController,
-            navigateToDetails = navController::navigateToDetails
+            navigateToDetails = navController::navigateToDetails,
         )
 
         tvShowsScreen(
             navController = navController,
-            navigateToDetails = navController::navigateToDetails
+            navigateToDetails = navController::navigateToDetails,
         )
 
         searchScreen(navigateToDetail = navController::navigateToDetails)
@@ -59,12 +58,9 @@ fun MoviesAndBeyondNavigation(
         youScreen(
             navController = navController,
             navigateToAuth = navController::navigateToAuth,
-            navigateToDetails = navController::navigateToDetails
+            navigateToDetails = navController::navigateToDetails,
         )
 
-        detailsScreen(
-            navController = navController,
-            navigateToAuth = navController::navigateToAuth
-        )
+        detailsScreen(navController = navController, navigateToAuth = navController::navigateToAuth)
     }
 }

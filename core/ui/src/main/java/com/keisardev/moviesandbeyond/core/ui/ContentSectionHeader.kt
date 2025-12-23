@@ -18,23 +18,23 @@ import androidx.compose.ui.text.font.FontWeight
 fun ContentSectionHeader(
     sectionName: String,
     onSeeAllClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = sectionName,
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
 
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
             contentDescription = stringResource(id = R.string.see_all),
-            modifier = Modifier.noRippleClickable { onSeeAllClick() }
+            modifier = Modifier.noRippleClickable { onSeeAllClick() },
         )
     }
 }

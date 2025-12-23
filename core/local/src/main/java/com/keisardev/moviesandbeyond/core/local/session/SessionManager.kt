@@ -2,14 +2,12 @@ package com.keisardev.moviesandbeyond.core.local.session
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import javax.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import javax.inject.Inject
 
-class SessionManager @Inject constructor(
-    private val sharedPreferences: SharedPreferences
-) {
+class SessionManager @Inject constructor(private val sharedPreferences: SharedPreferences) {
     companion object {
         const val USER_SESSION_ID = "user_sesion_id"
     }
@@ -17,21 +15,18 @@ class SessionManager @Inject constructor(
     val isLoggedIn: Flow<Boolean> = callbackFlow {
         trySend(getSessionId() != null)
 
-        val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == USER_SESSION_ID) {
-                trySend(getSessionId() != null)
+        val prefListener =
+            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == USER_SESSION_ID) {
+                    trySend(getSessionId() != null)
+                }
             }
-        }
         sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener)
-        awaitClose {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefListener)
-        }
+        awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefListener) }
     }
 
     fun storeSessionId(sessionId: String) {
-        sharedPreferences.edit {
-            putString(USER_SESSION_ID, sessionId)
-        }
+        sharedPreferences.edit { putString(USER_SESSION_ID, sessionId) }
     }
 
     fun getSessionId(): String? {
@@ -39,8 +34,6 @@ class SessionManager @Inject constructor(
     }
 
     fun deleteSessionId() {
-        sharedPreferences.edit {
-            putString(USER_SESSION_ID, null)
-        }
+        sharedPreferences.edit { putString(USER_SESSION_ID, null) }
     }
 }

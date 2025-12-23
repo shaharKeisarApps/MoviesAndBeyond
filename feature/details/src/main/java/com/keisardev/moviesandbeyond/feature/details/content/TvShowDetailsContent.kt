@@ -42,10 +42,8 @@ internal fun TvShowDetailsContent(
         onWatchlistClick = { onWatchlistClick(tvDetails.asLibraryItem()) },
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
-        onRecommendationClick = { id ->
-            onRecommendationClick("${id},${MediaType.TV}")
-        },
-        onBackdropCollapse = onBackdropCollapse
+        onRecommendationClick = { id -> onRecommendationClick("${id},${MediaType.TV}") },
+        onBackdropCollapse = onBackdropCollapse,
     ) {
         TvDetailsSection(
             originalLanguage = tvDetails.originalLanguage,
@@ -58,7 +56,7 @@ internal fun TvShowDetailsContent(
             numberOfSeasons = tvDetails.numberOfSeasons,
             networks = tvDetails.networks,
             productionCompanies = tvDetails.productionCompanies,
-            productionCountries = tvDetails.productionCountries
+            productionCountries = tvDetails.productionCountries,
         )
     }
 }
@@ -75,67 +73,49 @@ private fun TvDetailsSection(
     numberOfSeasons: Int,
     networks: String,
     productionCompanies: String,
-    productionCountries: String
+    productionCountries: String,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.padding(bottom = 6.dp)
+        modifier = Modifier.padding(bottom = 6.dp),
     ) {
         DetailItem(
             fieldName = stringResource(id = R.string.original_language),
-            value = originalLanguage
+            value = originalLanguage,
         )
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.first_air_date),
-            value = firstAirDate
-        )
+        DetailItem(fieldName = stringResource(id = R.string.first_air_date), value = firstAirDate)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.last_air_date),
-            value = lastAirDate
-        )
+        DetailItem(fieldName = stringResource(id = R.string.last_air_date), value = lastAirDate)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.in_production),
-            value = inProduction
-        )
+        DetailItem(fieldName = stringResource(id = R.string.in_production), value = inProduction)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.status),
-            value = status
-        )
+        DetailItem(fieldName = stringResource(id = R.string.status), value = status)
 
         nextAirDate?.let {
-            DetailItem(
-                fieldName = stringResource(id = R.string.next_air_date),
-                value = it
-            )
+            DetailItem(fieldName = stringResource(id = R.string.next_air_date), value = it)
         }
 
         DetailItem(
             fieldName = stringResource(id = R.string.number_episodes),
-            value = "$numberOfEpisodes"
+            value = "$numberOfEpisodes",
         )
 
         DetailItem(
             fieldName = stringResource(id = R.string.number_seasons),
-            value = "$numberOfSeasons"
+            value = "$numberOfSeasons",
         )
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.networks),
-            value = networks
-        )
+        DetailItem(fieldName = stringResource(id = R.string.networks), value = networks)
 
         DetailItem(
             fieldName = stringResource(id = R.string.production_companies),
-            value = productionCompanies
+            value = productionCompanies,
         )
 
         DetailItem(
             fieldName = stringResource(id = R.string.production_countries),
-            value = productionCountries
+            value = productionCountries,
         )
     }
 }

@@ -26,19 +26,11 @@ internal abstract class RepositoryModule {
     ): ContentRepository
 
     @Binds
-    abstract fun bindSearchRepository(
-        searchRepositoryImpl: SearchRepositoryImpl
-    ): SearchRepository
+    abstract fun bindSearchRepository(searchRepositoryImpl: SearchRepositoryImpl): SearchRepository
 
-    @Binds
-    abstract fun bindUserRepository(
-        userRepositoryImpl: UserRepositoryImpl
-    ): UserRepository
+    @Binds abstract fun bindUserRepository(userRepositoryImpl: UserRepositoryImpl): UserRepository
 
-    @Binds
-    abstract fun bindAuthRepository(
-        authRepositoryImpl: AuthRepositoryImpl
-    ): AuthRepository
+    @Binds abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
 
     @Binds
     abstract fun bindDetailsRepository(

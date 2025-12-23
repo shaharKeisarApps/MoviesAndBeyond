@@ -8,26 +8,26 @@ import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
-internal class ContentRepositoryImpl @Inject constructor(
-    private val tmdbApi: TmdbApi,
-    private val accountDetailsDao: AccountDetailsDao
-) : ContentRepository {
+internal class ContentRepositoryImpl
+@Inject
+constructor(private val tmdbApi: TmdbApi, private val accountDetailsDao: AccountDetailsDao) :
+    ContentRepository {
     override suspend fun getMovieItems(
         page: Int,
-        category: MovieListCategory
+        category: MovieListCategory,
     ): NetworkResponse<List<ContentItem>> {
         return try {
-            val response = tmdbApi.getMovieLists(
-                category = category.categoryName,
-                page = page,
-                region = accountDetailsDao.getRegionCode()
-            )
-            NetworkResponse.Success(response.results.map(
-                NetworkContentItem::asModel))
+            val response =
+                tmdbApi.getMovieLists(
+                    category = category.categoryName,
+                    page = page,
+                    region = accountDetailsDao.getRegionCode(),
+                )
+            NetworkResponse.Success(response.results.map(NetworkContentItem::asModel))
         } catch (e: IOException) {
             return NetworkResponse.Error()
         } catch (e: HttpException) {
@@ -37,13 +37,10 @@ internal class ContentRepositoryImpl @Inject constructor(
 
     override suspend fun getTvShowItems(
         page: Int,
-        category: TvShowListCategory
+        category: TvShowListCategory,
     ): NetworkResponse<List<ContentItem>> {
         return try {
-            val response = tmdbApi.getTvShowLists(
-                category = category.categoryName,
-                page = page
-            )
+            val response = tmdbApi.getTvShowLists(category = category.categoryName, page = page)
             NetworkResponse.Success(response.results.map(NetworkContentItem::asModel))
         } catch (e: IOException) {
             return NetworkResponse.Error()

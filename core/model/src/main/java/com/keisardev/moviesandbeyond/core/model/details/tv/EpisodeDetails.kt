@@ -12,5 +12,5 @@ data class EpisodeDetails(
     val showId: Int,
     val stillPath: String,
     val voteAverage: Double,
-    val voteCount: Int
+    val voteCount: Int,
 )

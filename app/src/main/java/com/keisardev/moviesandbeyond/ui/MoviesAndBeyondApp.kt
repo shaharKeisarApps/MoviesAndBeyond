@@ -36,15 +36,15 @@ import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.materials.CupertinoMaterials
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
-
 @OptIn(
-    ExperimentalHazeApi::class, ExperimentalHazeMaterialsApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalHazeApi::class,
+    ExperimentalHazeMaterialsApi::class,
+    ExperimentalMaterial3Api::class,
 )
 @Composable
 fun MoviesAndBeyondApp(
     hideOnboarding: Boolean,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     val hazeState = remember { HazeState() }
     val inputScale: HazeInputScale = HazeInputScale.Auto
@@ -53,31 +53,30 @@ fun MoviesAndBeyondApp(
     val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val showBottomBar = bottomBarDestinations.any { destination ->
-        currentDestination?.route?.contains(destination.name, true) == true
-    }
+    val showBottomBar =
+        bottomBarDestinations.any { destination ->
+            currentDestination?.route?.contains(destination.name, true) == true
+        }
 
     HazeScaffold(
         hazeState = hazeState,
         bottomBar = {
             if (showBottomBar)
-            MoviesAndBeyondNavigationBar(
-                destinations = bottomBarDestinations,
-                currentDestination = currentDestination,
-                onNavigateToDestination = { destination ->
-                    navController.navigateToBottomBarDestination(destination)
-                },
-                modifier = Modifier
-                    .hazeEffect(state = hazeState, style = style)
-                    .fillMaxWidth()
-            )
+                MoviesAndBeyondNavigationBar(
+                    destinations = bottomBarDestinations,
+                    currentDestination = currentDestination,
+                    onNavigateToDestination = { destination ->
+                        navController.navigateToBottomBarDestination(destination)
+                    },
+                    modifier = Modifier.hazeEffect(state = hazeState, style = style).fillMaxWidth(),
+                )
         },
-        contentWindowInsets = WindowInsets.safeDrawing
+        contentWindowInsets = WindowInsets.safeDrawing,
     ) { padding ->
         MoviesAndBeyondNavigation(
             hideOnboarding = hideOnboarding,
             navController = navController,
-            paddingValues = padding
+            paddingValues = padding,
         )
     }
 }
@@ -87,7 +86,7 @@ fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
     currentDestination: NavDestination?,
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     NavigationBar(modifier = modifier, containerColor = Color.Transparent) {
         destinations.forEach { destination ->
@@ -98,26 +97,24 @@ fun MoviesAndBeyondNavigationBar(
                 icon = {
                     Icon(
                         imageVector = if (selected) destination.selectedIcon else destination.icon,
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 },
-                label = { Text(stringResource(id = destination.titleId)) }
+                label = { Text(stringResource(id = destination.titleId)) },
             )
         }
     }
 }
 
-private fun NavDestination?.isDestinationInHierarchy(destination: MoviesAndBeyondDestination): Boolean {
-    return this?.hierarchy?.any {
-        it.route?.contains(destination.name, true) == true
-    } == true
+private fun NavDestination?.isDestinationInHierarchy(
+    destination: MoviesAndBeyondDestination
+): Boolean {
+    return this?.hierarchy?.any { it.route?.contains(destination.name, true) == true } == true
 }
 
 private fun NavController.navigateToBottomBarDestination(destination: MoviesAndBeyondDestination) {
     val navOptions = navOptions {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
+        popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
         restoreState = true
     }

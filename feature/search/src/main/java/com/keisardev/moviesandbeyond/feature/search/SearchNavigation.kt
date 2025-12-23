@@ -8,9 +8,7 @@ import androidx.navigation.compose.composable
 const val searchNavigationRoute = "search"
 
 fun NavGraphBuilder.searchScreen(navigateToDetail: (String) -> Unit) {
-    composable(route = searchNavigationRoute) {
-        SearchRoute(navigateToDetail = navigateToDetail)
-    }
+    composable(route = searchNavigationRoute) { SearchRoute(navigateToDetail = navigateToDetail) }
 }
 
 fun NavController.navigateToSearch(navOptions: NavOptions) {

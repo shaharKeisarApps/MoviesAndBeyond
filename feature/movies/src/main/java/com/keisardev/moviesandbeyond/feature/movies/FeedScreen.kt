@@ -38,7 +38,7 @@ internal fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
     viewModel: MoviesViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val nowPlayingMovies by viewModel.nowPlayingMovies.collectAsStateWithLifecycle()
     val popularMovies by viewModel.popularMovies.collectAsStateWithLifecycle()
@@ -56,7 +56,7 @@ internal fun FeedRoute(
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
         onErrorShown = viewModel::onErrorShown,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -71,7 +71,7 @@ internal fun FeedScreen(
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
     onErrorShown: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -82,10 +82,8 @@ internal fun FeedScreen(
     }
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(WindowInsets.safeDrawing.asPaddingValues()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        modifier = modifier.fillMaxSize().padding(WindowInsets.safeDrawing.asPaddingValues()),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         item {
             ContentSection(
@@ -93,7 +91,7 @@ internal fun FeedScreen(
                 sectionName = stringResource(id = R.string.now_playing),
                 appendItems = appendItems,
                 onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
+                onSeeAllClick = onSeeAllClick,
             )
         }
         item {
@@ -102,7 +100,7 @@ internal fun FeedScreen(
                 sectionName = stringResource(id = R.string.popular),
                 appendItems = appendItems,
                 onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
+                onSeeAllClick = onSeeAllClick,
             )
         }
         item {
@@ -111,7 +109,7 @@ internal fun FeedScreen(
                 sectionName = stringResource(id = R.string.top_rated),
                 appendItems = appendItems,
                 onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
+                onSeeAllClick = onSeeAllClick,
             )
         }
         item {
@@ -120,7 +118,7 @@ internal fun FeedScreen(
                 sectionName = stringResource(id = R.string.upcoming),
                 appendItems = appendItems,
                 onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
+                onSeeAllClick = onSeeAllClick,
             )
         }
     }
@@ -179,7 +177,7 @@ private fun ContentSection(
     sectionName: String,
     appendItems: (MovieListCategory) -> Unit,
     onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit
+    onSeeAllClick: (String) -> Unit,
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -192,34 +190,25 @@ private fun ContentSection(
             ContentSectionHeader(
                 sectionName = sectionName,
                 onSeeAllClick = { onSeeAllClick(content.category.name) },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
+                modifier = Modifier.padding(horizontal = horizontalPadding),
             )
         },
         rowContent = {
-            items(
-                items = content.items,
-                key = { it.id }
-            ) {
+            items(items = content.items, key = { it.id }) {
                 MediaItemCard(
                     posterPath = it.imagePath,
-                    onItemClick = {
-                        onItemClick("${it.id},${MediaType.MOVIE}")
-                    }
+                    onItemClick = { onItemClick("${it.id},${MediaType.MOVIE}") },
                 )
             }
 
             if (content.isLoading) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(110.dp)
-                    ) {
+                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp)
+        modifier = Modifier.height(160.dp),
     )
 }

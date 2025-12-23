@@ -11,5 +11,5 @@ data class PersonDetails(
     val knownForDepartment: String,
     val name: String,
     val placeOfBirth: String,
-    val profilePath: String
+    val profilePath: String,
 )

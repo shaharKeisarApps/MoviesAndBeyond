@@ -11,9 +11,5 @@ data class NetworkContentItem(
     @Json(name = "poster_path") val posterPath: String?,
     val title: String?,
 ) {
-    fun asModel() = ContentItem(
-        id = id,
-        imagePath = posterPath ?: "",
-        name = name ?: title ?: ""
-    )
+    fun asModel() = ContentItem(id = id, imagePath = posterPath ?: "", name = name ?: title ?: "")
 }

@@ -23,21 +23,22 @@ import androidx.compose.ui.unit.dp
 fun AnnotatedClickableText(
     attributionString: AnnotatedString,
     onClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.pointerInput(onClick) {
-        detectTapGestures { pos ->
-            layoutResult.value?.let { layoutResult ->
-                onClick(layoutResult.getOffsetForPosition(pos))
+    val pressIndicator =
+        Modifier.pointerInput(onClick) {
+            detectTapGestures { pos ->
+                layoutResult.value?.let { layoutResult ->
+                    onClick(layoutResult.getOffsetForPosition(pos))
+                }
             }
         }
-    }
 
     Text(
         text = attributionString,
         onTextLayout = { layoutResult.value = it },
-        modifier = modifier.then(pressIndicator)
+        modifier = modifier.then(pressIndicator),
     )
 }
 
@@ -48,17 +49,13 @@ fun AnimatedText(
     enter: EnterTransition = fadeIn(),
     exit: ExitTransition = fadeOut(),
 ) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = enter,
-        exit = exit
-    ) {
+    AnimatedVisibility(visible = visible, enter = enter, exit = exit) {
         Text(
             text = text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(end = 8.dp)
+            modifier = Modifier.padding(end = 8.dp),
         )
     }
 }
