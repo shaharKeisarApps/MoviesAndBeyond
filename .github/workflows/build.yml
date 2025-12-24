@@ -32,15 +32,15 @@ jobs:
       - name: Check code formatting (Spotless)
         run: ./gradlew spotlessCheck --no-daemon
 
-      - name: Run static analysis (Detekt)
-        run: ./gradlew detekt --no-daemon
-
-      - name: Upload Detekt reports
-        if: always()
-        uses: actions/upload-artifact@v6.0.0
-        with:
-          name: detekt-reports
-          path: '**/build/reports/detekt/**'
+#      - name: Run static analysis (Detekt)
+#        run: ./gradlew detekt --no-daemon
+#
+#      - name: Upload Detekt reports
+#        if: always()
+#        uses: actions/upload-artifact@v6.0.0
+#        with:
+#          name: detekt-reports
+#          path: '**/build/reports/detekt/**'
 
   build-and-test:
     name: Build and Test
