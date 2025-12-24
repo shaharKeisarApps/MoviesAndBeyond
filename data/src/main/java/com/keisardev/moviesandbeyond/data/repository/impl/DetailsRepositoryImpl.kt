@@ -6,13 +6,11 @@ import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
-class DetailsRepositoryImpl @Inject constructor(
-    private val tmdbApi: TmdbApi
-) : DetailsRepository {
+class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) : DetailsRepository {
     override suspend fun getMovieDetails(id: Int): NetworkResponse<MovieDetails> {
         return try {
             val response = tmdbApi.getMovieDetails(id).asModel()

@@ -8,11 +8,11 @@ import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 interface ContentRepository {
     suspend fun getMovieItems(
         page: Int,
-        category: MovieListCategory
+        category: MovieListCategory,
     ): NetworkResponse<List<ContentItem>>
 
     suspend fun getTvShowItems(
         page: Int,
-        category: TvShowListCategory
+        category: TvShowListCategory,
     ): NetworkResponse<List<ContentItem>>
 }

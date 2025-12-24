@@ -31,8 +31,7 @@ class DetailsViewModelTest {
     private val authRepository = TestAuthRepository()
     private lateinit var viewModel: DetailsViewModel
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
@@ -40,23 +39,14 @@ class DetailsViewModelTest {
     }
 
     @Test
-    fun `test initial state`() = runTest {
-        assertEquals(
-            DetailsUiState(),
-            viewModel.uiState.value
-        )
-    }
+    fun `test initial state`() = runTest { assertEquals(DetailsUiState(), viewModel.uiState.value) }
 
     @Test
     fun `test empty content state`() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
-        assertEquals(
-            ContentDetailUiState.Empty,
-            viewModel.contentDetailsUiState.value
-        )
+        assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
 
         collectJob.cancel()
     }
@@ -65,13 +55,12 @@ class DetailsViewModelTest {
     fun `test movie details content state`() = runTest {
         viewModel = createViewModel(navigationArgument = "100,${MediaType.MOVIE}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(
             ContentDetailUiState.Movie(data = testMovieDetail),
-            viewModel.contentDetailsUiState.value
+            viewModel.contentDetailsUiState.value,
         )
 
         collectJob.cancel()
@@ -81,13 +70,12 @@ class DetailsViewModelTest {
     fun `test tv show details content state`() = runTest {
         viewModel = createViewModel(navigationArgument = "101,${MediaType.TV}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(
             ContentDetailUiState.TV(data = testTvShowDetails),
-            viewModel.contentDetailsUiState.value
+            viewModel.contentDetailsUiState.value,
         )
 
         collectJob.cancel()
@@ -97,13 +85,12 @@ class DetailsViewModelTest {
     fun `test person details content state`() = runTest {
         viewModel = createViewModel(navigationArgument = "102,${MediaType.PERSON}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(
             ContentDetailUiState.Person(data = testPersonDetails),
-            viewModel.contentDetailsUiState.value
+            viewModel.contentDetailsUiState.value,
         )
 
         collectJob.cancel()
@@ -115,19 +102,12 @@ class DetailsViewModelTest {
         val errorResponse = detailsRepository.getMovieDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "100,${MediaType.MOVIE}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
-        assertEquals(
-            ContentDetailUiState.Empty,
-            viewModel.contentDetailsUiState.value
-        )
+        assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
 
         collectJob.cancel()
     }
@@ -138,19 +118,12 @@ class DetailsViewModelTest {
         val errorResponse = detailsRepository.getTvShowDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "101,${MediaType.TV}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
-        assertEquals(
-            ContentDetailUiState.Empty,
-            viewModel.contentDetailsUiState.value
-        )
+        assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
 
         collectJob.cancel()
     }
@@ -161,19 +134,12 @@ class DetailsViewModelTest {
         val errorResponse = detailsRepository.getPersonDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "102,${MediaType.PERSON}")
 
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.contentDetailsUiState.collect()
-        }
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
-        assertEquals(
-            ContentDetailUiState.Empty,
-            viewModel.contentDetailsUiState.value
-        )
+        assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
 
         collectJob.cancel()
     }
@@ -195,10 +161,7 @@ class DetailsViewModelTest {
         libraryRepository.generateError(true)
         viewModel.addOrRemoveFavorite(libraryItem)
 
-        assertEquals(
-            "An error occurred",
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
     }
 
     @Test
@@ -218,10 +181,7 @@ class DetailsViewModelTest {
         libraryRepository.generateError(true)
         viewModel.addOrRemoveFromWatchlist(libraryItem)
 
-        assertEquals(
-            "An error occurred",
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
     }
 
     @Test
@@ -238,14 +198,11 @@ class DetailsViewModelTest {
         assertFalse(viewModel.uiState.value.showSignInSheet)
     }
 
-    private fun createViewModel(
-        navigationArgument: String = ""
-    ) = DetailsViewModel(
-        savedStateHandle = SavedStateHandle(
-            mapOf(idNavigationArgument to navigationArgument)
-        ),
-        detailsRepository = detailsRepository,
-        libraryRepository = libraryRepository,
-        authRepository = authRepository
-    )
+    private fun createViewModel(navigationArgument: String = "") =
+        DetailsViewModel(
+            savedStateHandle = SavedStateHandle(mapOf(idNavigationArgument to navigationArgument)),
+            detailsRepository = detailsRepository,
+            libraryRepository = libraryRepository,
+            authRepository = authRepository,
+        )
 }

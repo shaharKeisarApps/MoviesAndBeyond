@@ -33,7 +33,7 @@ private val horizontalPadding = 8.dp
 @Composable
 internal fun SearchRoute(
     navigateToDetail: (String) -> Unit,
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val searchSuggestions by viewModel.searchSuggestions.collectAsStateWithLifecycle()
@@ -46,7 +46,7 @@ internal fun SearchRoute(
         onSearchQueryChange = viewModel::changeSearchQuery,
         onBack = viewModel::onBack,
         onSearchResultClick = navigateToDetail,
-        onErrorShown = viewModel::onErrorShown
+        onErrorShown = viewModel::onErrorShown,
     )
 }
 
@@ -58,7 +58,7 @@ internal fun SearchScreen(
     onSearchQueryChange: (String) -> Unit,
     onBack: () -> Unit,
     onSearchResultClick: (String) -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -68,19 +68,11 @@ internal fun SearchScreen(
         onErrorShown()
     }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             MoviesAndBeyondSearchBar(
                 value = searchQuery,
-                onQueryChange = { onSearchQueryChange(it) }
+                onQueryChange = { onSearchQueryChange(it) },
             )
 
             if (searchQuery.isNotEmpty()) {
@@ -94,19 +86,16 @@ internal fun SearchScreen(
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    items(
-                        items = searchSuggestions,
-                        key = { it.id }
-                    ) {
+                    items(items = searchSuggestions, key = { it.id }) {
                         SearchSuggestionItem(
                             name = it.name,
                             imagePath = it.imagePath,
                             onItemClick = {
                                 // Converting type to uppercase for [MediaType]
                                 onSearchResultClick("${it.id},${it.mediaType.uppercase()}")
-                            }
+                            },
                         )
                     }
                 }
@@ -117,19 +106,10 @@ internal fun SearchScreen(
 }
 
 @Composable
-private fun SearchHistoryContent(
-    history: List<String>
-) {
+private fun SearchHistoryContent(history: List<String>) {
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(
-            contentPadding = PaddingValues(10.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(
-                items = history
-            ) {
-                Text(it)
-            }
+        LazyColumn(contentPadding = PaddingValues(10.dp), modifier = Modifier.fillMaxSize()) {
+            items(items = history) { Text(it) }
         }
     }
 }

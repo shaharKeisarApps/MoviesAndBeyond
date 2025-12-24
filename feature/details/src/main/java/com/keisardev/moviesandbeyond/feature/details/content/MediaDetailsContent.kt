@@ -100,16 +100,15 @@ internal fun MediaDetailsContent(
     onCastClick: (String) -> Unit,
     onRecommendationClick: (String) -> Unit,
     onBackdropCollapse: (Boolean) -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val heightToCollapsePx = with(LocalDensity.current) { heightToCollapse.toPx() }
 
     // persist collapse offset between different Details screen
     var savedCollapseOffsetPx by rememberSaveable { mutableFloatStateOf(0f) }
 
-    val nestedScrollConnection = remember(heightToCollapsePx) {
-        ExitOnlyCollapseNestedConnection(heightToCollapsePx)
-    }
+    val nestedScrollConnection =
+        remember(heightToCollapsePx) { ExitOnlyCollapseNestedConnection(heightToCollapsePx) }
 
     LaunchedEffect(Unit) {
         // set value of savedCollapseOffsetPx when returning from different Details screen
@@ -118,40 +117,30 @@ internal fun MediaDetailsContent(
         // whenever backdrop collapses or expands, save collapse offset
         snapshotFlow { nestedScrollConnection.collapseOffsetPx }
             .debounce(500L)
-            .collect { offset ->
-                savedCollapseOffsetPx = offset
-            }
+            .collect { offset -> savedCollapseOffsetPx = offset }
     }
 
-    val backdropHeight = with(LocalDensity.current) {
-        (backdropExpandedHeight.toPx() + nestedScrollConnection.collapseOffsetPx).toDp()
-    }
-    val isBackdropCollapsed by remember(backdropHeight) {
-        derivedStateOf { backdropHeight == collapsedHeight }
-    }
-    LaunchedEffect(isBackdropCollapsed) {
-        onBackdropCollapse(isBackdropCollapsed)
-    }
+    val backdropHeight =
+        with(LocalDensity.current) {
+            (backdropExpandedHeight.toPx() + nestedScrollConnection.collapseOffsetPx).toDp()
+        }
+    val isBackdropCollapsed by
+        remember(backdropHeight) { derivedStateOf { backdropHeight == collapsedHeight } }
+    LaunchedEffect(isBackdropCollapsed) { onBackdropCollapse(isBackdropCollapsed) }
 
     val scrollValue = 1 - ((backdropExpandedHeight - backdropHeight) / heightToCollapse)
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .nestedScroll(nestedScrollConnection)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)) {
         BackdropImageSection(
             path = backdropPath,
             scrollValue = scrollValue,
-            modifier = Modifier.height(backdropHeight)
+            modifier = Modifier.height(backdropHeight),
         )
         LazyColumn(
-            contentPadding = PaddingValues(
-                horizontal = horizontalPadding,
-                vertical = verticalPadding
-            ),
+            contentPadding =
+                PaddingValues(horizontal = horizontalPadding, vertical = verticalPadding),
             verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             item {
                 InfoSection(
@@ -160,7 +149,7 @@ internal fun MediaDetailsContent(
                     rating = rating,
                     releaseYear = releaseYear,
                     runtime = runtime,
-                    tagline = tagline
+                    tagline = tagline,
                 )
             }
 
@@ -171,7 +160,7 @@ internal fun MediaDetailsContent(
                     isFavorite = isFavorite,
                     isAddedToWatchList = isAddedToWatchList,
                     onFavoriteClick = onFavoriteClick,
-                    onWatchlistClick = onWatchlistClick
+                    onWatchlistClick = onWatchlistClick,
                 )
             }
 
@@ -179,7 +168,7 @@ internal fun MediaDetailsContent(
                 TopBilledCast(
                     cast = cast,
                     onCastClick = onCastClick,
-                    onSeeAllCastClick = onSeeAllCastClick
+                    onSeeAllCastClick = onSeeAllCastClick,
                 )
             }
 
@@ -190,16 +179,15 @@ internal fun MediaDetailsContent(
             item {
                 Recommendations(
                     recommendations = recommendations,
-                    onRecommendationClick = onRecommendationClick
+                    onRecommendationClick = onRecommendationClick,
                 )
             }
         }
     }
 }
 
-private class ExitOnlyCollapseNestedConnection(
-    private val heightToCollapse: Float
-) : NestedScrollConnection {
+private class ExitOnlyCollapseNestedConnection(private val heightToCollapse: Float) :
+    NestedScrollConnection {
     var collapseOffsetPx by mutableFloatStateOf(0f)
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -222,7 +210,7 @@ private class ExitOnlyCollapseNestedConnection(
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
-        source: NestedScrollSource
+        source: NestedScrollSource,
     ): Offset {
         // change height of top app bar when scrolling all the way down and
         // child has finished scrolling
@@ -238,31 +226,22 @@ private class ExitOnlyCollapseNestedConnection(
 }
 
 @Composable
-internal fun DetailItem(
-    fieldName: String,
-    value: String
-) {
+internal fun DetailItem(fieldName: String, value: String) {
     val text = buildAnnotatedString {
-        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
-            append(fieldName)
-        }
+        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(fieldName) }
         append(value)
     }
     Text(text)
 }
 
 @Composable
-private fun BackdropImageSection(
-    path: String,
-    scrollValue: Float,
-    modifier: Modifier = Modifier
-) {
+private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Modifier = Modifier) {
     Surface(modifier.fillMaxWidth()) {
         TmdbImage(
             width = 1280,
             imageUrl = path,
             contentScale = ContentScale.Crop,
-            alpha = scrollValue
+            alpha = scrollValue,
         )
     }
 }
@@ -275,23 +254,21 @@ private fun InfoSection(
     rating: Double,
     releaseYear: Int,
     tagline: String,
-    runtime: String
+    runtime: String,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
             text = name,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
 
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if (runtime.isNotEmpty()) {
                 Text(runtime)
                 if (releaseYear.toString().isNotEmpty()) {
@@ -306,28 +283,20 @@ private fun InfoSection(
         Rating(rating = rating, count = voteCount)
 
         if (tagline.isNotEmpty()) {
-            Text(
-                text = tagline,
-                textAlign = TextAlign.Center,
-                fontStyle = FontStyle.Italic
-            )
+            Text(text = tagline, textAlign = TextAlign.Center, fontStyle = FontStyle.Italic)
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun GenreSection(
-    genres: List<String>
-) {
+private fun GenreSection(genres: List<String>) {
     if (genres.isNotEmpty()) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            genres.forEach {
-                GenreButton(name = it)
-            }
+            genres.forEach { GenreButton(name = it) }
         }
     }
 }
@@ -338,20 +307,17 @@ private fun TopBilledCast(
     onCastClick: (String) -> Unit,
     onSeeAllCastClick: () -> Unit,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         ContentSectionHeader(
             sectionName = stringResource(id = R.string.top_billed_cast),
-            onSeeAllClick = onSeeAllCastClick
+            onSeeAllClick = onSeeAllCastClick,
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .height(IntrinsicSize.Max)
-                .padding(bottom = 2.dp)
+            modifier =
+                Modifier.horizontalScroll(rememberScrollState())
+                    .height(IntrinsicSize.Max)
+                    .padding(bottom = 2.dp),
         ) {
             cast.forEach {
                 CastItem(
@@ -359,22 +325,19 @@ private fun TopBilledCast(
                     imagePath = it.profilePath,
                     name = it.name,
                     characterName = it.character,
-                    onItemClick = onCastClick
+                    onItemClick = onCastClick,
                 )
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(130.dp)
-                    .noRippleClickable { onSeeAllCastClick() }
+                modifier =
+                    Modifier.fillMaxHeight().width(130.dp).noRippleClickable { onSeeAllCastClick() }
             ) {
                 Text(
                     text = stringResource(id = R.string.view_all),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .noRippleClickable { onSeeAllCastClick() }
+                    modifier =
+                        Modifier.align(Alignment.Center).noRippleClickable { onSeeAllCastClick() },
                 )
             }
         }
@@ -384,7 +347,7 @@ private fun TopBilledCast(
 @Composable
 private fun Recommendations(
     recommendations: List<ContentItem>,
-    onRecommendationClick: (String) -> Unit
+    onRecommendationClick: (String) -> Unit,
 ) {
     LazyRowContentSection(
         pagingEnabled = false,
@@ -392,7 +355,7 @@ private fun Recommendations(
             Text(
                 text = stringResource(id = R.string.recommendations),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         },
         rowContent = {
@@ -401,23 +364,20 @@ private fun Recommendations(
                     Box(Modifier.fillMaxSize()) {
                         Text(
                             text = stringResource(id = R.string.not_available),
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.align(Alignment.Center),
                         )
                     }
                 }
             } else {
-                items(
-                    items = recommendations,
-                    key = { it.id }
-                ) {
+                items(items = recommendations, key = { it.id }) {
                     MediaItemCard(
                         posterPath = it.imagePath,
-                        onItemClick = { onRecommendationClick("${it.id}") }
+                        onItemClick = { onRecommendationClick("${it.id}") },
                     )
                 }
             }
         },
-        modifier = Modifier.padding(bottom = 4.dp)
+        modifier = Modifier.padding(bottom = 4.dp),
     )
 }
 
@@ -428,38 +388,29 @@ private fun CastItem(
     name: String,
     characterName: String,
     onItemClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Card(
-        shape = RoundedCornerShape(6.dp)
-    ) {
+    Card(shape = RoundedCornerShape(6.dp)) {
         Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(130.dp)
-                .noRippleClickable {
+            modifier =
+                Modifier.fillMaxHeight().width(130.dp).noRippleClickable {
                     onItemClick("${id},${MediaType.PERSON}")
                 }
         ) {
             TmdbImage(
                 width = 500,
                 imageUrl = imagePath,
-                modifier = modifier
-                    .height(140.dp)
-                    .noRippleClickable {
+                modifier =
+                    modifier.height(140.dp).noRippleClickable {
                         onItemClick("${id},${MediaType.PERSON}")
-                    }
+                    },
             )
             Spacer(Modifier.height(4.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
                 Text(
                     text = name,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(text = characterName)
@@ -473,67 +424,61 @@ private fun LibraryActions(
     isFavorite: Boolean,
     isAddedToWatchList: Boolean,
     onFavoriteClick: () -> Unit,
-    onWatchlistClick: () -> Unit
+    onWatchlistClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Max)
-            .padding(top = 6.dp, bottom = 4.dp)
+        modifier =
+            Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(top = 6.dp, bottom = 4.dp)
     ) {
         LibraryActionButton(
-            name = if (isFavorite) {
-                stringResource(id = R.string.remove_from_favorites)
-            } else {
-                stringResource(id = R.string.add_to_favorites)
-            },
+            name =
+                if (isFavorite) {
+                    stringResource(id = R.string.remove_from_favorites)
+                } else {
+                    stringResource(id = R.string.add_to_favorites)
+                },
             icon = Icons.Rounded.Favorite,
-            iconTint = if (isFavorite) {
-                Color.Red
-            } else {
-                MaterialTheme.colorScheme.onPrimary
-            },
+            iconTint =
+                if (isFavorite) {
+                    Color.Red
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                },
             onClick = onFavoriteClick,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
+            modifier = Modifier.fillMaxHeight().weight(1f),
         )
         Spacer(Modifier.width(8.dp))
         LibraryActionButton(
-            name = if (isAddedToWatchList) {
-                stringResource(id = R.string.remove_from_watchlist)
-            } else {
-                stringResource(id = R.string.add_to_watchlist)
-            },
-            icon = if (isAddedToWatchList) {
-                Icons.Rounded.Bookmark
-            } else {
-                Icons.Outlined.BookmarkBorder
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ),
+            name =
+                if (isAddedToWatchList) {
+                    stringResource(id = R.string.remove_from_watchlist)
+                } else {
+                    stringResource(id = R.string.add_to_watchlist)
+                },
+            icon =
+                if (isAddedToWatchList) {
+                    Icons.Rounded.Bookmark
+                } else {
+                    Icons.Outlined.BookmarkBorder
+                },
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
             border = BorderStroke(1.dp, Color.Black),
             onClick = onWatchlistClick,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
+            modifier = Modifier.fillMaxHeight().weight(1f),
         )
     }
 }
 
 @Composable
-private fun GenreButton(
-    name: String
-) {
+private fun GenreButton(name: String) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer
+        color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
-        Text(
-            text = name,
-            modifier = Modifier.padding(8.dp)
-        )
+        Text(text = name, modifier = Modifier.padding(8.dp))
     }
 }

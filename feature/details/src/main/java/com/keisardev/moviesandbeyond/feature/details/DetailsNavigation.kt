@@ -12,20 +12,13 @@ private const val creditsNavigationRoute = "credits"
 internal const val idNavigationArgument = "id"
 private const val detailsNavigationRouteWithArg = "$detailsNavigationRoute/{$idNavigationArgument}"
 
-fun NavGraphBuilder.detailsScreen(
-    navController: NavController,
-    navigateToAuth: () -> Unit
-) {
-    navigation(
-        route = detailsNavigationRouteWithArg,
-        startDestination = detailsNavigationRoute
-    ) {
-        composable(
-            route = detailsNavigationRoute
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(detailsNavigationRouteWithArg)
-            }
+fun NavGraphBuilder.detailsScreen(navController: NavController, navigateToAuth: () -> Unit) {
+    navigation(route = detailsNavigationRouteWithArg, startDestination = detailsNavigationRoute) {
+        composable(route = detailsNavigationRoute) { backStackEntry ->
+            val parentEntry =
+                remember(backStackEntry) {
+                    navController.getBackStackEntry(detailsNavigationRouteWithArg)
+                }
             val viewModel = hiltViewModel<DetailsViewModel>(parentEntry)
 
             DetailsRoute(
@@ -33,22 +26,21 @@ fun NavGraphBuilder.detailsScreen(
                 onItemClick = navController::navigateToDetails,
                 onSeeAllCastClick = navController::navigateToCredits,
                 navigateToAuth = navigateToAuth,
-                viewModel = viewModel
+                viewModel = viewModel,
             )
         }
 
-        composable(
-            route = creditsNavigationRoute
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(detailsNavigationRouteWithArg)
-            }
+        composable(route = creditsNavigationRoute) { backStackEntry ->
+            val parentEntry =
+                remember(backStackEntry) {
+                    navController.getBackStackEntry(detailsNavigationRouteWithArg)
+                }
             val viewModel = hiltViewModel<DetailsViewModel>(parentEntry)
 
             CreditsRoute(
                 viewModel = viewModel,
                 onItemClick = navController::navigateToDetails,
-                onBackClick = navController::navigateUp
+                onBackClick = navController::navigateUp,
             )
         }
     }

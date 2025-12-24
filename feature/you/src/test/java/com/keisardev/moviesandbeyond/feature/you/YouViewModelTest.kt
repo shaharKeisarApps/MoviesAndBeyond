@@ -25,39 +25,26 @@ class YouViewModelTest {
     private val userRepository = TestUserRepository()
     private lateinit var viewModel: YouViewModel
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
-        viewModel = YouViewModel(
-            authRepository = authRepository,
-            userRepository = userRepository
-        )
+        viewModel = YouViewModel(authRepository = authRepository, userRepository = userRepository)
     }
 
     @Test
     fun `test initial state`() {
-        TestCase.assertEquals(
-            YouUiState(),
-            viewModel.uiState.value
-        )
+        TestCase.assertEquals(YouUiState(), viewModel.uiState.value)
     }
 
     @Test
     fun `test account details`() = runTest {
-        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.uiState.collect()
-        }
-        val loggedInCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.isLoggedIn.collect()
-        }
+        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val loggedInCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.isLoggedIn.collect() }
 
         authRepository.setAuthStatus(isLoggedIn = true)
-        assertEquals(
-            YouUiState(accountDetails = testAccountDetails),
-            viewModel.uiState.value
-        )
+        assertEquals(YouUiState(accountDetails = testAccountDetails), viewModel.uiState.value)
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()
@@ -65,17 +52,15 @@ class YouViewModelTest {
 
     @Test
     fun `test user settings`() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.userSettings.collect()
-        }
+        val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.userSettings.collect() }
 
         assertEquals(
             UserSettings(
                 useDynamicColor = testUserData.useDynamicColor,
                 includeAdultResults = testUserData.includeAdultResults,
-                darkMode = testUserData.darkMode
+                darkMode = testUserData.darkMode,
             ),
-            viewModel.userSettings.value
+            viewModel.userSettings.value,
         )
 
         collectJob.cancel()
@@ -90,39 +75,25 @@ class YouViewModelTest {
 
     @Test
     fun `test preference updates`() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.userSettings.collect()
-        }
+        val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.userSettings.collect() }
 
         viewModel.setDynamicColorPreference(true)
-        assertEquals(
-            true,
-            viewModel.userSettings.value?.useDynamicColor
-        )
+        assertEquals(true, viewModel.userSettings.value?.useDynamicColor)
 
         viewModel.setDarkModePreference(SelectedDarkMode.LIGHT)
-        assertEquals(
-            SelectedDarkMode.LIGHT,
-            viewModel.userSettings.value?.darkMode
-        )
+        assertEquals(SelectedDarkMode.LIGHT, viewModel.userSettings.value?.darkMode)
 
         viewModel.setAdultResultPreference(true)
-        assertEquals(
-            true,
-            viewModel.userSettings.value?.includeAdultResults
-        )
+        assertEquals(true, viewModel.userSettings.value?.includeAdultResults)
 
         collectJob.cancel()
     }
 
     @Test
     fun `test logout error`() = runTest {
-        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.uiState.collect()
-        }
-        val loggedInCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.isLoggedIn.collect()
-        }
+        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val loggedInCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.isLoggedIn.collect() }
 
         with(authRepository) {
             setAuthStatus(true)
@@ -132,10 +103,7 @@ class YouViewModelTest {
         val errorResponse = authRepository.logout(0) as NetworkResponse.Error
         viewModel.logOut()
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()
@@ -143,23 +111,16 @@ class YouViewModelTest {
 
     @Test
     fun `test refresh error`() = runTest {
-        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.uiState.collect()
-        }
-        val loggedInCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.isLoggedIn.collect()
-        }
+        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val loggedInCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.isLoggedIn.collect() }
 
         authRepository.setAuthStatus(true)
         userRepository.generateError(true)
-        val errorResponse = userRepository.updateAccountDetails(0)
-                as NetworkResponse.Error
+        val errorResponse = userRepository.updateAccountDetails(0) as NetworkResponse.Error
         viewModel.onRefresh()
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()

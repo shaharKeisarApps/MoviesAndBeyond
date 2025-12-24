@@ -39,9 +39,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState
-                    .onEach { uiState = it }
-                    .collect {}
+                viewModel.uiState.onEach { uiState = it }.collect {}
             }
         }
 
@@ -56,10 +54,7 @@ class MainActivity : ComponentActivity() {
             val darkTheme = shouldUseDarkTheme(uiState)
             val dynamicColor = shouldUseDynamicColor(uiState)
 
-            MoviesAndBeyondTheme(
-                darkTheme = darkTheme,
-                dynamicColor = dynamicColor
-            ) {
+            MoviesAndBeyondTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
                 if (uiState is Success) {
                     MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
                 }
@@ -69,23 +64,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun shouldUseDarkTheme(
-    uiState: MainActivityUiState
-): Boolean {
+private fun shouldUseDarkTheme(uiState: MainActivityUiState): Boolean {
     return when (uiState) {
         Loading -> isSystemInDarkTheme()
-        is Success -> when (uiState.darkMode) {
-            SelectedDarkMode.SYSTEM -> isSystemInDarkTheme()
-            SelectedDarkMode.DARK -> true
-            SelectedDarkMode.LIGHT -> false
-        }
+        is Success ->
+            when (uiState.darkMode) {
+                SelectedDarkMode.SYSTEM -> isSystemInDarkTheme()
+                SelectedDarkMode.DARK -> true
+                SelectedDarkMode.LIGHT -> false
+            }
     }
 }
 
 @Composable
-private fun shouldUseDynamicColor(
-    uiState: MainActivityUiState
-): Boolean {
+private fun shouldUseDynamicColor(uiState: MainActivityUiState): Boolean {
     return when (uiState) {
         Loading -> false
         is Success -> uiState.useDynamicColor

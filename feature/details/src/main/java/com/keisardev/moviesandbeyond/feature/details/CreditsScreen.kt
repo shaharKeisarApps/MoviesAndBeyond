@@ -35,15 +35,11 @@ import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 internal fun CreditsRoute(
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: DetailsViewModel
+    viewModel: DetailsViewModel,
 ) {
     val details by viewModel.contentDetailsUiState.collectAsStateWithLifecycle()
 
-    CreditsScreen(
-        details = details,
-        onItemClick = onItemClick,
-        onBackClick = onBackClick
-    )
+    CreditsScreen(details = details, onItemClick = onItemClick, onBackClick = onBackClick)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +47,7 @@ internal fun CreditsRoute(
 private fun CreditsScreen(
     details: ContentDetailUiState,
     onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -59,27 +55,21 @@ private fun CreditsScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.credits),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                 },
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
             )
         }
     ) { paddingValues ->
         Box(Modifier.padding(paddingValues)) {
             when (details) {
                 is ContentDetailUiState.Movie -> {
-                    CreditsLazyColumn(
-                        credits = details.data.credits,
-                        onItemClick = onItemClick
-                    )
+                    CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
                 }
 
                 is ContentDetailUiState.TV -> {
-                    CreditsLazyColumn(
-                        credits = details.data.credits,
-                        onItemClick = onItemClick
-                    )
+                    CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
                 }
 
                 else -> Unit
@@ -90,53 +80,30 @@ private fun CreditsScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CreditsLazyColumn(
-    credits: Credits,
-    onItemClick: (String) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 2.dp)
-    ) {
-        stickyHeader {
-            CategoryHeader(stringResource(id = R.string.cast))
-        }
-        items(
-            items = credits.cast,
-            key = { it.id }
-        ) {
+private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
+    LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp)) {
+        stickyHeader { CategoryHeader(stringResource(id = R.string.cast)) }
+        items(items = credits.cast, key = { it.id }) {
             CreditsItem(
                 name = it.name,
                 role = it.character,
                 imagePath = it.profilePath,
-                onItemClick = {
-                    onItemClick("${it.id},${MediaType.PERSON}")
-                }
+                onItemClick = { onItemClick("${it.id},${MediaType.PERSON}") },
             )
         }
 
         if (credits.crew.isNotEmpty()) {
-            item {
-                CategoryHeader(text = stringResource(id = R.string.crew))
-            }
+            item { CategoryHeader(text = stringResource(id = R.string.crew)) }
 
             val crewListByDepartment = credits.crew.groupBy { it.department }
             crewListByDepartment.forEach { mapEntry ->
-                stickyHeader {
-                    CategoryHeader(text = mapEntry.key)
-                }
-                items(
-                    items = mapEntry.value,
-                    key = { it.creditId }
-                ) {
+                stickyHeader { CategoryHeader(text = mapEntry.key) }
+                items(items = mapEntry.value, key = { it.creditId }) {
                     CreditsItem(
                         name = it.name,
                         role = it.job,
                         imagePath = it.profilePath,
-                        onItemClick = {
-                            onItemClick("${it.id},${MediaType.PERSON}")
-                        }
+                        onItemClick = { onItemClick("${it.id},${MediaType.PERSON}") },
                     )
                 }
             }
@@ -150,19 +117,17 @@ private fun CreditsItem(
     role: String,
     imagePath: String,
     onItemClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .noRippleClickable { onItemClick() }
-            .padding(horizontal = horizontalPadding, vertical = 6.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .noRippleClickable { onItemClick() }
+                .padding(horizontal = horizontalPadding, vertical = 6.dp),
     ) {
-        PersonImage(
-            imageUrl = imagePath,
-            modifier = Modifier.size(64.dp)
-        )
+        PersonImage(imageUrl = imagePath, modifier = Modifier.size(64.dp))
 
         Spacer(Modifier.width(10.dp))
 
@@ -170,7 +135,7 @@ private fun CreditsItem(
             Text(
                 text = name,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
             Spacer(Modifier.height(2.dp))
             Text(text = role)
@@ -179,17 +144,15 @@ private fun CreditsItem(
 }
 
 @Composable
-private fun CategoryHeader(
-    text: String,
-    modifier: Modifier = Modifier
-) {
+private fun CategoryHeader(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.SemiBold,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(10.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(10.dp),
     )
 }

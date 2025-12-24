@@ -23,26 +23,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 
 @Composable
-fun PersonImage(
-    imageUrl: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        color = Color.LightGray,
-        shape = CircleShape,
-        modifier = modifier
-    ) {
+fun PersonImage(imageUrl: String, modifier: Modifier = Modifier) {
+    Surface(color = Color.LightGray, shape = CircleShape, modifier = modifier) {
         if (imageUrl.isEmpty()) {
             Icon(
                 imageVector = Icons.Rounded.AccountCircle,
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         } else {
-            TmdbImage(
-                width = 300,
-                imageUrl = imageUrl
-            )
+            TmdbImage(width = 300, imageUrl = imageUrl)
         }
     }
 }
@@ -53,18 +43,14 @@ fun TmdbImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.FillBounds,
-    alpha: Float = 1f
+    alpha: Float = 1f,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .alpha(alpha)
-    ) {
+    Box(modifier = modifier.fillMaxSize().alpha(alpha)) {
         if (imageUrl.isEmpty()) {
             Text(
                 text = stringResource(id = R.string.no_image_available),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
             )
         } else {
             SubcomposeAsyncImage(
@@ -75,13 +61,11 @@ fun TmdbImage(
                     Box(Modifier.fillMaxSize()) {
                         CircularProgressIndicator(
                             strokeCap = StrokeCap.Round,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(20.dp)
+                            modifier = Modifier.align(Alignment.Center).size(20.dp),
                         )
                     }
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

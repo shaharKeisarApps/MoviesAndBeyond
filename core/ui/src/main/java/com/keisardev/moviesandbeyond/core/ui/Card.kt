@@ -9,23 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MediaItemCard(
-    posterPath: String,
-    modifier: Modifier = Modifier,
-    onItemClick: () -> Unit = {}
-) {
+fun MediaItemCard(posterPath: String, modifier: Modifier = Modifier, onItemClick: () -> Unit = {}) {
     Card(
         shape = RoundedCornerShape(6.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        modifier = modifier
-            .size(width = 120.dp, height = 160.dp)
-            .noRippleClickable { onItemClick() }
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        modifier =
+            modifier.size(width = 120.dp, height = 160.dp).noRippleClickable { onItemClick() },
     ) {
-        TmdbImage(
-            width = 500,
-            imageUrl = posterPath
-        )
+        TmdbImage(width = 500, imageUrl = posterPath)
     }
 }

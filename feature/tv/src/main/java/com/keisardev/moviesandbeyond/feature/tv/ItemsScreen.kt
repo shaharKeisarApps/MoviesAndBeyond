@@ -32,27 +32,30 @@ fun ItemsRoute(
     categoryName: String,
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: TvShowsViewModel
+    viewModel: TvShowsViewModel,
 ) {
     val category = enumValueOf<TvShowListCategory>(categoryName)
-    val content by when (category) {
-        TvShowListCategory.AIRING_TODAY -> viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
-        TvShowListCategory.POPULAR -> viewModel.popularTvShows.collectAsStateWithLifecycle()
-        TvShowListCategory.TOP_RATED -> viewModel.topRatedTvShows.collectAsStateWithLifecycle()
-        TvShowListCategory.ON_THE_AIR -> viewModel.onAirTvShows.collectAsStateWithLifecycle()
-    }
-    val categoryDisplayName = when (category) {
-        TvShowListCategory.AIRING_TODAY -> stringResource(id = R.string.airing_today)
-        TvShowListCategory.ON_THE_AIR -> stringResource(id = R.string.on_air)
-        TvShowListCategory.TOP_RATED -> stringResource(id = R.string.top_rated)
-        TvShowListCategory.POPULAR -> stringResource(id = R.string.popular)
-    }
+    val content by
+        when (category) {
+            TvShowListCategory.AIRING_TODAY ->
+                viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
+            TvShowListCategory.POPULAR -> viewModel.popularTvShows.collectAsStateWithLifecycle()
+            TvShowListCategory.TOP_RATED -> viewModel.topRatedTvShows.collectAsStateWithLifecycle()
+            TvShowListCategory.ON_THE_AIR -> viewModel.onAirTvShows.collectAsStateWithLifecycle()
+        }
+    val categoryDisplayName =
+        when (category) {
+            TvShowListCategory.AIRING_TODAY -> stringResource(id = R.string.airing_today)
+            TvShowListCategory.ON_THE_AIR -> stringResource(id = R.string.on_air)
+            TvShowListCategory.TOP_RATED -> stringResource(id = R.string.top_rated)
+            TvShowListCategory.POPULAR -> stringResource(id = R.string.popular)
+        }
     ItemsScreen(
         content = content,
         categoryDisplayName = categoryDisplayName,
         appendItems = viewModel::appendItems,
         onItemClick = { onItemClick("$it,${MediaType.TV}") },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
     )
 }
 
@@ -63,53 +66,35 @@ internal fun ItemsScreen(
     categoryDisplayName: String,
     appendItems: (TvShowListCategory) -> Unit,
     onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = {
-                    Text(
-                        text = categoryDisplayName,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                onBackClick = onBackClick
+                title = { Text(text = categoryDisplayName, fontWeight = FontWeight.SemiBold) },
+                onBackClick = onBackClick,
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-        ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(paddingValues)) {
             LazyVerticalContentGrid(
                 pagingEnabled = true,
                 itemsEmpty = content.items.isEmpty(),
                 isLoading = content.isLoading,
                 endReached = content.endReached,
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
-                appendItems = { appendItems(content.category) }
+                appendItems = { appendItems(content.category) },
             ) {
-                items(
-                    items = content.items,
-                    key = { it.id }
-                ) {
+                items(items = content.items, key = { it.id }) {
                     MediaItemCard(
                         posterPath = it.imagePath,
                         onItemClick = { onItemClick("${it.id},${MediaType.TV}") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(160.dp)
+                        modifier = Modifier.fillMaxWidth().height(160.dp),
                     )
                 }
                 if (content.isLoading) {
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                        ) {
+                        Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
                             CircularProgressIndicator(Modifier.align(Alignment.Center))
                         }
                     }

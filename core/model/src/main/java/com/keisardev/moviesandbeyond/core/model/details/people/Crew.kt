@@ -6,5 +6,5 @@ data class Crew(
     val id: Int,
     val job: String,
     val name: String,
-    val profilePath: String
+    val profilePath: String,
 )

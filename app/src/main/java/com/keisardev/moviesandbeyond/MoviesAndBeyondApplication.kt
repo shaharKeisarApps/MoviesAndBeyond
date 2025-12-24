@@ -11,24 +11,22 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MoviesAndBeyondApplication : Application(), ImageLoaderFactory, Configuration.Provider {
 
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+    @Inject lateinit var workerFactory: HiltWorkerFactory
 
     override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .apply {
-                setWorkerFactory(workerFactory)
-                if (BuildConfig.DEBUG) {
-                    setMinimumLoggingLevel(android.util.Log.DEBUG)
-                } else {
-                    setMinimumLoggingLevel(android.util.Log.ERROR)
+        get() =
+            Configuration.Builder()
+                .apply {
+                    setWorkerFactory(workerFactory)
+                    if (BuildConfig.DEBUG) {
+                        setMinimumLoggingLevel(android.util.Log.DEBUG)
+                    } else {
+                        setMinimumLoggingLevel(android.util.Log.ERROR)
+                    }
                 }
-            }
-            .build()
+                .build()
 
     override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            .crossfade(true)
-            .build()
+        return ImageLoader.Builder(this).crossfade(true).build()
     }
 }

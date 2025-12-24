@@ -9,18 +9,20 @@ import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+class AuthViewModel
+@Inject
+constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState = _uiState.asStateFlow()
@@ -29,9 +31,7 @@ class AuthViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            hideOnboarding = userRepository.userData
-                .map { it.hideOnboarding }
-                .first()
+            hideOnboarding = userRepository.userData.map { it.hideOnboarding }.first()
         }
     }
 
@@ -39,31 +39,27 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val response = authRepository.login(
-                username = _uiState.value.username,
-                password = _uiState.value.password
-            )
+            val response =
+                authRepository.login(
+                    username = _uiState.value.username,
+                    password = _uiState.value.password,
+                )
             when (response) {
                 is NetworkResponse.Success -> {
                     if (hideOnboarding == false) {
                         /**
-                         * User has opened app for first time. This will recompose the NavHost
-                         * and user will be automatically navigated from AuthScreen.
+                         * User has opened app for first time. This will recompose the NavHost and
+                         * user will be automatically navigated from AuthScreen.
                          */
                         setHideOnboarding()
                     } else {
-                        _uiState.update {
-                            it.copy(isLoggedIn = true)
-                        }
+                        _uiState.update { it.copy(isLoggedIn = true) }
                     }
                 }
 
                 is NetworkResponse.Error -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = response.errorMessage
-                        )
+                        it.copy(isLoading = false, errorMessage = response.errorMessage)
                     }
                 }
             }
@@ -71,9 +67,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun setHideOnboarding() {
-        viewModelScope.launch {
-            userRepository.setHideOnboarding(true)
-        }
+        viewModelScope.launch { userRepository.setHideOnboarding(true) }
     }
 
     fun onErrorShown() {
@@ -94,5 +88,5 @@ data class AuthUiState(
     val password: String = "",
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
 )

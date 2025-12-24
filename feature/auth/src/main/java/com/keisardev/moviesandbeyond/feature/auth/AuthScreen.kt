@@ -59,10 +59,7 @@ import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun AuthRoute(
-    onBackClick: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
-) {
+internal fun AuthRoute(onBackClick: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AuthScreen(
@@ -73,7 +70,7 @@ internal fun AuthRoute(
         onContinueWithoutSignInClick = viewModel::setHideOnboarding,
         onUsernameChange = viewModel::onUsernameChange,
         onPasswordChange = viewModel::onPasswordChange,
-        onErrorShown = viewModel::onErrorShown
+        onErrorShown = viewModel::onErrorShown,
     )
 }
 
@@ -104,20 +101,16 @@ internal fun AuthScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBarWithBackButton(onBackClick = onBackClick)
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+        topBar = { TopAppBarWithBackButton(onBackClick = onBackClick) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(horizontal = 12.dp)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(horizontal = 12.dp)
+                    .verticalScroll(rememberScrollState()),
         ) {
             val focusManager = LocalFocusManager.current
             var passwordVisible by remember { mutableStateOf(false) }
@@ -125,7 +118,7 @@ internal fun AuthScreen(
             Text(
                 text = stringResource(id = R.string.sign_in),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(Modifier.height(10.dp))
@@ -137,7 +130,7 @@ internal fun AuthScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(Modifier.height(10.dp))
@@ -147,15 +140,14 @@ internal fun AuthScreen(
                 onValueChange = onPasswordChange,
                 placeholder = { Text(stringResource(id = R.string.password)) },
                 singleLine = true,
-                visualTransformation = if (passwordVisible) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
+                visualTransformation =
+                    if (passwordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                 trailingIcon = {
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible }
-                    ) {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         if (passwordVisible) {
                             Icon(
                                 imageVector = Icons.Default.VisibilityOff,
@@ -169,25 +161,23 @@ internal fun AuthScreen(
                         }
                     }
                 },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Password
-                ),
+                keyboardOptions =
+                    KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Password,
+                    ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(Modifier.height(20.dp))
 
             if (uiState.isLoading) {
-                val authIndicatorDescription = stringResource(
-                    id = R.string.auth_circular_progress_indicator
-                )
+                val authIndicatorDescription =
+                    stringResource(id = R.string.auth_circular_progress_indicator)
                 CircularProgressIndicator(
-                    modifier = Modifier.semantics {
-                        contentDescription = authIndicatorDescription
-                    }
+                    modifier = Modifier.semantics { contentDescription = authIndicatorDescription }
                 )
             } else {
                 Button(
@@ -195,16 +185,14 @@ internal fun AuthScreen(
                         onLogInClick()
                         focusManager.clearFocus()
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
                 ) {
                     val signInText = stringResource(id = R.string.sign_in)
                     Text(
                         text = signInText,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.semantics { contentDescription = signInText }
+                        modifier = Modifier.semantics { contentDescription = signInText },
                     )
                 }
             }
@@ -216,18 +204,18 @@ internal fun AuthScreen(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         HorizontalDivider(
                             thickness = 1.dp,
                             color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                         Text(text = stringResource(id = R.string.or))
                         HorizontalDivider(
                             thickness = 1.dp,
                             color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                     }
 
@@ -235,15 +223,13 @@ internal fun AuthScreen(
 
                     Button(
                         onClick = onContinueWithoutSignInClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
                     ) {
                         Text(
                             text = stringResource(id = R.string.continue_without_sign_in),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     }
                 }
@@ -255,13 +241,13 @@ internal fun AuthScreen(
             val signUpAnnotatedClickableText = buildAnnotatedString {
                 append(stringResource(id = R.string.no_account))
                 append(" ")
-                pushStringAnnotation(
-                    tag = "URL", annotation = "https://www.themoviedb.org/signup"
-                )
+                pushStringAnnotation(tag = "URL", annotation = "https://www.themoviedb.org/signup")
                 withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold
-                    )
+                    style =
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
                 ) {
                     append(stringResource(id = R.string.sign_up))
                 }
@@ -271,12 +257,11 @@ internal fun AuthScreen(
             AnnotatedClickableText(
                 attributionString = signUpAnnotatedClickableText,
                 onClick = { offset ->
-                    signUpAnnotatedClickableText.getStringAnnotations(
-                        tag = "URL",
-                        start = offset,
-                        end = offset
-                    ).firstOrNull()?.let { uriHandler.openUri(it.item) }
-                }
+                    signUpAnnotatedClickableText
+                        .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                        .firstOrNull()
+                        ?.let { uriHandler.openUri(it.item) }
+                },
             )
         }
     }
@@ -293,6 +278,6 @@ private fun AuthScreenPreview() {
         onContinueWithoutSignInClick = {},
         onUsernameChange = {},
         onPasswordChange = {},
-        onErrorShown = {}
+        onErrorShown = {},
     )
 }

@@ -36,7 +36,7 @@ private val horizontalPadding = 8.dp
 internal fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
-    viewModel: TvShowsViewModel
+    viewModel: TvShowsViewModel,
 ) {
     val airingTodayTvShows by viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
     val onAirTvShows by viewModel.onAirTvShows.collectAsStateWithLifecycle()
@@ -53,7 +53,7 @@ internal fun FeedRoute(
         appendItems = viewModel::appendItems,
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
-        onErrorShown = viewModel::onErrorShown
+        onErrorShown = viewModel::onErrorShown,
     )
 }
 
@@ -67,7 +67,7 @@ internal fun FeedScreen(
     appendItems: (TvShowListCategory) -> Unit,
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -77,15 +77,11 @@ internal fun FeedScreen(
         onErrorShown()
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarState) }
-    ) { paddingValues ->
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier.fillMaxWidth().padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {
                 ContentSection(
@@ -93,7 +89,7 @@ internal fun FeedScreen(
                     sectionName = stringResource(id = R.string.airing_today),
                     appendItems = appendItems,
                     onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
+                    onSeeAllClick = onSeeAllClick,
                 )
             }
             item {
@@ -102,7 +98,7 @@ internal fun FeedScreen(
                     sectionName = stringResource(id = R.string.on_air),
                     appendItems = appendItems,
                     onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
+                    onSeeAllClick = onSeeAllClick,
                 )
             }
             item {
@@ -111,7 +107,7 @@ internal fun FeedScreen(
                     sectionName = stringResource(id = R.string.top_rated),
                     appendItems = appendItems,
                     onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
+                    onSeeAllClick = onSeeAllClick,
                 )
             }
             item {
@@ -120,7 +116,7 @@ internal fun FeedScreen(
                     sectionName = stringResource(id = R.string.popular),
                     appendItems = appendItems,
                     onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
+                    onSeeAllClick = onSeeAllClick,
                 )
             }
         }
@@ -133,7 +129,7 @@ private fun ContentSection(
     sectionName: String,
     appendItems: (TvShowListCategory) -> Unit,
     onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit
+    onSeeAllClick: (String) -> Unit,
 ) {
     LazyRowContentSection(
         pagingEnabled = true,
@@ -146,34 +142,25 @@ private fun ContentSection(
             ContentSectionHeader(
                 sectionName = sectionName,
                 onSeeAllClick = { onSeeAllClick(content.category.name) },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
+                modifier = Modifier.padding(horizontal = horizontalPadding),
             )
         },
         rowContent = {
-            items(
-                items = content.items,
-                key = { it.id }
-            ) {
+            items(items = content.items, key = { it.id }) {
                 MediaItemCard(
                     posterPath = it.imagePath,
-                    onItemClick = {
-                        onItemClick("${it.id},${MediaType.TV}")
-                    }
+                    onItemClick = { onItemClick("${it.id},${MediaType.TV}") },
                 )
             }
 
             if (content.isLoading) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(110.dp)
-                    ) {
+                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp)
+        modifier = Modifier.height(160.dp),
     )
 }

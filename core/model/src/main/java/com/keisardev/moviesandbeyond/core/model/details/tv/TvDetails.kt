@@ -31,16 +31,17 @@ data class TvDetails(
     val rating: Double,
     val recommendations: List<ContentItem>,
     val releaseYear: Int,
-//    val seasons: List<Season>,
+    //    val seasons: List<Season>,
     val status: String,
     val tagline: String,
     val type: String,
-    val voteCount: Int
+    val voteCount: Int,
 ) {
-    fun asLibraryItem() = LibraryItem(
-        id = id,
-        imagePath = posterPath,
-        name = name,
-        mediaType = MediaType.TV.name.lowercase(),
-    )
+    fun asLibraryItem() =
+        LibraryItem(
+            id = id,
+            imagePath = posterPath,
+            name = name,
+            mediaType = MediaType.TV.name.lowercase(),
+        )
 }

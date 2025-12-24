@@ -13,9 +13,13 @@ interface UserRepository {
 
     suspend fun setAdultResultPreference(includeAdultResults: Boolean)
 
-    suspend fun setDarkModePreference(selectedDarkMode: com.keisardev.moviesandbeyond.core.model.SelectedDarkMode)
+    suspend fun setDarkModePreference(
+        selectedDarkMode: com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
+    )
 
-    suspend fun updateAccountDetails(accountId: Int): com.keisardev.moviesandbeyond.core.model.NetworkResponse<Unit>
+    suspend fun updateAccountDetails(
+        accountId: Int
+    ): com.keisardev.moviesandbeyond.core.model.NetworkResponse<Unit>
 
     suspend fun setHideOnboarding(hideOnboarding: Boolean)
 }

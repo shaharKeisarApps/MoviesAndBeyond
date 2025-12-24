@@ -24,48 +24,34 @@ class SearchViewModelTest {
     private val searchRepository = TestSearchRepository()
     private lateinit var viewModel: SearchViewModel
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
-        viewModel = SearchViewModel(
-            userRepository = userRepository,
-            searchRepository = searchRepository
-        )
+        viewModel =
+            SearchViewModel(userRepository = userRepository, searchRepository = searchRepository)
     }
 
     @Test
     fun `test initial state`() {
-        assertEquals(
-            "",
-            viewModel.searchQuery.value
-        )
+        assertEquals("", viewModel.searchQuery.value)
 
         assertNull(viewModel.errorMessage.value)
 
-        assertEquals(
-            emptyList<SearchItem>(),
-            viewModel.searchSuggestions.value
-        )
+        assertEquals(emptyList<SearchItem>(), viewModel.searchSuggestions.value)
     }
 
     @Test
     fun `test search result when query entered`() = runTest {
-        val searchQueryCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.searchQuery.collect()
-        }
-        val searchResultCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.searchSuggestions.collect()
-        }
+        val searchQueryCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchQuery.collect() }
+        val searchResultCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchSuggestions.collect() }
 
         viewModel.changeSearchQuery("test")
         advanceUntilIdle()
 
-        assertEquals(
-            testSearchResults,
-            viewModel.searchSuggestions.value
-        )
+        assertEquals(testSearchResults, viewModel.searchSuggestions.value)
 
         searchQueryCollectJob.cancel()
         searchResultCollectJob.cancel()
@@ -73,28 +59,20 @@ class SearchViewModelTest {
 
     @Test
     fun `test search result error`() = runTest {
-        val searchQueryCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.searchQuery.collect()
-        }
-        val searchResultCollectJob = launch(UnconfinedTestDispatcher()) {
-            viewModel.searchSuggestions.collect()
-        }
+        val searchQueryCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchQuery.collect() }
+        val searchResultCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchSuggestions.collect() }
 
         searchRepository.generateError(true)
-        val errorResponse = searchRepository.getSearchSuggestions("test", false)
-                as NetworkResponse.Error
+        val errorResponse =
+            searchRepository.getSearchSuggestions("test", false) as NetworkResponse.Error
         viewModel.changeSearchQuery("test")
         advanceUntilIdle()
 
-        assertEquals(
-            emptyList<SearchItem>(),
-            viewModel.searchSuggestions.value
-        )
+        assertEquals(emptyList<SearchItem>(), viewModel.searchSuggestions.value)
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.errorMessage.value
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.errorMessage.value)
 
         searchQueryCollectJob.cancel()
         searchResultCollectJob.cancel()

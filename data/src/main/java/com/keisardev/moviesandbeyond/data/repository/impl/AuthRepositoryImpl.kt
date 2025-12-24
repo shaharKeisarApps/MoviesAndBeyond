@@ -14,39 +14,38 @@ import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.model.asEntity
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import retrofit2.HttpException
 
-internal class AuthRepositoryImpl @Inject constructor(
+internal class AuthRepositoryImpl
+@Inject
+constructor(
     private val tmdbApi: TmdbApi,
     private val favoriteContentDao: FavoriteContentDao,
     private val watchlistContentDao: WatchlistContentDao,
     private val accountDetailsDao: AccountDetailsDao,
     private val userPreferencesDataStore: UserPreferencesDataStore,
     private val sessionManager: SessionManager,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
 ) : AuthRepository {
     override val isLoggedIn = sessionManager.isLoggedIn
 
-    override suspend fun login(
-        username: String,
-        password: String
-    ): NetworkResponse<Unit> {
+    override suspend fun login(username: String, password: String): NetworkResponse<Unit> {
         return try {
             val response = tmdbApi.createRequestToken()
-            val loginRequest = LoginRequest(
-                username = username,
-                password = password,
-                requestToken = response.requestToken
-            )
+            val loginRequest =
+                LoginRequest(
+                    username = username,
+                    password = password,
+                    requestToken = response.requestToken,
+                )
             val loginResponse = tmdbApi.validateWithLogin(loginRequest)
 
             val sessionRequest = SessionRequest(loginResponse.requestToken)
             val sessionResponse = tmdbApi.createSession(sessionRequest)
 
-            val accountDetails =
-                tmdbApi.getAccountDetails(sessionResponse.sessionId).asEntity()
+            val accountDetails = tmdbApi.getAccountDetails(sessionResponse.sessionId).asEntity()
 
             sessionManager.storeSessionId(sessionResponse.sessionId)
             accountDetailsDao.addAccountDetails(accountDetails)

@@ -8,6 +8,8 @@ import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,57 +19,51 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
-import javax.inject.Inject
 
 @HiltViewModel
-class YouViewModel @Inject constructor(
+class YouViewModel
+@Inject
+constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(YouUiState())
     val uiState = _uiState.asStateFlow()
 
-    val isLoggedIn = authRepository.isLoggedIn
-        .onEach { isLoggedIn ->
-            if (isLoggedIn) getAccountDetails()
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = null
-        )
-
-    val userSettings: StateFlow<UserSettings?> = userRepository.userData
-        .map {
-            UserSettings(
-                useDynamicColor = it.useDynamicColor,
-                includeAdultResults = it.includeAdultResults,
-                darkMode = it.darkMode
+    val isLoggedIn =
+        authRepository.isLoggedIn
+            .onEach { isLoggedIn -> if (isLoggedIn) getAccountDetails() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = null,
             )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = null
-        )
+
+    val userSettings: StateFlow<UserSettings?> =
+        userRepository.userData
+            .map {
+                UserSettings(
+                    useDynamicColor = it.useDynamicColor,
+                    includeAdultResults = it.includeAdultResults,
+                    darkMode = it.darkMode,
+                )
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = null,
+            )
 
     fun setDynamicColorPreference(useDynamicColor: Boolean) {
-        viewModelScope.launch {
-            userRepository.setDynamicColorPreference(useDynamicColor)
-        }
+        viewModelScope.launch { userRepository.setDynamicColorPreference(useDynamicColor) }
     }
 
     fun setAdultResultPreference(includeAdultResults: Boolean) {
-        viewModelScope.launch {
-            userRepository.setAdultResultPreference(includeAdultResults)
-        }
+        viewModelScope.launch { userRepository.setAdultResultPreference(includeAdultResults) }
     }
 
     fun setDarkModePreference(selectedDarkMode: SelectedDarkMode) {
-        viewModelScope.launch {
-            userRepository.setDarkModePreference(selectedDarkMode)
-        }
+        viewModelScope.launch { userRepository.setDarkModePreference(selectedDarkMode) }
     }
 
     fun getAccountDetails() {
@@ -75,18 +71,10 @@ class YouViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val accountDetails = userRepository.getAccountDetails()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        accountDetails = accountDetails
-                    )
-                }
+                _uiState.update { it.copy(isLoading = false, accountDetails = accountDetails) }
             } catch (e: IOException) {
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Failed to load account details."
-                    )
+                    it.copy(isLoading = false, errorMessage = "Failed to load account details.")
                 }
             }
         }
@@ -96,9 +84,7 @@ class YouViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoggingOut = true) }
 
-            val response = authRepository.logout(
-                accountId = _uiState.value.accountDetails!!.id
-            )
+            val response = authRepository.logout(accountId = _uiState.value.accountDetails!!.id)
             when (response) {
                 is NetworkResponse.Success -> {}
 
@@ -116,9 +102,8 @@ class YouViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }
 
-            val response = userRepository.updateAccountDetails(
-                accountId = _uiState.value.accountDetails!!.id
-            )
+            val response =
+                userRepository.updateAccountDetails(accountId = _uiState.value.accountDetails!!.id)
             when (response) {
                 is NetworkResponse.Success -> {}
 
@@ -142,7 +127,7 @@ data class YouUiState(
     val isRefreshing: Boolean = false,
     val isLoggingOut: Boolean = false,
     val accountDetails: AccountDetails? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )
 
 data class UserSettings(

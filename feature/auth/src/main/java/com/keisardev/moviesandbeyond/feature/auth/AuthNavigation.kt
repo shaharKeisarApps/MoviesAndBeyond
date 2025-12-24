@@ -6,14 +6,8 @@ import androidx.navigation.compose.composable
 
 private const val authScreenNavigationRoute = "auth"
 
-fun NavGraphBuilder.authScreen(
-    onBackClick: () -> Unit,
-) {
-    composable(
-        route = authScreenNavigationRoute
-    ) {
-        AuthRoute(onBackClick = onBackClick)
-    }
+fun NavGraphBuilder.authScreen(onBackClick: () -> Unit) {
+    composable(route = authScreenNavigationRoute) { AuthRoute(onBackClick = onBackClick) }
 }
 
 fun NavController.navigateToAuth() {

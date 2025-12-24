@@ -12,7 +12,7 @@ import java.util.Locale
 data class NetworkMovieDetails(
     val adult: Boolean,
     @Json(name = "backdrop_path") val backdropPath: String?,
-//    val belongs_to_collection: Any,
+    //    val belongs_to_collection: Any,
     val budget: Int,
     val credits: NetworkCredits,
     val genres: List<NetworkGenre>?,
@@ -30,30 +30,31 @@ data class NetworkMovieDetails(
     val tagline: String,
     val title: String,
     @Json(name = "vote_average") val voteAverage: Double,
-    @Json(name = "vote_count") val voteCount: Int
+    @Json(name = "vote_count") val voteCount: Int,
 ) {
-    fun asModel() = MovieDetails(
-        adult = adult,
-        backdropPath = backdropPath ?: "",
-        budget = "%,d".format(budget),
-        credits = credits.asModel(),
-        genres = genres?.map { it.name } ?: emptyList(),
-        id = id,
-        originalLanguage = Locale(originalLanguage).displayLanguage,
-        overview = overview,
-        posterPath = posterPath ?: "",
-        productionCompanies = productionCompanies.joinToString(separator = ", ") { it.name },
-        productionCountries = productionCountries.joinToString(separator = ", ") { it.name },
-        rating = voteAverage / 2,
-        recommendations = recommendations.results.map(NetworkContentItem::asModel),
-        releaseDate = formatDate(releaseDate),
-        releaseYear = releaseDate.split("-").first().toInt(),
-        revenue = "%,d".format(revenue),
-        runtime = getFormattedRuntime(),
-        tagline = tagline,
-        title = title,
-        voteCount = voteCount
-    )
+    fun asModel() =
+        MovieDetails(
+            adult = adult,
+            backdropPath = backdropPath ?: "",
+            budget = "%,d".format(budget),
+            credits = credits.asModel(),
+            genres = genres?.map { it.name } ?: emptyList(),
+            id = id,
+            originalLanguage = Locale(originalLanguage).displayLanguage,
+            overview = overview,
+            posterPath = posterPath ?: "",
+            productionCompanies = productionCompanies.joinToString(separator = ", ") { it.name },
+            productionCountries = productionCountries.joinToString(separator = ", ") { it.name },
+            rating = voteAverage / 2,
+            recommendations = recommendations.results.map(NetworkContentItem::asModel),
+            releaseDate = formatDate(releaseDate),
+            releaseYear = releaseDate.split("-").first().toInt(),
+            revenue = "%,d".format(revenue),
+            runtime = getFormattedRuntime(),
+            tagline = tagline,
+            title = title,
+            voteCount = voteCount,
+        )
 
     private fun getFormattedRuntime(): String {
         val hours = runtime.div(60)

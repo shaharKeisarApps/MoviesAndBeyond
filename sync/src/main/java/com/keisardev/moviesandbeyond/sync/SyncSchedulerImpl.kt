@@ -19,66 +19,61 @@ import com.keisardev.moviesandbeyond.sync.util.putEnum
 import com.keisardev.moviesandbeyond.sync.workers.LibrarySyncWorker
 import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker
 import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker.Companion.ITEM_EXISTS_KEY
+import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker.Companion.ITEM_TYPE_KEY
 import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker.Companion.MEDIA_TYPE_KEY
 import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker.Companion.TASK_KEY
-import com.keisardev.moviesandbeyond.sync.workers.LibraryTaskWorker.Companion.ITEM_TYPE_KEY
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-internal class SyncSchedulerImpl @Inject constructor(
-    private val workManager: WorkManager
-) : SyncScheduler {
+internal class SyncSchedulerImpl @Inject constructor(private val workManager: WorkManager) :
+    SyncScheduler {
     override fun scheduleLibraryTaskWork(libraryTask: LibraryTask) {
-        val libraryTaskWorkRequest = OneTimeWorkRequestBuilder<LibraryTaskWorker>()
-            .setConstraints(getWorkConstraints())
-            .setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                10L,
-                TimeUnit.SECONDS
-            )
-            .setInputData(generateInputData(libraryTask))
-            .build()
+        val libraryTaskWorkRequest =
+            OneTimeWorkRequestBuilder<LibraryTaskWorker>()
+                .setConstraints(getWorkConstraints())
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10L, TimeUnit.SECONDS)
+                .setInputData(generateInputData(libraryTask))
+                .build()
 
         workManager.enqueueUniqueWork(
             generateWorkerName(
                 mediaId = libraryTask.mediaId,
                 mediaType = libraryTask.mediaType,
-                itemType = libraryTask.itemType
+                itemType = libraryTask.itemType,
             ),
             ExistingWorkPolicy.REPLACE,
-            libraryTaskWorkRequest
+            libraryTaskWorkRequest,
         )
     }
 
     override fun scheduleLibrarySyncWork() {
-        val librarySyncWorkRequest = OneTimeWorkRequestBuilder<LibrarySyncWorker>()
-            .setConstraints(getWorkConstraints())
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .build()
+        val librarySyncWorkRequest =
+            OneTimeWorkRequestBuilder<LibrarySyncWorker>()
+                .setConstraints(getWorkConstraints())
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
 
         workManager.enqueueUniqueWork(
             LibrarySyncWorker.SYNC_LIBRARY_WORK_NAME,
             ExistingWorkPolicy.REPLACE,
-            librarySyncWorkRequest
+            librarySyncWorkRequest,
         )
     }
 
     override fun isWorkNotScheduled(
         mediaId: Int,
         mediaType: MediaType,
-        itemType: LibraryItemType
+        itemType: LibraryItemType,
     ): Boolean {
-        return workManager.getWorkInfosForUniqueWork(
-            generateWorkerName(
-                mediaId = mediaId,
-                mediaType = mediaType,
-                itemType = itemType
+        return workManager
+            .getWorkInfosForUniqueWork(
+                generateWorkerName(mediaId = mediaId, mediaType = mediaType, itemType = itemType)
             )
-        ).get()
+            .get()
             .any {
-                it.state == WorkInfo.State.ENQUEUED
-                        || it.state == WorkInfo.State.RUNNING
-                        || it.state == WorkInfo.State.BLOCKED
+                it.state == WorkInfo.State.ENQUEUED ||
+                    it.state == WorkInfo.State.RUNNING ||
+                    it.state == WorkInfo.State.BLOCKED
             }
             .not()
     }
@@ -86,7 +81,7 @@ internal class SyncSchedulerImpl @Inject constructor(
     private fun generateWorkerName(
         mediaId: Int,
         mediaType: MediaType,
-        itemType: LibraryItemType
+        itemType: LibraryItemType,
     ): String {
         return when (itemType) {
             LibraryItemType.FAVORITE -> "${FAVORITES_TAG}-${mediaId}-${mediaType.name}"
@@ -94,14 +89,14 @@ internal class SyncSchedulerImpl @Inject constructor(
         }
     }
 
-    private fun generateInputData(libraryTask: LibraryTask) = Data.Builder()
-        .putInt(TASK_KEY, libraryTask.mediaId)
-        .putEnum(MEDIA_TYPE_KEY, libraryTask.mediaType)
-        .putEnum(ITEM_TYPE_KEY, libraryTask.itemType)
-        .putBoolean(ITEM_EXISTS_KEY, libraryTask.itemExistLocally)
-        .build()
+    private fun generateInputData(libraryTask: LibraryTask) =
+        Data.Builder()
+            .putInt(TASK_KEY, libraryTask.mediaId)
+            .putEnum(MEDIA_TYPE_KEY, libraryTask.mediaType)
+            .putEnum(ITEM_TYPE_KEY, libraryTask.itemType)
+            .putBoolean(ITEM_EXISTS_KEY, libraryTask.itemExistLocally)
+            .build()
 
-    private fun getWorkConstraints() = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
+    private fun getWorkConstraints() =
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }

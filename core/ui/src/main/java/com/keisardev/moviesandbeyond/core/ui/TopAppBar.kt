@@ -21,22 +21,19 @@ fun TopAppBarWithBackButton(
     title: @Composable () -> Unit = {},
     topAppBarColors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     iconButtonColors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = title,
         navigationIcon = {
-            IconButton(
-                colors = iconButtonColors,
-                onClick = onBackClick
-            ) {
+            IconButton(colors = iconButtonColors, onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
+                    contentDescription = stringResource(id = R.string.back),
                 )
             }
         },
         colors = topAppBarColors,
-        modifier = modifier
+        modifier = modifier,
     )
 }

@@ -16,26 +16,22 @@ import com.keisardev.moviesandbeyond.R
 enum class MoviesAndBeyondDestination(
     @StringRes val titleId: Int,
     val selectedIcon: ImageVector,
-    val icon: ImageVector
+    val icon: ImageVector,
 ) {
     MOVIES(
         titleId = R.string.movies,
         selectedIcon = Icons.Rounded.Home,
-        icon = Icons.Outlined.Home
+        icon = Icons.Outlined.Home,
     ),
     TV_SHOWS(
         titleId = R.string.tv_shows,
         selectedIcon = Icons.Rounded.LiveTv,
-        icon = Icons.Outlined.LiveTv
+        icon = Icons.Outlined.LiveTv,
     ),
     SEARCH(
         titleId = R.string.search,
         selectedIcon = Icons.Rounded.Search,
-        icon = Icons.Outlined.Search
+        icon = Icons.Outlined.Search,
     ),
-    YOU(
-        titleId = R.string.you,
-        selectedIcon = Icons.Rounded.Person,
-        icon = Icons.Outlined.Person
-    )
+    YOU(titleId = R.string.you, selectedIcon = Icons.Rounded.Person, icon = Icons.Outlined.Person),
 }

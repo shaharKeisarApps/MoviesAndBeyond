@@ -11,14 +11,15 @@ data class NetworkCrew(
     val id: Int,
     val job: String?,
     val name: String,
-    @Json(name = "profile_path") val profilePath: String?
+    @Json(name = "profile_path") val profilePath: String?,
 ) {
-    fun asModel() = Crew(
-        creditId = creditId,
-        department = department ?: "",
-        id = id,
-        job = job ?: "",
-        name = name,
-        profilePath = profilePath ?: ""
-    )
+    fun asModel() =
+        Crew(
+            creditId = creditId,
+            department = department ?: "",
+            id = id,
+            job = job ?: "",
+            name = name,
+            profilePath = profilePath ?: "",
+        )
 }

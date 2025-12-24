@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 data class SearchResponse(
     val page: Int,
     val results: List<NetworkSearchItem>,
-    @Json(name = "total_pages") val totalPages: Int
+    @Json(name = "total_pages") val totalPages: Int,
 )
