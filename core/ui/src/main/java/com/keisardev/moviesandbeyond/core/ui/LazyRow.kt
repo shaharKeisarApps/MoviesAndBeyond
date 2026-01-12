@@ -52,15 +52,15 @@ fun LazyRowContentSection(
             }
         }
 
-        val shouldAppend = isAtEnd && !isLoading && !endReached
-        LaunchedEffect(isAtEnd) {
-            if (shouldAppend) appendItems()
+        // Fix: Include all dependencies in LaunchedEffect to avoid stale values
+        LaunchedEffect(isAtEnd, isLoading, endReached) {
+            if (isAtEnd && !isLoading && !endReached) {
+                appendItems()
+            }
         }
     }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         sectionHeaderContent()
 
         Box(modifier.fillMaxWidth()) {
@@ -71,8 +71,7 @@ fun LazyRowContentSection(
                     contentPadding = rowContentPadding,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     state = lazyRowState,
-                    content = rowContent
-                )
+                    content = rowContent)
             }
         }
     }

@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 private val horizontalPadding = 8.dp
 
 @Composable
-internal fun FeedRoute(
+fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
     viewModel: TvShowsViewModel
@@ -53,8 +53,7 @@ internal fun FeedRoute(
         appendItems = viewModel::appendItems,
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
-        onErrorShown = viewModel::onErrorShown
-    )
+        onErrorShown = viewModel::onErrorShown)
 }
 
 @Composable
@@ -77,53 +76,44 @@ internal fun FeedScreen(
         onErrorShown()
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarState) }
-    ) { paddingValues ->
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            item {
-                ContentSection(
-                    content = airingTodayTvShows,
-                    sectionName = stringResource(id = R.string.airing_today),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
+            modifier = Modifier.fillMaxWidth().padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                item {
+                    ContentSection(
+                        content = airingTodayTvShows,
+                        sectionName = stringResource(id = R.string.airing_today),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = onAirTvShows,
+                        sectionName = stringResource(id = R.string.on_air),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = topRatedTvShows,
+                        sectionName = stringResource(id = R.string.top_rated),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = popularTvShows,
+                        sectionName = stringResource(id = R.string.popular),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
             }
-            item {
-                ContentSection(
-                    content = onAirTvShows,
-                    sectionName = stringResource(id = R.string.on_air),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = topRatedTvShows,
-                    sectionName = stringResource(id = R.string.top_rated),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = popularTvShows,
-                    sectionName = stringResource(id = R.string.popular),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-        }
     }
 }
 
@@ -135,45 +125,43 @@ private fun ContentSection(
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit
 ) {
+    // STABLE: Only recreated when category changes
+    val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
+    val stableSeeAllClick = remember(content.category) { { onSeeAllClick(content.category.name) } }
+
     LazyRowContentSection(
         pagingEnabled = true,
         isLoading = content.isLoading,
         endReached = content.endReached,
         itemsEmpty = content.items.isEmpty(),
         rowContentPadding = PaddingValues(horizontal = horizontalPadding),
-        appendItems = { appendItems(content.category) },
+        appendItems = stableAppendItems,
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(content.category.name) },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
-            )
+                onSeeAllClick = stableSeeAllClick,
+                modifier = Modifier.padding(horizontal = horizontalPadding))
         },
         rowContent = {
             items(
                 items = content.items,
-                key = { it.id }
-            ) {
-                MediaItemCard(
-                    posterPath = it.imagePath,
-                    onItemClick = {
-                        onItemClick("${it.id},${MediaType.TV}")
-                    }
-                )
+                key = { it.id },
+                contentType = { "media_item" } // Enables Compose slot reuse optimization
+            ) { item ->
+                // STABLE: Remembered per item - prevents lambda recreation
+                val stableItemClick = remember(item.id) {
+                    { onItemClick("${item.id},${MediaType.TV}") }
+                }
+                MediaItemCard(posterPath = item.imagePath, onItemClick = stableItemClick)
             }
 
             if (content.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(110.dp)
-                    ) {
+                item(contentType = "loading") { // Different contentType for loading indicator
+                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp)
-    )
+        modifier = Modifier.height(160.dp))
 }

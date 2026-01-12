@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 private val horizontalPadding = 8.dp
 
 @Composable
-internal fun FeedRoute(
+fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
     viewModel: MoviesViewModel,
@@ -56,8 +56,7 @@ internal fun FeedRoute(
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
         onErrorShown = viewModel::onErrorShown,
-        modifier = modifier
-    )
+        modifier = modifier)
 }
 
 @Composable
@@ -82,48 +81,41 @@ internal fun FeedScreen(
     }
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(WindowInsets.safeDrawing.asPaddingValues()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        item {
-            ContentSection(
-                content = nowPlayingMovies,
-                sectionName = stringResource(id = R.string.now_playing),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
+        modifier = modifier.fillMaxSize().padding(WindowInsets.safeDrawing.asPaddingValues()),
+        verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            item {
+                ContentSection(
+                    content = nowPlayingMovies,
+                    sectionName = stringResource(id = R.string.now_playing),
+                    appendItems = appendItems,
+                    onItemClick = onItemClick,
+                    onSeeAllClick = onSeeAllClick)
+            }
+            item {
+                ContentSection(
+                    content = popularMovies,
+                    sectionName = stringResource(id = R.string.popular),
+                    appendItems = appendItems,
+                    onItemClick = onItemClick,
+                    onSeeAllClick = onSeeAllClick)
+            }
+            item {
+                ContentSection(
+                    content = topRatedMovies,
+                    sectionName = stringResource(id = R.string.top_rated),
+                    appendItems = appendItems,
+                    onItemClick = onItemClick,
+                    onSeeAllClick = onSeeAllClick)
+            }
+            item {
+                ContentSection(
+                    content = upcomingMovies,
+                    sectionName = stringResource(id = R.string.upcoming),
+                    appendItems = appendItems,
+                    onItemClick = onItemClick,
+                    onSeeAllClick = onSeeAllClick)
+            }
         }
-        item {
-            ContentSection(
-                content = popularMovies,
-                sectionName = stringResource(id = R.string.popular),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-        item {
-            ContentSection(
-                content = topRatedMovies,
-                sectionName = stringResource(id = R.string.top_rated),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-        item {
-            ContentSection(
-                content = upcomingMovies,
-                sectionName = stringResource(id = R.string.upcoming),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-    }
     /*Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(hostState = snackbarState) },
@@ -181,45 +173,43 @@ private fun ContentSection(
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit
 ) {
+    // STABLE: Only recreated when category changes
+    val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
+    val stableSeeAllClick = remember(content.category) { { onSeeAllClick(content.category.name) } }
+
     LazyRowContentSection(
         pagingEnabled = true,
         isLoading = content.isLoading,
         endReached = content.endReached,
         itemsEmpty = content.items.isEmpty(),
         rowContentPadding = PaddingValues(horizontal = horizontalPadding),
-        appendItems = { appendItems(content.category) },
+        appendItems = stableAppendItems,
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(content.category.name) },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
-            )
+                onSeeAllClick = stableSeeAllClick,
+                modifier = Modifier.padding(horizontal = horizontalPadding))
         },
         rowContent = {
             items(
                 items = content.items,
-                key = { it.id }
-            ) {
-                MediaItemCard(
-                    posterPath = it.imagePath,
-                    onItemClick = {
-                        onItemClick("${it.id},${MediaType.MOVIE}")
-                    }
-                )
+                key = { it.id },
+                contentType = { "media_item" } // Enables Compose slot reuse optimization
+            ) { item ->
+                // STABLE: Remembered per item - prevents lambda recreation
+                val stableItemClick = remember(item.id) {
+                    { onItemClick("${item.id},${MediaType.MOVIE}") }
+                }
+                MediaItemCard(posterPath = item.imagePath, onItemClick = stableItemClick)
             }
 
             if (content.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(110.dp)
-                    ) {
+                item(contentType = "loading") { // Different contentType for loading indicator
+                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp)
-    )
+        modifier = Modifier.height(160.dp))
 }
