@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
-import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
@@ -48,8 +48,9 @@ internal fun PersonDetailsContent(
                 modifier = modifier.fillMaxWidth().padding(paddingValues)) {
                     item {
                         Row(Modifier.fillMaxWidth()) {
-                            MediaItemCard(
-                                personDetails.profilePath,
+                            // Person profile image - doesn't need shared element transitions
+                            SimpleMediaItemCard(
+                                posterPath = personDetails.profilePath,
                                 modifier = Modifier.size(height = 200.dp, width = 140.dp))
 
                             Spacer(Modifier.width(10.dp))

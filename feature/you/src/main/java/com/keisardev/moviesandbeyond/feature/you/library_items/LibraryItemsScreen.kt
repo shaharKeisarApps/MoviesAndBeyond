@@ -43,7 +43,12 @@ import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.you.R
 import kotlinx.coroutines.launch
 
@@ -118,7 +123,7 @@ internal fun LibraryItemsScreen(
                     }
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Spacing.xs))
 
                 HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
                     Column(Modifier.fillMaxSize()) {
@@ -157,12 +162,30 @@ private fun LibraryContent(
                 modifier = Modifier.align(Alignment.Center))
         } else {
             LazyVerticalContentGrid(
-                pagingEnabled = false, contentPadding = PaddingValues(horizontal = 10.dp)) {
-                    items(items = content, key = { it.id }) {
-                        LibraryItem(
-                            posterPath = it.imagePath,
-                            onItemClick = { onItemClick("${it.id},${it.mediaType.uppercase()}") },
-                            onDeleteClick = { onDeleteClick(it) })
+                pagingEnabled = false,
+                contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) {
+                    items(items = content, key = { it.id }) { item ->
+                        // Convert string media type to SharedMediaType for shared elements
+                        val sharedMediaType =
+                            when (item.mediaType.lowercase()) {
+                                "movie" -> SharedMediaType.Movie
+                                "tv" -> SharedMediaType.TvShow
+                                else -> null
+                            }
+                        LibraryItemCard(
+                            posterPath = item.imagePath,
+                            sharedElementKey =
+                                sharedMediaType?.let {
+                                    MediaSharedElementKey(
+                                        mediaId = item.id.toLong(),
+                                        mediaType = it,
+                                        origin = SharedElementOrigin.LIBRARY,
+                                        elementType = SharedElementType.Image)
+                                },
+                            onItemClick = {
+                                onItemClick("${item.id},${item.mediaType.uppercase()}")
+                            },
+                            onDeleteClick = { onDeleteClick(item) })
                     }
                 }
         }
@@ -170,9 +193,15 @@ private fun LibraryContent(
 }
 
 @Composable
-private fun LibraryItem(posterPath: String, onItemClick: () -> Unit, onDeleteClick: () -> Unit) {
+private fun LibraryItemCard(
+    posterPath: String,
+    sharedElementKey: MediaSharedElementKey? = null,
+    onItemClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Box {
-        MediaItemCard(posterPath = posterPath, onItemClick = onItemClick)
+        MediaItemCard(
+            posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
 
         Surface(
             shape = CircleShape,

@@ -21,14 +21,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.SearchItem
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
 import com.keisardev.moviesandbeyond.core.ui.MoviesAndBeyondSearchBar
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import kotlinx.coroutines.launch
-
-private val horizontalPadding = 8.dp
 
 @Composable
 fun SearchRoute(navigateToDetail: (String) -> Unit, viewModel: SearchViewModel = hiltViewModel()) {
@@ -77,17 +79,33 @@ internal fun SearchScreen(
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                     modifier = Modifier.fillMaxSize()) {
-                        items(items = searchSuggestions, key = { it.id }) {
+                        items(items = searchSuggestions, key = { it.id }) { item ->
+                            // Convert string media type to SharedMediaType for shared elements
+                            val sharedMediaType =
+                                when (item.mediaType.lowercase()) {
+                                    "movie" -> SharedMediaType.Movie
+                                    "tv" -> SharedMediaType.TvShow
+                                    "person" -> SharedMediaType.Person
+                                    else -> null
+                                }
                             SearchSuggestionItem(
-                                name = it.name,
-                                imagePath = it.imagePath,
+                                name = item.name,
+                                imagePath = item.imagePath,
+                                sharedElementKey =
+                                    sharedMediaType?.let {
+                                        MediaSharedElementKey(
+                                            mediaId = item.id.toLong(),
+                                            mediaType = it,
+                                            origin = SharedElementOrigin.SEARCH,
+                                            elementType = SharedElementType.Image)
+                                    },
                                 onItemClick = {
                                     // Converting type to uppercase for [MediaType]
-                                    onSearchResultClick("${it.id},${it.mediaType.uppercase()}")
+                                    onSearchResultClick("${item.id},${item.mediaType.uppercase()}")
                                 })
                         }
                     }
@@ -100,7 +118,7 @@ internal fun SearchScreen(
 @Composable
 private fun SearchHistoryContent(history: List<String>) {
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(contentPadding = PaddingValues(10.dp), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(contentPadding = PaddingValues(Spacing.md), modifier = Modifier.fillMaxSize()) {
             items(items = history) { Text(it) }
         }
     }

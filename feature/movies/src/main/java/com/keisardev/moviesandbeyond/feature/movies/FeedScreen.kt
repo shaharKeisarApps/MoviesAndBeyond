@@ -3,17 +3,16 @@ package com.keisardev.moviesandbeyond.feature.movies
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,16 +21,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import kotlinx.coroutines.launch
-
-private val horizontalPadding = 8.dp
 
 @Composable
 fun FeedRoute(
@@ -79,90 +81,47 @@ internal fun FeedScreen(
         scope.launch { snackbarState.showSnackbar(it) }
         onErrorShown()
     }
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        modifier = modifier.fillMaxSize().padding(WindowInsets.safeDrawing.asPaddingValues()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)) {
-            item {
-                ContentSection(
-                    content = nowPlayingMovies,
-                    sectionName = stringResource(id = R.string.now_playing),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick)
-            }
-            item {
-                ContentSection(
-                    content = popularMovies,
-                    sectionName = stringResource(id = R.string.popular),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick)
-            }
-            item {
-                ContentSection(
-                    content = topRatedMovies,
-                    sectionName = stringResource(id = R.string.top_rated),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick)
-            }
-            item {
-                ContentSection(
-                    content = upcomingMovies,
-                    sectionName = stringResource(id = R.string.upcoming),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick)
-            }
-        }
-    /*Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarState) },
-    ) { paddingValues ->
+
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
         LazyColumn(
-            contentPadding = paddingValues,
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            item {
-                ContentSection(
-                    content = nowPlayingMovies,
-                    sectionName = stringResource(id = R.string.now_playing),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
+            contentPadding =
+                PaddingValues(top = Spacing.feedTopPadding, bottom = Spacing.feedBottomPadding),
+            modifier = modifier.fillMaxWidth().padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing)) {
+                item {
+                    ContentSection(
+                        content = nowPlayingMovies,
+                        sectionName = stringResource(id = R.string.now_playing),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = popularMovies,
+                        sectionName = stringResource(id = R.string.popular),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = topRatedMovies,
+                        sectionName = stringResource(id = R.string.top_rated),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+                item {
+                    ContentSection(
+                        content = upcomingMovies,
+                        sectionName = stringResource(id = R.string.upcoming),
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
             }
-            item {
-                ContentSection(
-                    content = popularMovies,
-                    sectionName = stringResource(id = R.string.popular),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = topRatedMovies,
-                    sectionName = stringResource(id = R.string.top_rated),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = upcomingMovies,
-                    sectionName = stringResource(id = R.string.upcoming),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-        }
-    }*/
+    }
 }
 
 @Composable
@@ -182,34 +141,45 @@ private fun ContentSection(
         isLoading = content.isLoading,
         endReached = content.endReached,
         itemsEmpty = content.items.isEmpty(),
-        rowContentPadding = PaddingValues(horizontal = horizontalPadding),
+        rowContentPadding = PaddingValues(horizontal = Spacing.screenPadding),
         appendItems = stableAppendItems,
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
                 onSeeAllClick = stableSeeAllClick,
-                modifier = Modifier.padding(horizontal = horizontalPadding))
+                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
         },
         rowContent = {
             items(
                 items = content.items,
                 key = { it.id },
                 contentType = { "media_item" } // Enables Compose slot reuse optimization
-            ) { item ->
-                // STABLE: Remembered per item - prevents lambda recreation
-                val stableItemClick = remember(item.id) {
-                    { onItemClick("${item.id},${MediaType.MOVIE}") }
+                ) { item ->
+                    // STABLE: Remembered per item - prevents lambda recreation
+                    val stableItemClick =
+                        remember(item.id) { { onItemClick("${item.id},${MediaType.MOVIE}") } }
+                    // Shared element key for smooth transitions to detail screen
+                    val sharedElementKey =
+                        remember(item.id) {
+                            MediaSharedElementKey(
+                                mediaId = item.id.toLong(),
+                                mediaType = SharedMediaType.Movie,
+                                origin = SharedElementOrigin.MOVIES_FEED,
+                                elementType = SharedElementType.Image)
+                        }
+                    MediaItemCard(
+                        posterPath = item.imagePath,
+                        sharedElementKey = sharedElementKey,
+                        onItemClick = stableItemClick)
                 }
-                MediaItemCard(posterPath = item.imagePath, onItemClick = stableItemClick)
-            }
 
             if (content.isLoading) {
                 item(contentType = "loading") { // Different contentType for loading indicator
-                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
+                    Box(modifier = Modifier.fillMaxHeight().width(Dimens.loadingIndicatorWidth)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp))
+        modifier = Modifier.height(Dimens.cardHeight))
 }

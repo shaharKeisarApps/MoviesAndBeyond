@@ -1,5 +1,7 @@
 package com.keisardev.moviesandbeyond.ui
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawing
@@ -9,11 +11,13 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
+import com.keisardev.moviesandbeyond.core.ui.LocalSharedTransitionScope
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNav3
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationState
@@ -27,40 +31,50 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 @OptIn(
     ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class,
-    ExperimentalMaterial3Api::class)
+    ExperimentalMaterial3Api::class,
+    ExperimentalSharedTransitionApi::class)
 @Composable
 fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
-    val hazeState = remember { HazeState() }
-    val style = CupertinoMaterials.ultraThin()
+    // Wrap entire app with SharedTransitionLayout for shared element transitions
+    SharedTransitionLayout {
+        // Provide SharedTransitionScope to all child composables
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            val hazeState = remember { HazeState() }
+            val style = CupertinoMaterials.ultraThin()
 
-    // Navigation 3: Use NavigationState instead of NavController
-    val navigationState = remember { NavigationState(hideOnboarding) }
+            // Navigation 3: Use NavigationState instead of NavController
+            val navigationState = remember { NavigationState(hideOnboarding) }
 
-    val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
+            val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
 
-    // Determine if bottom bar should be shown based on current navigation state
-    val showBottomBar =
-        navigationState.hasCompletedOnboarding &&
-            isTopLevelDestination(navigationState.topLevelBackStack.topLevelKey)
+            // Determine if bottom bar should be shown based on current navigation state
+            val showBottomBar =
+                navigationState.hasCompletedOnboarding &&
+                    isTopLevelDestination(navigationState.topLevelBackStack.topLevelKey)
 
-    HazeScaffold(
-        hazeState = hazeState,
-        bottomBar = {
-            if (showBottomBar) {
-                MoviesAndBeyondNavigationBar(
-                    destinations = bottomBarDestinations,
-                    selectedDestination =
-                        topLevelRouteToDestination(navigationState.topLevelBackStack.topLevelKey),
-                    onNavigateToDestination = { destination ->
-                        navigationState.topLevelBackStack.switchToTopLevel(
-                            destinationToTopLevelRoute(destination))
-                    },
-                    modifier = Modifier.hazeEffect(state = hazeState, style = style).fillMaxWidth())
-            }
-        },
-        contentWindowInsets = WindowInsets.safeDrawing) { padding ->
-            MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+            HazeScaffold(
+                hazeState = hazeState,
+                bottomBar = {
+                    if (showBottomBar) {
+                        MoviesAndBeyondNavigationBar(
+                            destinations = bottomBarDestinations,
+                            selectedDestination =
+                                topLevelRouteToDestination(
+                                    navigationState.topLevelBackStack.topLevelKey),
+                            onNavigateToDestination = { destination ->
+                                navigationState.topLevelBackStack.switchToTopLevel(
+                                    destinationToTopLevelRoute(destination))
+                            },
+                            modifier =
+                                Modifier.hazeEffect(state = hazeState, style = style)
+                                    .fillMaxWidth())
+                    }
+                },
+                contentWindowInsets = WindowInsets.safeDrawing) { padding ->
+                    MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+                }
         }
+    }
 }
 
 @Composable

@@ -63,14 +63,13 @@ import com.keisardev.moviesandbeyond.core.model.details.people.Cast
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.LibraryActionButton
-import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.Rating
+import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TmdbImage
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
-import com.keisardev.moviesandbeyond.feature.details.horizontalPadding
-import com.keisardev.moviesandbeyond.feature.details.verticalPadding
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
@@ -137,7 +136,7 @@ internal fun MediaDetailsContent(
             modifier = Modifier.height(backdropHeight))
         LazyColumn(
             contentPadding =
-                PaddingValues(horizontal = horizontalPadding, vertical = verticalPadding),
+                PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.xs),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.fillMaxWidth()) {
                 item {
@@ -353,10 +352,12 @@ private fun Recommendations(
                     }
                 }
             } else {
-                items(items = recommendations, key = { it.id }) {
-                    MediaItemCard(
-                        posterPath = it.imagePath,
-                        onItemClick = { onRecommendationClick("${it.id}") })
+                items(items = recommendations, key = { it.id }) { item ->
+                    // Use SimpleMediaItemCard for recommendations (no shared element transitions
+                    // since these navigate to a new detail screen, not back to a list)
+                    SimpleMediaItemCard(
+                        posterPath = item.imagePath,
+                        onItemClick = { onRecommendationClick("${item.id}") })
                 }
             }
         },

@@ -21,16 +21,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import kotlinx.coroutines.launch
-
-private val horizontalPadding = 8.dp
 
 @Composable
 fun FeedRoute(
@@ -78,9 +81,10 @@ internal fun FeedScreen(
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
         LazyColumn(
-            contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
+            contentPadding =
+                PaddingValues(top = Spacing.feedTopPadding, bottom = Spacing.feedBottomPadding),
             modifier = Modifier.fillMaxWidth().padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing)) {
                 item {
                     ContentSection(
                         content = airingTodayTvShows,
@@ -134,34 +138,45 @@ private fun ContentSection(
         isLoading = content.isLoading,
         endReached = content.endReached,
         itemsEmpty = content.items.isEmpty(),
-        rowContentPadding = PaddingValues(horizontal = horizontalPadding),
+        rowContentPadding = PaddingValues(horizontal = Spacing.screenPadding),
         appendItems = stableAppendItems,
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
                 onSeeAllClick = stableSeeAllClick,
-                modifier = Modifier.padding(horizontal = horizontalPadding))
+                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
         },
         rowContent = {
             items(
                 items = content.items,
                 key = { it.id },
                 contentType = { "media_item" } // Enables Compose slot reuse optimization
-            ) { item ->
-                // STABLE: Remembered per item - prevents lambda recreation
-                val stableItemClick = remember(item.id) {
-                    { onItemClick("${item.id},${MediaType.TV}") }
+                ) { item ->
+                    // STABLE: Remembered per item - prevents lambda recreation
+                    val stableItemClick =
+                        remember(item.id) { { onItemClick("${item.id},${MediaType.TV}") } }
+                    // Shared element key for smooth transitions to detail screen
+                    val sharedElementKey =
+                        remember(item.id) {
+                            MediaSharedElementKey(
+                                mediaId = item.id.toLong(),
+                                mediaType = SharedMediaType.TvShow,
+                                origin = SharedElementOrigin.TV_FEED,
+                                elementType = SharedElementType.Image)
+                        }
+                    MediaItemCard(
+                        posterPath = item.imagePath,
+                        sharedElementKey = sharedElementKey,
+                        onItemClick = stableItemClick)
                 }
-                MediaItemCard(posterPath = item.imagePath, onItemClick = stableItemClick)
-            }
 
             if (content.isLoading) {
                 item(contentType = "loading") { // Different contentType for loading indicator
-                    Box(modifier = Modifier.fillMaxHeight().width(110.dp)) {
+                    Box(modifier = Modifier.fillMaxHeight().width(Dimens.loadingIndicatorWidth)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp))
+        modifier = Modifier.height(Dimens.cardHeight))
 }

@@ -30,6 +30,7 @@ import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 @Composable
 fun CreditsRoute(
@@ -124,7 +125,7 @@ private fun CreditsItem(
             modifier
                 .fillMaxWidth()
                 .noRippleClickable { onItemClick() }
-                .padding(horizontal = horizontalPadding, vertical = 6.dp)) {
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
             PersonImage(imageUrl = imagePath, modifier = Modifier.size(64.dp))
 
             Spacer(Modifier.width(10.dp))

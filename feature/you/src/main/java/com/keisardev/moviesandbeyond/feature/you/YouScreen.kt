@@ -54,11 +54,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.image.LandscapistImage
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.LIGHT
@@ -66,6 +63,10 @@ import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.SYSTEM
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.image.LandscapistImage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -211,11 +212,11 @@ private fun LoggedInView(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing),
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 10.dp, vertical = 4.dp)) {
+                .padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
             PersonImage(imageUrl = accountDetails.avatar ?: "", modifier = Modifier.size(64.dp))
             Text(
                 text = accountDetails.username,
@@ -293,11 +294,9 @@ private fun LibrarySection(onLibraryItemClick: (String) -> Unit) {
 private fun LibraryItemOption(optionName: String, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).height(42.dp)) {
-            Text(
-                text = optionName,
-                fontSize = 18.sp,
-            )
+        modifier =
+            Modifier.fillMaxWidth().clickable(onClick = onClick).height(Dimens.listItemMinHeight)) {
+            Text(text = optionName, style = MaterialTheme.typography.bodyLarge)
         }
 }
 
@@ -319,10 +318,11 @@ private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()) {
                     LandscapistImage(
                         imageModel = { R.drawable.tmdb_logo },
-                        imageOptions = ImageOptions(
-                            contentScale = ContentScale.Fit,
-                            contentDescription = stringResource(id = R.string.tmdb_logo_description)
-                        ),
+                        imageOptions =
+                            ImageOptions(
+                                contentScale = ContentScale.Fit,
+                                contentDescription =
+                                    stringResource(id = R.string.tmdb_logo_description)),
                         modifier = Modifier.size(100.dp))
                     Spacer(Modifier.height(8.dp))
                     Text(

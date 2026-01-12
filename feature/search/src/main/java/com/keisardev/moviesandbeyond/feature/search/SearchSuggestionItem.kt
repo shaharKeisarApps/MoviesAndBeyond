@@ -9,14 +9,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 
 @Composable
-internal fun SearchSuggestionItem(name: String, imagePath: String, onItemClick: () -> Unit) {
+internal fun SearchSuggestionItem(
+    name: String,
+    imagePath: String,
+    sharedElementKey: MediaSharedElementKey? = null,
+    onItemClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.noRippleClickable { onItemClick() }) {
-            MediaItemCard(posterPath = imagePath, onItemClick = onItemClick)
+            MediaItemCard(
+                posterPath = imagePath,
+                sharedElementKey = sharedElementKey,
+                onItemClick = onItemClick)
             Text(
                 text = name,
                 maxLines = 2,

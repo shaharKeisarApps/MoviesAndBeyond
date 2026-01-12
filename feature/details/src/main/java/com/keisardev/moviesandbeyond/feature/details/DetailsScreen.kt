@@ -40,13 +40,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.ui.AnimatedText
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.content.MovieDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.PersonDetailsContent
 import com.keisardev.moviesandbeyond.feature.details.content.TvShowDetailsContent
 import kotlinx.coroutines.launch
-
-internal val horizontalPadding = 8.dp
-internal val verticalPadding = 4.dp
 
 @Composable
 fun DetailsRoute(
@@ -121,8 +119,8 @@ internal fun DetailsScreen(
                             modifier =
                                 Modifier.fillMaxWidth()
                                     .padding(
-                                        horizontal = horizontalPadding,
-                                        vertical = verticalPadding)) {
+                                        horizontal = Spacing.screenPadding,
+                                        vertical = Spacing.xs)) {
                                 Text(
                                     text = stringResource(id = R.string.sign_in_sheet_text),
                                     style = MaterialTheme.typography.bodyLarge)
@@ -194,7 +192,8 @@ internal fun DetailsScreen(
                             personDetails = contentDetailsUiState.data,
                             onBackClick = onBackClick,
                             modifier =
-                                Modifier.padding(horizontal = horizontalPadding, vertical = 6.dp))
+                                Modifier.padding(
+                                    horizontal = Spacing.screenPadding, vertical = Spacing.sm))
                     }
                 }
 

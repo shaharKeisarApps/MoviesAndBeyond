@@ -1,22 +1,21 @@
 package com.keisardev.moviesandbeyond.core.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.keisardev.moviesandbeyond.core.ui.loading.ShimmerRow
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 @Composable
 fun LazyRowContentSection(
@@ -60,19 +59,18 @@ fun LazyRowContentSection(
         }
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing)) {
         sectionHeaderContent()
 
-        Box(modifier.fillMaxWidth()) {
-            if (itemsEmpty && isLoading) {
-                CircularProgressIndicator(Modifier.align(Alignment.Center))
-            } else {
-                LazyRow(
-                    contentPadding = rowContentPadding,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    state = lazyRowState,
-                    content = rowContent)
-            }
+        if (itemsEmpty && isLoading) {
+            ShimmerRow(contentPadding = rowContentPadding, modifier = modifier.fillMaxWidth())
+        } else {
+            LazyRow(
+                contentPadding = rowContentPadding,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+                state = lazyRowState,
+                modifier = modifier.fillMaxWidth(),
+                content = rowContent)
         }
     }
 }

@@ -17,15 +17,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
-
-private val horizontalPadding = 8.dp
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 @Composable
 fun ItemsRoute(
@@ -79,17 +82,23 @@ internal fun ItemsScreen(
                     itemsEmpty = content.items.isEmpty(),
                     isLoading = content.isLoading,
                     endReached = content.endReached,
-                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
                     appendItems = { appendItems(content.category) }) {
-                        items(items = content.items, key = { it.id }) {
+                        items(items = content.items, key = { it.id }) { item ->
                             MediaItemCard(
-                                posterPath = it.imagePath,
-                                onItemClick = { onItemClick("${it.id},${MediaType.TV}") },
-                                modifier = Modifier.fillMaxWidth().height(160.dp))
+                                posterPath = item.imagePath,
+                                sharedElementKey =
+                                    MediaSharedElementKey(
+                                        mediaId = item.id.toLong(),
+                                        mediaType = SharedMediaType.TvShow,
+                                        origin = SharedElementOrigin.TV_ITEMS,
+                                        elementType = SharedElementType.Image),
+                                onItemClick = { onItemClick("${item.id},${MediaType.TV}") },
+                                modifier = Modifier.fillMaxWidth().height(Dimens.cardHeight))
                         }
                         if (content.isLoading) {
                             item {
-                                Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
+                                Box(modifier = Modifier.fillMaxWidth().height(Dimens.cardHeight)) {
                                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                                 }
                             }

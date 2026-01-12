@@ -1,7 +1,6 @@
 package com.keisardev.moviesandbeyond.core.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,15 +8,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.keisardev.moviesandbeyond.core.ui.loading.ShimmerGridCard
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 @Composable
 fun LazyVerticalContentGrid(
@@ -55,18 +54,25 @@ fun LazyVerticalContentGrid(
         LaunchedEffect(isAtBottom) { if (shouldAppend) appendItems() }
     }
 
-    Box(Modifier.fillMaxWidth()) {
-        if (itemsEmpty && isLoading) {
-            CircularProgressIndicator(Modifier.align(Alignment.Center))
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = contentPadding,
-                state = lazyGridState,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize(),
-                content = content)
-        }
+    if (itemsEmpty && isLoading) {
+        // Shimmer loading grid
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(Dimens.gridColumns),
+            contentPadding = contentPadding,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+            verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+            userScrollEnabled = false,
+            modifier = Modifier.fillMaxWidth()) {
+                items(6) { ShimmerGridCard() }
+            }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(Dimens.gridColumns),
+            contentPadding = contentPadding,
+            state = lazyGridState,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+            verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+            modifier = Modifier.fillMaxSize(),
+            content = content)
     }
 }

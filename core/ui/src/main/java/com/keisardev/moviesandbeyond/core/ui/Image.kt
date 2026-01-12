@@ -28,19 +28,15 @@ import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 // Shared ImageOptions instances to avoid recreation on recomposition
-private val listImageOptions = ImageOptions(
-    contentScale = ContentScale.Crop,
-    requestSize = IntSize(500, 750)
-)
+private val listImageOptions =
+    ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(500, 750))
 
-private val personImageOptions = ImageOptions(
-    contentScale = ContentScale.Crop,
-    requestSize = IntSize(300, 300)
-)
+private val personImageOptions =
+    ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(300, 300))
 
 /**
- * Reusable image component for person/cast profile images.
- * Uses CircularRevealPlugin for animated reveal effect.
+ * Reusable image component for person/cast profile images. Uses CircularRevealPlugin for animated
+ * reveal effect.
  *
  * @param imageUrl The TMDB image path (without base URL)
  * @param contentDescription Accessibility description for the image
@@ -57,8 +53,7 @@ fun PersonImage(
             Icon(
                 imageVector = Icons.Rounded.AccountCircle,
                 contentDescription = contentDescription,
-                modifier = Modifier.fillMaxSize()
-            )
+                modifier = Modifier.fillMaxSize())
         } else {
             // Remember URL to prevent lambda recreation
             val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
@@ -67,17 +62,14 @@ fun PersonImage(
                 imageModel = { fullUrl },
                 modifier = Modifier.fillMaxSize(),
                 imageOptions = personImageOptions,
-                component = rememberImageComponent {
-                    +CircularRevealPlugin(duration = 350)
-                }
-            )
+                component = rememberImageComponent { +CircularRevealPlugin(duration = 350) })
         }
     }
 }
 
 /**
- * Reusable TMDB image component with shimmer loading and crossfade animation.
- * Use this for detail screens, backdrops, and non-list images.
+ * Reusable TMDB image component with shimmer loading and crossfade animation. Use this for detail
+ * screens, backdrops, and non-list images.
  *
  * @param width TMDB image width (e.g., 500, 780, 1280)
  * @param imageUrl The TMDB image path (without base URL)
@@ -100,38 +92,32 @@ fun TmdbImage(
             Text(
                 text = stringResource(id = R.string.no_image_available),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
-            )
+                modifier = Modifier.align(Alignment.Center))
         } else {
             LandscapistImage(
                 imageModel = { "https://image.tmdb.org/t/p/w${width}$imageUrl" },
-                imageOptions = ImageOptions(
-                    contentScale = contentScale,
-                    contentDescription = contentDescription,
-                    alpha = alpha,
-                    // Request size hint for automatic downsampling and better cache efficiency
-                    requestSize = IntSize(width, (width * 1.5).toInt())
-                ),
+                imageOptions =
+                    ImageOptions(
+                        contentScale = contentScale,
+                        contentDescription = contentDescription,
+                        alpha = alpha,
+                        // Request size hint for automatic downsampling and better cache efficiency
+                        requestSize = IntSize(width, (width * 1.5).toInt())),
                 modifier = Modifier.fillMaxSize(),
-                component = rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.DarkGray,
-                            highlightColor = Color.Gray
-                        )
-                    )
-                    +CrossfadePlugin(duration = 350)
-                },
+                component =
+                    rememberImageComponent {
+                        +ShimmerPlugin(
+                            Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+                        +CrossfadePlugin(duration = 350)
+                    },
                 failure = {
                     Box(Modifier.matchParentSize()) {
                         Text(
                             text = stringResource(id = R.string.no_image_available),
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                            modifier = Modifier.align(Alignment.Center))
                     }
-                }
-            )
+                })
         }
     }
 }
@@ -149,6 +135,7 @@ fun TmdbImage(
  * @param contentDescription Accessibility description for the image
  * @param modifier Modifier for the image container
  */
+@Suppress("UnusedParameter") // contentDescription kept for API consistency and future accessibility
 @Composable
 fun TmdbListImage(
     imageUrl: String,
@@ -156,16 +143,11 @@ fun TmdbListImage(
     contentDescription: String? = null
 ) {
     if (imageUrl.isEmpty()) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(Color.DarkGray)
-        ) {
+        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray)) {
             Text(
                 text = stringResource(id = R.string.no_image_available),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
-            )
+                modifier = Modifier.align(Alignment.Center))
         }
     } else {
         // Remember the full URL to prevent lambda recreation on recomposition
@@ -173,12 +155,7 @@ fun TmdbListImage(
 
         // STABLE: Plugin component with shimmer only (no crossfade for instant cache display)
         val component = rememberImageComponent {
-            +ShimmerPlugin(
-                Shimmer.Flash(
-                    baseColor = Color.DarkGray,
-                    highlightColor = Color.Gray
-                )
-            )
+            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
             // No CrossfadePlugin - cached images display instantly without animation delay
         }
 
@@ -188,18 +165,12 @@ fun TmdbListImage(
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(Color.DarkGray)
-                ) {
+                Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) {
                     Text(
                         text = stringResource(id = R.string.no_image_available),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                        modifier = Modifier.align(Alignment.Center))
                 }
-            }
-        )
+            })
     }
 }
