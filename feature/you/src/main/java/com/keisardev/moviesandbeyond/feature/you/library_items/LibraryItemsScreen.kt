@@ -48,7 +48,7 @@ import com.keisardev.moviesandbeyond.feature.you.R
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun LibraryItemsRoute(
+fun LibraryItemsRoute(
     onBackClick: () -> Unit,
     navigateToDetails: (String) -> Unit,
     viewModel: LibraryItemsViewModel = hiltViewModel()
@@ -66,8 +66,7 @@ internal fun LibraryItemsRoute(
         onDeleteItem = viewModel::deleteItem,
         onBackClick = onBackClick,
         onItemClick = navigateToDetails,
-        onErrorShown = viewModel::onErrorShown
-    )
+        onErrorShown = viewModel::onErrorShown)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -90,80 +89,58 @@ internal fun LibraryItemsScreen(
         onErrorShown()
     }
 
-    val libraryItemTitle = when (libraryItemType) {
-        LibraryItemType.FAVORITE -> stringResource(id = R.string.favorites)
-        LibraryItemType.WATCHLIST -> stringResource(id = R.string.watchlist)
-        else -> null
-    }
+    val libraryItemTitle =
+        when (libraryItemType) {
+            LibraryItemType.FAVORITE -> stringResource(id = R.string.favorites)
+            LibraryItemType.WATCHLIST -> stringResource(id = R.string.watchlist)
+            else -> null
+        }
 
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = {
-                    libraryItemTitle?.let { Text(text = it) }
-                },
-                onBackClick = onBackClick
-            )
+                title = { libraryItemTitle?.let { Text(text = it) } }, onBackClick = onBackClick)
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            val libraryMediaTabs = LibraryMediaType.entries
-            val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                val libraryMediaTabs = LibraryMediaType.entries
+                val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
 
-            val selectedTabIndex by remember(pagerState.currentPage) {
-                mutableIntStateOf(pagerState.currentPage)
-            }
+                val selectedTabIndex by
+                    remember(pagerState.currentPage) { mutableIntStateOf(pagerState.currentPage) }
 
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = { Text(text = stringResource(id = mediaTypeTab.displayName)) }
-                    )
+                TabRow(selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()) {
+                    libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            text = { Text(text = stringResource(id = mediaTypeTab.displayName)) })
+                    }
                 }
-            }
 
-            Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(4.dp))
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
-                Column(Modifier.fillMaxSize()) {
-                    when (libraryMediaTabs[page]) {
-                        LibraryMediaType.MOVIE -> {
-                            LibraryContent(
-                                content = movieItems,
-                                onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem
-                            )
-                        }
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                    Column(Modifier.fillMaxSize()) {
+                        when (libraryMediaTabs[page]) {
+                            LibraryMediaType.MOVIE -> {
+                                LibraryContent(
+                                    content = movieItems,
+                                    onItemClick = onItemClick,
+                                    onDeleteClick = onDeleteItem)
+                            }
 
-                        LibraryMediaType.TV -> {
-                            LibraryContent(
-                                content = tvItems,
-                                onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem
-                            )
+                            LibraryMediaType.TV -> {
+                                LibraryContent(
+                                    content = tvItems,
+                                    onItemClick = onItemClick,
+                                    onDeleteClick = onDeleteItem)
+                            }
                         }
                     }
                 }
             }
         }
-    }
 }
 
 @Composable
@@ -177,58 +154,35 @@ private fun LibraryContent(
             Text(
                 text = stringResource(id = R.string.no_items),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.align(Alignment.Center)
-            )
+                modifier = Modifier.align(Alignment.Center))
         } else {
             LazyVerticalContentGrid(
-                pagingEnabled = false,
-                contentPadding = PaddingValues(horizontal = 10.dp)
-            ) {
-                items(
-                    items = content,
-                    key = { it.id }
-                ) {
-                    LibraryItem(
-                        posterPath = it.imagePath,
-                        onItemClick = {
-                            onItemClick("${it.id},${it.mediaType.uppercase()}")
-                        },
-                        onDeleteClick = { onDeleteClick(it) }
-                    )
+                pagingEnabled = false, contentPadding = PaddingValues(horizontal = 10.dp)) {
+                    items(items = content, key = { it.id }) {
+                        LibraryItem(
+                            posterPath = it.imagePath,
+                            onItemClick = { onItemClick("${it.id},${it.mediaType.uppercase()}") },
+                            onDeleteClick = { onDeleteClick(it) })
+                    }
                 }
-            }
         }
     }
 }
 
 @Composable
-private fun LibraryItem(
-    posterPath: String,
-    onItemClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
+private fun LibraryItem(posterPath: String, onItemClick: () -> Unit, onDeleteClick: () -> Unit) {
     Box {
-        MediaItemCard(
-            posterPath = posterPath,
-            onItemClick = onItemClick
-        )
+        MediaItemCard(posterPath = posterPath, onItemClick = onItemClick)
 
         Surface(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(42.dp)
-                .padding(4.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(id = R.string.delete),
-                tint = Color.Black,
-                modifier = Modifier
-                    .clickable(onClick = onDeleteClick)
-                    .padding(4.dp)
-            )
-        }
+            modifier = Modifier.align(Alignment.TopEnd).size(42.dp).padding(4.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delete),
+                    tint = Color.Black,
+                    modifier = Modifier.clickable(onClick = onDeleteClick).padding(4.dp))
+            }
     }
 }

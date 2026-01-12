@@ -21,8 +21,8 @@ internal object DatabaseModule {
     fun provideMoviesAndBeyondDatabase(
         @ApplicationContext context: Context
     ): MoviesAndBeyondDatabase {
-        return Room
-            .databaseBuilder(context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
+        return Room.databaseBuilder(
+                context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
             /*.addMigrations(
                 MIGRATION_1_2,
                 MIGRATION_2_3,
@@ -40,25 +40,19 @@ internal object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideFavoriteContentDao(
-        db: MoviesAndBeyondDatabase
-    ): FavoriteContentDao {
+    fun provideFavoriteContentDao(db: MoviesAndBeyondDatabase): FavoriteContentDao {
         return db.favoriteContentDao()
     }
 
     @Singleton
     @Provides
-    fun provideWatchlistContentDao(
-        db: MoviesAndBeyondDatabase
-    ): WatchlistContentDao {
+    fun provideWatchlistContentDao(db: MoviesAndBeyondDatabase): WatchlistContentDao {
         return db.watchlistContentDao()
     }
 
     @Singleton
     @Provides
-    fun provideAccountDetailsDao(
-        db: MoviesAndBeyondDatabase
-    ): AccountDetailsDao {
+    fun provideAccountDetailsDao(db: MoviesAndBeyondDatabase): AccountDetailsDao {
         return db.accountDetailsDao()
     }
 }

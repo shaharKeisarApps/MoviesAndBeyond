@@ -35,27 +35,29 @@ fun ItemsRoute(
     viewModel: MoviesViewModel
 ) {
     val category = enumValueOf<MovieListCategory>(categoryName)
-    val content by when (category) {
-        MovieListCategory.NOW_PLAYING -> viewModel.nowPlayingMovies.collectAsStateWithLifecycle()
-        MovieListCategory.UPCOMING -> viewModel.upcomingMovies.collectAsStateWithLifecycle()
-        MovieListCategory.TOP_RATED -> viewModel.topRatedMovies.collectAsStateWithLifecycle()
-        MovieListCategory.POPULAR -> viewModel.popularMovies.collectAsStateWithLifecycle()
-    }
+    val content by
+        when (category) {
+            MovieListCategory.NOW_PLAYING ->
+                viewModel.nowPlayingMovies.collectAsStateWithLifecycle()
+            MovieListCategory.UPCOMING -> viewModel.upcomingMovies.collectAsStateWithLifecycle()
+            MovieListCategory.TOP_RATED -> viewModel.topRatedMovies.collectAsStateWithLifecycle()
+            MovieListCategory.POPULAR -> viewModel.popularMovies.collectAsStateWithLifecycle()
+        }
 
-    val categoryDisplayName = when (category) {
-        MovieListCategory.NOW_PLAYING -> stringResource(id = R.string.now_playing)
-        MovieListCategory.UPCOMING -> stringResource(id = R.string.upcoming)
-        MovieListCategory.TOP_RATED -> stringResource(id = R.string.top_rated)
-        MovieListCategory.POPULAR -> stringResource(id = R.string.popular)
-    }
+    val categoryDisplayName =
+        when (category) {
+            MovieListCategory.NOW_PLAYING -> stringResource(id = R.string.now_playing)
+            MovieListCategory.UPCOMING -> stringResource(id = R.string.upcoming)
+            MovieListCategory.TOP_RATED -> stringResource(id = R.string.top_rated)
+            MovieListCategory.POPULAR -> stringResource(id = R.string.popular)
+        }
 
     ItemsScreen(
         content = content,
         categoryDisplayName = categoryDisplayName,
         appendItems = viewModel::appendItems,
         onItemClick = onItemClick,
-        onBackClick = onBackClick
-    )
+        onBackClick = onBackClick)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,53 +72,31 @@ internal fun ItemsScreen(
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = {
-                    Text(
-                        text = categoryDisplayName,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                onBackClick = onBackClick
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-        ) {
-            LazyVerticalContentGrid(
-                pagingEnabled = true,
-                itemsEmpty = content.items.isEmpty(),
-                isLoading = content.isLoading,
-                endReached = content.endReached,
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                appendItems = { appendItems(content.category) }
-            ) {
-                items(
-                    items = content.items,
-                    key = { it.id }
-                ) {
-                    MediaItemCard(
-                        posterPath = it.imagePath,
-                        onItemClick = { onItemClick("${it.id},${MediaType.MOVIE}") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(160.dp)
-                    )
-                }
-                if (content.isLoading) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                        ) {
-                            CircularProgressIndicator(Modifier.align(Alignment.Center))
+                title = { Text(text = categoryDisplayName, fontWeight = FontWeight.SemiBold) },
+                onBackClick = onBackClick)
+        }) { paddingValues ->
+            Column(modifier = Modifier.fillMaxWidth().padding(paddingValues)) {
+                LazyVerticalContentGrid(
+                    pagingEnabled = true,
+                    itemsEmpty = content.items.isEmpty(),
+                    isLoading = content.isLoading,
+                    endReached = content.endReached,
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    appendItems = { appendItems(content.category) }) {
+                        items(items = content.items, key = { it.id }) {
+                            MediaItemCard(
+                                posterPath = it.imagePath,
+                                onItemClick = { onItemClick("${it.id},${MediaType.MOVIE}") },
+                                modifier = Modifier.fillMaxWidth().height(160.dp))
+                        }
+                        if (content.isLoading) {
+                            item {
+                                Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
+                                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                                }
+                            }
                         }
                     }
-                }
             }
         }
-    }
 }

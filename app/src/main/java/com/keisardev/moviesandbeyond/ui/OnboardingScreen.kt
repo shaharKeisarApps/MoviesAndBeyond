@@ -33,78 +33,61 @@ import com.keisardev.moviesandbeyond.R
 const val onboardingNavigationRoute = "onboarding"
 
 @Composable
-fun OnboardingScreen(
-    navigateToAuth: () -> Unit
-) {
+fun OnboardingScreen(navigateToAuth: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         var contentVisible by rememberSaveable { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
-            contentVisible = true
-        }
+        LaunchedEffect(Unit) { contentVisible = true }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Spacer(Modifier.height(200.dp))
+            modifier = Modifier.fillMaxWidth()) {
+                Spacer(Modifier.height(200.dp))
 
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn() + slideInHorizontally(
-                    animationSpec = tween(easing = LinearOutSlowInEasing),
-                    initialOffsetX = { -it }
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                AnimatedVisibility(
+                    visible = contentVisible,
+                    enter =
+                        fadeIn() +
+                            slideInHorizontally(
+                                animationSpec = tween(easing = LinearOutSlowInEasing),
+                                initialOffsetX = { -it })) {
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold)
+                    }
+
+                Spacer(Modifier.height(10.dp))
+
+                AnimatedVisibility(
+                    visible = contentVisible,
+                    enter =
+                        fadeIn() +
+                            slideInHorizontally(
+                                animationSpec = tween(easing = LinearOutSlowInEasing),
+                                initialOffsetX = { -it })) {
+                        Text(
+                            text = stringResource(id = R.string.onboarding_text),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold)
+                    }
             }
 
-            Spacer(Modifier.height(10.dp))
-
+        Row(modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 10.dp)) {
             AnimatedVisibility(
                 visible = contentVisible,
-                enter = fadeIn() + slideInHorizontally(
-                    animationSpec = tween(easing = LinearOutSlowInEasing),
-                    initialOffsetX = { -it }
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.onboarding_text),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 10.dp)
-        ) {
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn() + slideInVertically(
-                    animationSpec = tween(durationMillis = 400),
-                    initialOffsetY = { it }
-                )
-            ) {
-                Button(
-                    onClick = navigateToAuth,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(bottom = 8.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.get_started),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                enter =
+                    fadeIn() +
+                        slideInVertically(
+                            animationSpec = tween(durationMillis = 400), initialOffsetY = { it })) {
+                    Button(
+                        onClick = navigateToAuth,
+                        modifier = Modifier.fillMaxWidth().height(56.dp).padding(bottom = 8.dp)) {
+                            Text(
+                                text = stringResource(id = R.string.get_started),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold)
+                        }
                 }
-            }
         }
     }
 }

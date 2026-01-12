@@ -11,10 +11,6 @@ data class NetworkCast(
     val name: String,
     @Json(name = "profile_path") val profilePath: String?
 ) {
-    fun asModel() = Cast(
-        character = character ?: "",
-        id = id,
-        name = name,
-        profilePath = profilePath ?: ""
-    )
+    fun asModel() =
+        Cast(character = character ?: "", id = id, name = name, profilePath = profilePath ?: "")
 }

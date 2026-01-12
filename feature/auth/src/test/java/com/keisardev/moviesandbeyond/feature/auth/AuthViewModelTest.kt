@@ -18,15 +18,11 @@ class AuthViewModelTest {
     private val userRepository = TestUserRepository()
     private lateinit var viewModel: AuthViewModel
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setup() {
-        viewModel = AuthViewModel(
-            authRepository = authRepository,
-            userRepository = userRepository
-        )
+        viewModel = AuthViewModel(authRepository = authRepository, userRepository = userRepository)
     }
 
     @Test
@@ -52,10 +48,7 @@ class AuthViewModelTest {
     @Test
     fun `test login success when after onboarding`() = runTest {
         userRepository.setHideOnboarding(true)
-        viewModel = AuthViewModel(
-            authRepository = authRepository,
-            userRepository = userRepository
-        )
+        viewModel = AuthViewModel(authRepository = authRepository, userRepository = userRepository)
 
         val username = "name"
         val password = "1234"
@@ -73,19 +66,14 @@ class AuthViewModelTest {
         val password = "1234"
 
         authRepository.generateError(true)
-        val errorResponse = authRepository.login(
-            username = username,
-            password = password
-        ) as NetworkResponse.Error
+        val errorResponse =
+            authRepository.login(username = username, password = password) as NetworkResponse.Error
 
         viewModel.onUsernameChange(username)
         viewModel.onPasswordChange(password)
         viewModel.logIn()
 
-        assertEquals(
-            errorResponse.errorMessage,
-            viewModel.uiState.value.errorMessage
-        )
+        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
     }
 
     @Test
@@ -101,10 +89,7 @@ class AuthViewModelTest {
 
         viewModel.onUsernameChange(username)
 
-        assertEquals(
-            username,
-            viewModel.uiState.value.username
-        )
+        assertEquals(username, viewModel.uiState.value.username)
     }
 
     @Test
@@ -113,9 +98,6 @@ class AuthViewModelTest {
 
         viewModel.onPasswordChange(password)
 
-        assertEquals(
-            password,
-            viewModel.uiState.value.password
-        )
+        assertEquals(password, viewModel.uiState.value.password)
     }
 }

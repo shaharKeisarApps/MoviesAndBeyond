@@ -7,19 +7,17 @@ import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
-class TvShowsViewModel @Inject constructor(
-    private val contentRepository: ContentRepository
-) : ViewModel() {
-    private val _airingTodayTvShows = MutableStateFlow(
-        ContentUiState(TvShowListCategory.AIRING_TODAY)
-    )
+class TvShowsViewModel @Inject constructor(private val contentRepository: ContentRepository) :
+    ViewModel() {
+    private val _airingTodayTvShows =
+        MutableStateFlow(ContentUiState(TvShowListCategory.AIRING_TODAY))
     val airingTodayTvShows = _airingTodayTvShows.asStateFlow()
 
     private val _onAirTvShows = MutableStateFlow(ContentUiState(TvShowListCategory.ON_THE_AIR))
@@ -63,12 +61,10 @@ class TvShowsViewModel @Inject constructor(
             val stateValue = _airingTodayTvShows.value
             val newPage = stateValue.page + 1
 
-            val response = handleResponse(
-                contentRepository.getTvShowItems(
-                    page = newPage,
-                    category = stateValue.category
-                )
-            )
+            val response =
+                handleResponse(
+                    contentRepository.getTvShowItems(
+                        page = newPage, category = stateValue.category))
             val items = response.first
             val endReached = response.second
 
@@ -77,8 +73,7 @@ class TvShowsViewModel @Inject constructor(
                     items = (stateValue.items + items).distinct(),
                     page = newPage,
                     endReached = endReached,
-                    isLoading = false
-                )
+                    isLoading = false)
             }
         }
     }
@@ -92,12 +87,10 @@ class TvShowsViewModel @Inject constructor(
             val stateValue = _onAirTvShows.value
             val newPage = stateValue.page + 1
 
-            val response = handleResponse(
-                contentRepository.getTvShowItems(
-                    page = newPage,
-                    category = stateValue.category
-                )
-            )
+            val response =
+                handleResponse(
+                    contentRepository.getTvShowItems(
+                        page = newPage, category = stateValue.category))
             val items = response.first
             val endReached = response.second
 
@@ -106,8 +99,7 @@ class TvShowsViewModel @Inject constructor(
                     items = (stateValue.items + items).distinct(),
                     page = newPage,
                     endReached = endReached,
-                    isLoading = false
-                )
+                    isLoading = false)
             }
         }
     }
@@ -121,12 +113,10 @@ class TvShowsViewModel @Inject constructor(
             val stateValue = _popularTvShows.value
             val newPage = stateValue.page + 1
 
-            val response = handleResponse(
-                contentRepository.getTvShowItems(
-                    page = newPage,
-                    category = stateValue.category
-                )
-            )
+            val response =
+                handleResponse(
+                    contentRepository.getTvShowItems(
+                        page = newPage, category = stateValue.category))
             val items = response.first
             val endReached = response.second
 
@@ -135,8 +125,7 @@ class TvShowsViewModel @Inject constructor(
                     items = (stateValue.items + items).distinct(),
                     page = newPage,
                     endReached = endReached,
-                    isLoading = false
-                )
+                    isLoading = false)
             }
         }
     }
@@ -150,12 +139,10 @@ class TvShowsViewModel @Inject constructor(
             val stateValue = _topRatedTvShows.value
             val newPage = stateValue.page + 1
 
-            val response = handleResponse(
-                contentRepository.getTvShowItems(
-                    page = newPage,
-                    category = stateValue.category
-                )
-            )
+            val response =
+                handleResponse(
+                    contentRepository.getTvShowItems(
+                        page = newPage, category = stateValue.category))
             val items = response.first
             val endReached = response.second
 
@@ -164,8 +151,7 @@ class TvShowsViewModel @Inject constructor(
                     items = (stateValue.items + items).distinct(),
                     page = newPage,
                     endReached = endReached,
-                    isLoading = false
-                )
+                    isLoading = false)
             }
         }
     }
@@ -194,11 +180,8 @@ data class ContentUiState(
     val page: Int,
     val category: TvShowListCategory
 ) {
-    constructor(category: TvShowListCategory) : this(
-        items = emptyList(),
-        isLoading = false,
-        endReached = false,
-        page = 0,
-        category = category
-    )
+    constructor(
+        category: TvShowListCategory
+    ) : this(
+        items = emptyList(), isLoading = false, endReached = false, page = 0, category = category)
 }

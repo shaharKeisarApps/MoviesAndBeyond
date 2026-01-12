@@ -1,9 +1,9 @@
+import com.keisardev.moviesandbeyond.findLibrary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-import com.keisardev.moviesandbeyond.findLibrary
 
-class AndroidHiltConventionPlugin: Plugin<Project> {
+class AndroidHiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {

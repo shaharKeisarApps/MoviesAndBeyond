@@ -1,10 +1,6 @@
-plugins {
-    id("moviesandbeyond.android.feature")
-}
+plugins { id("moviesandbeyond.android.feature") }
 
-android {
-    namespace = "com.keisardev.moviesandbeyond.feature.details"
-}
+android { namespace = "com.keisardev.moviesandbeyond.feature.details" }
 
 dependencies {
     implementation(projects.data)

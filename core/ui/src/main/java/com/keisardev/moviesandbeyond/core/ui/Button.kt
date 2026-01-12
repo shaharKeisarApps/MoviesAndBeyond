@@ -39,28 +39,15 @@ fun LibraryActionButton(
         colors = colors,
         border = border,
         interactionSource = remember { MutableInteractionSource() },
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = name,
-            tint = iconTint
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = name,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
-        )
-    }
+        modifier = modifier) {
+            Icon(imageVector = icon, contentDescription = name, tint = iconTint)
+            Spacer(Modifier.width(4.dp))
+            Text(text = name, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+        }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun LibraryActionButtonPreview() {
-    LibraryActionButton(
-        name = "Favorite",
-        icon = Icons.Rounded.Favorite,
-        onClick = {}
-    )
+    LibraryActionButton(name = "Favorite", icon = Icons.Rounded.Favorite, onClick = {})
 }

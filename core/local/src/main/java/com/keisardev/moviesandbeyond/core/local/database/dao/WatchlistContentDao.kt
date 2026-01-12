@@ -24,17 +24,16 @@ interface WatchlistContentDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWatchlistItem(watchlistContentEntity: WatchlistContentEntity)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType)")
+    @Query(
+        "SELECT EXISTS(SELECT 1 FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType)")
     suspend fun checkWatchlistItemExists(mediaId: Int, mediaType: String): Boolean
 
     @Query("DELETE FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType ")
     suspend fun deleteWatchlistItem(mediaId: Int, mediaType: String)
 
-    @Query("DELETE FROM watchlist_content")
-    suspend fun deleteAllWatchlistItems()
+    @Query("DELETE FROM watchlist_content") suspend fun deleteAllWatchlistItems()
 
-    @Upsert
-    suspend fun upsertWatchlistItems(items: List<WatchlistContentEntity>)
+    @Upsert suspend fun upsertWatchlistItems(items: List<WatchlistContentEntity>)
 
     @Transaction
     suspend fun syncWatchlistItems(
@@ -42,8 +41,6 @@ interface WatchlistContentDao {
         deleteItems: List<Pair<Int, String>>
     ) {
         upsertWatchlistItems(upsertItems)
-        deleteItems.forEach {
-            deleteWatchlistItem(mediaId = it.first, mediaType = it.second)
-        }
+        deleteItems.forEach { deleteWatchlistItem(mediaId = it.first, mediaType = it.second) }
     }
 }

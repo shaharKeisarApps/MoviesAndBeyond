@@ -1,10 +1,6 @@
-plugins {
-    id("moviesandbeyond.android.feature")
-}
+plugins { id("moviesandbeyond.android.feature") }
 
-android {
-    namespace = "com.keisardev.moviesandbeyond.feature.movies"
-}
+android { namespace = "com.keisardev.moviesandbeyond.feature.movies" }
 
 dependencies {
     implementation(projects.data)
@@ -13,6 +9,5 @@ dependencies {
     api(libs.haze)
     api(libs.haze.materials)
     androidTestImplementation(projects.core.testing)
-    implementation(libs.coil.kt.compose)
-
+    // Landscapist comes from core:ui via the feature plugin
 }

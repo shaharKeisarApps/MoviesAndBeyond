@@ -14,18 +14,9 @@ data class NetworkAccountDetails(
     val username: String
 )
 
-@JsonClass(generateAdapter = true)
-data class Avatar(
-    val gravatar: Gravatar,
-    val tmdb: Tmdb
-)
+@JsonClass(generateAdapter = true) data class Avatar(val gravatar: Gravatar, val tmdb: Tmdb)
+
+@JsonClass(generateAdapter = true) data class Gravatar(val hash: String)
 
 @JsonClass(generateAdapter = true)
-data class Gravatar(
-    val hash: String
-)
-
-@JsonClass(generateAdapter = true)
-data class Tmdb(
-    @Json(name = "avatar_path") val avatarPath: String?
-)
+data class Tmdb(@Json(name = "avatar_path") val avatarPath: String?)

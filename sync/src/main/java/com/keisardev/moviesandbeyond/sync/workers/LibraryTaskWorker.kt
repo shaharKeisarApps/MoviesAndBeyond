@@ -12,7 +12,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class LibraryTaskWorker @AssistedInject constructor(
+class LibraryTaskWorker
+@AssistedInject
+constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val libraryRepository: LibraryRepository
@@ -23,12 +25,12 @@ class LibraryTaskWorker @AssistedInject constructor(
         val taskType = inputData.getEnum<LibraryItemType>(ITEM_TYPE_KEY)
         val itemExists = inputData.getBoolean(ITEM_EXISTS_KEY, false)
 
-        val syncSuccessful = libraryRepository.executeLibraryTask(
-            id = itemId,
-            mediaType = mediaType,
-            libraryItemType = taskType,
-            itemExistsLocally = itemExists
-        )
+        val syncSuccessful =
+            libraryRepository.executeLibraryTask(
+                id = itemId,
+                mediaType = mediaType,
+                libraryItemType = taskType,
+                itemExistsLocally = itemExists)
 
         return if (syncSuccessful) {
             Result.success()

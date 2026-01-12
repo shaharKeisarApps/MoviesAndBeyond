@@ -12,25 +12,16 @@ import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 
 @Composable
-internal fun SearchSuggestionItem(
-    name: String,
-    imagePath: String,
-    onItemClick: () -> Unit
-) {
+internal fun SearchSuggestionItem(name: String, imagePath: String, onItemClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.noRippleClickable { onItemClick() }
-    ) {
-        MediaItemCard(
-            posterPath = imagePath,
-            onItemClick = onItemClick
-        )
-        Text(
-            text = name,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
-        )
-    }
+        modifier = Modifier.noRippleClickable { onItemClick() }) {
+            MediaItemCard(posterPath = imagePath, onItemClick = onItemClick)
+            Text(
+                text = name,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center)
+        }
 }

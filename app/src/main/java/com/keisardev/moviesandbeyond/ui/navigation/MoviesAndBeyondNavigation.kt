@@ -25,46 +25,37 @@ fun MoviesAndBeyondNavigation(
     navController: NavHostController,
     paddingValues: PaddingValues
 ) {
-    val startDestination = if (hideOnboarding) {
-        moviesNavigationRoute
-    } else {
-        onboardingNavigationRoute
-    }
+    val startDestination =
+        if (hideOnboarding) {
+            moviesNavigationRoute
+        } else {
+            onboardingNavigationRoute
+        }
 
     NavHost(
         modifier = Modifier.padding(paddingValues),
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(
-            route = onboardingNavigationRoute
-        ) {
+        composable(route = onboardingNavigationRoute) {
             OnboardingScreen(navigateToAuth = navController::navigateToAuth)
         }
 
         authScreen(onBackClick = navController::navigateUp)
 
         moviesScreen(
-            navController = navController,
-            navigateToDetails = navController::navigateToDetails
-        )
+            navController = navController, navigateToDetails = navController::navigateToDetails)
 
         tvShowsScreen(
-            navController = navController,
-            navigateToDetails = navController::navigateToDetails
-        )
+            navController = navController, navigateToDetails = navController::navigateToDetails)
 
         searchScreen(navigateToDetail = navController::navigateToDetails)
 
         youScreen(
             navController = navController,
             navigateToAuth = navController::navigateToAuth,
-            navigateToDetails = navController::navigateToDetails
-        )
+            navigateToDetails = navController::navigateToDetails)
 
-        detailsScreen(
-            navController = navController,
-            navigateToAuth = navController::navigateToAuth
-        )
+        detailsScreen(navController = navController, navigateToAuth = navController::navigateToAuth)
     }
 }

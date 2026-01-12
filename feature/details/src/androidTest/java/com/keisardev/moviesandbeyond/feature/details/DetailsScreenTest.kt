@@ -8,13 +8,11 @@ import org.junit.Rule
 import org.junit.Test
 
 class DetailsScreenTest {
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun circularProgressIndicator_whenLoading_displayed() {
-        val loadingContentDescription = composeTestRule.activity
-            .getString(R.string.details_loading)
+        val loadingContentDescription = composeTestRule.activity.getString(R.string.details_loading)
 
         composeTestRule.setContent {
             DetailsScreen(
@@ -27,38 +25,35 @@ class DetailsScreenTest {
                 onItemClick = {},
                 onSeeAllCastClick = {},
                 onSignInClick = {},
-                onBackClick = {}
-            )
+                onBackClick = {})
         }
 
-        composeTestRule
-            .onNodeWithContentDescription(loadingContentDescription)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(loadingContentDescription).assertIsDisplayed()
     }
 
-   /* @Test
-    fun signInSheet_whenStateIsTrue_exists() {
-        val signInSheetContentDescription = composeTestRule.activity
-            .getString(R.string.details_sign_in_sheet)
+    /* @Test
+        fun signInSheet_whenStateIsTrue_exists() {
+            val signInSheetContentDescription = composeTestRule.activity
+                .getString(R.string.details_sign_in_sheet)
 
-        composeTestRule.setContent {
-            DetailsScreen(
-                uiState = DetailsUiState(showSignInSheet = true),
-                contentDetailsUiState = ContentDetailUiState.Movie(testMovieDetail),
-                onHideBottomSheet = {},
-                onErrorShown = {},
-                onFavoriteClick = {},
-                onWatchlistClick = {},
-                onItemClick = {},
-                onSeeAllCastClick = {},
-                onSignInClick = {},
-                onBackClick = {}
-            )
-        }
+            composeTestRule.setContent {
+                DetailsScreen(
+                    uiState = DetailsUiState(showSignInSheet = true),
+                    contentDetailsUiState = ContentDetailUiState.Movie(testMovieDetail),
+                    onHideBottomSheet = {},
+                    onErrorShown = {},
+                    onFavoriteClick = {},
+                    onWatchlistClick = {},
+                    onItemClick = {},
+                    onSeeAllCastClick = {},
+                    onSignInClick = {},
+                    onBackClick = {}
+                )
+            }
 
-        composeTestRule
-            .onNodeWithText("Sign In")
-//            .onNodeWithContentDescription(signInSheetContentDescription)
-            .assertExists()
-    }*/
+            composeTestRule
+                .onNodeWithText("Sign In")
+    //            .onNodeWithContentDescription(signInSheetContentDescription)
+                .assertExists()
+        }*/
 }

@@ -7,6 +7,7 @@ import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.data.repository.SearchRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +22,12 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class SearchViewModel @Inject constructor(
+class SearchViewModel
+@Inject
+constructor(
     private val userRepository: UserRepository,
     private val searchRepository: SearchRepository
 ) : ViewModel() {
@@ -41,28 +43,27 @@ class SearchViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
-    val searchSuggestions: StateFlow<List<SearchItem>> = _searchQuery
-        .filter { it.isNotEmpty() }
-        .mapLatest { query ->
-            delay(200)
-            val response = searchRepository.getSearchSuggestions(
-                query = query,
-                includeAdult = includeAdult
-            )
-            when (response) {
-                is NetworkResponse.Success -> response.data
+    val searchSuggestions: StateFlow<List<SearchItem>> =
+        _searchQuery
+            .filter { it.isNotEmpty() }
+            .mapLatest { query ->
+                delay(200)
+                val response =
+                    searchRepository.getSearchSuggestions(
+                        query = query, includeAdult = includeAdult)
+                when (response) {
+                    is NetworkResponse.Success -> response.data
 
-                is NetworkResponse.Error -> {
-                    _errorMessage.update { response.errorMessage }
-                    emptyList()
+                    is NetworkResponse.Error -> {
+                        _errorMessage.update { response.errorMessage }
+                        emptyList()
+                    }
                 }
             }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = emptyList()
-        )
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = emptyList())
 
     fun changeSearchQuery(query: String) {
         _searchQuery.update { query }

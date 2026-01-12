@@ -18,12 +18,9 @@ import javax.inject.Singleton
 internal object DatastoreModule {
     @Singleton
     @Provides
-    fun provideProtoDataStore(
-        @ApplicationContext appContext: Context
-    ): DataStore<UserPreferences> {
+    fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<UserPreferences> {
         return DataStoreFactory.create(
             serializer = UserPreferencesSerializer,
-            produceFile = { appContext.dataStoreFile("user_prefs") }
-        )
+            produceFile = { appContext.dataStoreFile("user_prefs") })
     }
 }

@@ -2,7 +2,7 @@ package com.keisardev.moviesandbeyond.sync.util
 
 import androidx.work.Data
 
-fun <T: Enum<T>> Data.Builder.putEnum(key: String, taskType: T) = apply {
+fun <T : Enum<T>> Data.Builder.putEnum(key: String, taskType: T) = apply {
     putString(key, taskType.name)
 }
 

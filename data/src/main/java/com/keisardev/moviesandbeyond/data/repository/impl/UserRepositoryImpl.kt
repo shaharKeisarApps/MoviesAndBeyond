@@ -9,20 +9,22 @@ import com.keisardev.moviesandbeyond.core.model.user.UserData
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.model.asEntity
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
-import kotlinx.coroutines.flow.Flow
-import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import retrofit2.HttpException
 
-internal class UserRepositoryImpl @Inject constructor(
+internal class UserRepositoryImpl
+@Inject
+constructor(
     private val userPreferencesDataStore: UserPreferencesDataStore,
     private val tmdbApi: TmdbApi,
     private val accountDetailsDao: AccountDetailsDao,
 ) : UserRepository {
     override val userData: Flow<UserData> = userPreferencesDataStore.userData
 
-    override suspend fun getAccountDetails(): AccountDetails? = accountDetailsDao
-        .getAccountDetails()?.asModel()
+    override suspend fun getAccountDetails(): AccountDetails? =
+        accountDetailsDao.getAccountDetails()?.asModel()
 
     override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
         userPreferencesDataStore.setDynamicColorPreference(useDynamicColor)

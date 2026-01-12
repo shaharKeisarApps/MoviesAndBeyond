@@ -52,9 +52,7 @@ fun LazyVerticalContentGrid(
         }
 
         val shouldAppend = isAtBottom && !isLoading && !endReached
-        LaunchedEffect(isAtBottom) {
-            if (shouldAppend) appendItems()
-        }
+        LaunchedEffect(isAtBottom) { if (shouldAppend) appendItems() }
     }
 
     Box(Modifier.fillMaxWidth()) {
@@ -68,8 +66,7 @@ fun LazyVerticalContentGrid(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize(),
-                content = content
-            )
+                content = content)
         }
     }
 }

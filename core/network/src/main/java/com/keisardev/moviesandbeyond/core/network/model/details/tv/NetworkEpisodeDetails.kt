@@ -20,18 +20,18 @@ data class NetworkEpisodeDetails(
     @Json(name = "vote_average") val voteAverage: Double,
     @Json(name = "vote_count") val voteCount: Int
 ) {
-    fun asModel() = EpisodeDetails(
-        airDate = formatDate(airDate),
-        episodeNumber = episodeNumber,
-        id = id,
-        name = name,
-        overview = overview,
-        productionCode = productionCode,
-        runtime = runtime,
-        seasonNumber = seasonNumber,
-        showId = showId,
-        stillPath = stillPath ?: "",
-        voteAverage = voteAverage,
-        voteCount = voteCount
-    )
+    fun asModel() =
+        EpisodeDetails(
+            airDate = formatDate(airDate),
+            episodeNumber = episodeNumber,
+            id = id,
+            name = name,
+            overview = overview,
+            productionCode = productionCode,
+            runtime = runtime,
+            seasonNumber = seasonNumber,
+            showId = showId,
+            stillPath = stillPath ?: "",
+            voteAverage = voteAverage,
+            voteCount = voteCount)
 }

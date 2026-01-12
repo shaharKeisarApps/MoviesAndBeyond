@@ -14,9 +14,9 @@ data class NetworkSearchItem(
     @Json(name = "profile_path") val profilePath: String?,
 )
 
-fun NetworkSearchItem.asModel() = SearchItem(
-    id = id,
-    name = title ?: name ?: "",
-    mediaType = mediaType,
-    imagePath = posterPath ?: profilePath ?: ""
-)
+fun NetworkSearchItem.asModel() =
+    SearchItem(
+        id = id,
+        name = title ?: name ?: "",
+        mediaType = mediaType,
+        imagePath = posterPath ?: profilePath ?: "")

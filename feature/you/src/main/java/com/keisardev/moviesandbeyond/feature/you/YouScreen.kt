@@ -47,7 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -57,9 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.image.LandscapistImage
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.LIGHT
@@ -70,7 +69,7 @@ import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun YouRoute(
+fun YouRoute(
     navigateToAuth: () -> Unit,
     navigateToLibraryItem: (String) -> Unit,
     viewModel: YouViewModel = hiltViewModel()
@@ -90,8 +89,7 @@ internal fun YouRoute(
         onReloadAccountDetailsClick = viewModel::getAccountDetails,
         onRefresh = viewModel::onRefresh,
         onLogOutClick = viewModel::logOut,
-        onErrorShown = viewModel::onErrorShown
-    )
+        onErrorShown = viewModel::onErrorShown)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,93 +125,81 @@ internal fun YouScreen(
             onChangeTheme = onChangeTheme,
             onChangeDarkMode = onChangeDarkMode,
             onChangeIncludeAdult = onChangeIncludeAdult,
-            onDismissRequest = { showSettingsDialog = !showSettingsDialog }
-        )
+            onDismissRequest = { showSettingsDialog = !showSettingsDialog })
     }
 
     var showAttributionInfoDialog by rememberSaveable { mutableStateOf(false) }
     if (showAttributionInfoDialog) {
         AttributionInfoDialog(
-            onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog }
-        )
+            onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog })
     }
 
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {},
                 actions = {
-                    IconButton(
-                        onClick = { showAttributionInfoDialog = true }
-                    ) {
+                    IconButton(onClick = { showAttributionInfoDialog = true }) {
                         Icon(
                             imageVector = Icons.Rounded.Info,
-                            contentDescription = stringResource(id = R.string.attribution_info)
-                        )
+                            contentDescription = stringResource(id = R.string.attribution_info))
                     }
 
                     userSettings?.let {
-                        IconButton(
-                            onClick = { showSettingsDialog = true }
-                        ) {
+                        IconButton(onClick = { showSettingsDialog = true }) {
                             Icon(
                                 imageVector = Icons.Rounded.Settings,
-                                contentDescription = stringResource(id = R.string.settings_dialog_title)
-                            )
+                                contentDescription =
+                                    stringResource(id = R.string.settings_dialog_title))
                         }
                     }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .pullToRefresh(isRefreshing = uiState.isRefreshing, state = pullToRefreshState, onRefresh = onRefresh)
-        ) {
-            Column(Modifier.fillMaxSize()) {
-                isLoggedIn?.let {
-                    if (isLoggedIn) {
-                        uiState.accountDetails?.let {
-                            LoggedInView(
-                                accountDetails = it,
-                                isLoggingOut = uiState.isLoggingOut,
-                                onLibraryItemClick = onLibraryItemClick,
-                                onLogOutClick = onLogOutClick
-                            )
-                        } ?: LoadAccountDetails(
-                            isLoading = uiState.isLoading,
-                            onReloadAccountDetailsClick = onReloadAccountDetailsClick
-                        )
-                    } else {
-                        LoggedOutView(
-                            onNavigateToAuth = onNavigateToAuth
-                        )
+                })
+        }) { paddingValues ->
+            Box(
+                modifier =
+                    Modifier.padding(paddingValues)
+                        .pullToRefresh(
+                            isRefreshing = uiState.isRefreshing,
+                            state = pullToRefreshState,
+                            onRefresh = onRefresh)) {
+                    Column(Modifier.fillMaxSize()) {
+                        isLoggedIn?.let {
+                            if (isLoggedIn) {
+                                uiState.accountDetails?.let {
+                                    LoggedInView(
+                                        accountDetails = it,
+                                        isLoggingOut = uiState.isLoggingOut,
+                                        onLibraryItemClick = onLibraryItemClick,
+                                        onLogOutClick = onLogOutClick)
+                                }
+                                    ?: LoadAccountDetails(
+                                        isLoading = uiState.isLoading,
+                                        onReloadAccountDetailsClick = onReloadAccountDetailsClick)
+                            } else {
+                                LoggedOutView(onNavigateToAuth = onNavigateToAuth)
+                            }
+                        }
                     }
+
+                    /*  PullToRefreshContainer(
+                        state = pullToRefreshState,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                    )
+
+                    if (pullToRefreshState.isRefreshing) {
+                        LaunchedEffect(true) { onRefresh() }
+                    }
+
+                    LaunchedEffect(uiState.isRefreshing) {
+                        if (uiState.isRefreshing) {
+                            pullToRefreshState.startRefresh()
+                        } else {
+                            pullToRefreshState.endRefresh()
+                        }
+                    }*/
                 }
-            }
-
-          /*  PullToRefreshContainer(
-                state = pullToRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter),
-            )
-
-            if (pullToRefreshState.isRefreshing) {
-                LaunchedEffect(true) { onRefresh() }
-            }
-
-            LaunchedEffect(uiState.isRefreshing) {
-                if (uiState.isRefreshing) {
-                    pullToRefreshState.startRefresh()
-                } else {
-                    pullToRefreshState.endRefresh()
-                }
-            }*/
         }
-    }
 }
 
 @Composable
@@ -226,89 +212,61 @@ private fun LoggedInView(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-    ) {
-        PersonImage(
-            imageUrl = accountDetails.avatar ?: "",
-            modifier = Modifier.size(64.dp)
-        )
-        Text(
-            text = accountDetails.username,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = accountDetails.name,
-            style = MaterialTheme.typography.titleMedium,
-        )
-        LibrarySection(onLibraryItemClick = onLibraryItemClick)
+        modifier =
+            Modifier.fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 10.dp, vertical = 4.dp)) {
+            PersonImage(imageUrl = accountDetails.avatar ?: "", modifier = Modifier.size(64.dp))
+            Text(
+                text = accountDetails.username,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold)
+            Text(
+                text = accountDetails.name,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            LibrarySection(onLibraryItemClick = onLibraryItemClick)
 
-        if (isLoggingOut) {
-            CircularProgressIndicator()
-        } else {
-            Button(
-                onClick = onLogOutClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                Text(stringResource(id = R.string.log_out))
+            if (isLoggingOut) {
+                CircularProgressIndicator()
+            } else {
+                Button(onClick = onLogOutClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(id = R.string.log_out))
+                }
             }
         }
-    }
 }
 
 @Composable
-private fun LoggedOutView(
-    onNavigateToAuth: () -> Unit
-) {
+private fun LoggedOutView(onNavigateToAuth: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .padding(horizontal = 12.dp)
-                .align(Alignment.Center),
+            modifier =
+                Modifier.fillMaxWidth(0.6f).padding(horizontal = 12.dp).align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.log_in_description),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Button(
-                onClick = onNavigateToAuth,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(id = R.string.log_in))
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp))
+                Text(
+                    text = stringResource(id = R.string.log_in_description),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge)
+                Button(onClick = onNavigateToAuth, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(id = R.string.log_in))
+                }
             }
-        }
     }
 }
 
 @Composable
-private fun LoadAccountDetails(
-    isLoading: Boolean,
-    onReloadAccountDetailsClick: () -> Unit
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
+private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
             CircularProgressIndicator()
         } else {
-            Button(
-                onClick = onReloadAccountDetailsClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Button(onClick = onReloadAccountDetailsClick, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(id = R.string.reload_account_details))
             }
         }
@@ -316,52 +274,35 @@ private fun LoadAccountDetails(
 }
 
 @Composable
-private fun LibrarySection(
-    onLibraryItemClick: (String) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
+private fun LibrarySection(onLibraryItemClick: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
         Text(
             text = stringResource(id = R.string.your_library),
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
-        )
+            fontWeight = FontWeight.SemiBold)
         LibraryItemOption(
             optionName = stringResource(id = R.string.favorites),
-            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) }
-        )
+            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) })
         LibraryItemOption(
             optionName = stringResource(id = R.string.watchlist),
-            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) }
-        )
+            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) })
     }
 }
 
 @Composable
-private fun LibraryItemOption(
-    optionName: String,
-    onClick: () -> Unit
-) {
+private fun LibraryItemOption(optionName: String, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .height(42.dp)
-    ) {
-        Text(
-            text = optionName,
-            fontSize = 18.sp,
-        )
-    }
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).height(42.dp)) {
+            Text(
+                text = optionName,
+                fontSize = 18.sp,
+            )
+        }
 }
 
 @Composable
-private fun AttributionInfoDialog(
-    onDismissRequest: () -> Unit
-) {
+private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -369,32 +310,26 @@ private fun AttributionInfoDialog(
                 text = stringResource(R.string.settings_dialog_dismiss_text),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .clickable { onDismissRequest() },
+                modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
             )
         },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .decoderFactory(SvgDecoder.Factory())
-                        .data(R.drawable.tmdb_logo)
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp)
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(id = R.string.attribution_text),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    )
+                modifier = Modifier.fillMaxWidth()) {
+                    LandscapistImage(
+                        imageModel = { R.drawable.tmdb_logo },
+                        imageOptions = ImageOptions(
+                            contentScale = ContentScale.Fit,
+                            contentDescription = stringResource(id = R.string.tmdb_logo_description)
+                        ),
+                        modifier = Modifier.size(100.dp))
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.attribution_text),
+                        textAlign = TextAlign.Center)
+                }
+        })
 }
 
 @Composable
@@ -418,24 +353,20 @@ private fun SettingsDialog(
                 HorizontalDivider()
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.verticalScroll(rememberScrollState())
-                ) {
-                    SettingsPanel(
-                        settings = userSettings,
-                        onChangeTheme = onChangeTheme,
-                        onChangeDarkMode = onChangeDarkMode,
-                        onChangeIncludeAdult = onChangeIncludeAdult
-                    )
-                }
+                    modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        SettingsPanel(
+                            settings = userSettings,
+                            onChangeTheme = onChangeTheme,
+                            onChangeDarkMode = onChangeDarkMode,
+                            onChangeIncludeAdult = onChangeIncludeAdult)
+                    }
             },
             confirmButton = {
                 Text(
                     text = stringResource(R.string.settings_dialog_dismiss_text),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .clickable { onDismissRequest() },
+                    modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
                 )
             },
         )
@@ -455,13 +386,11 @@ private fun SettingsPanel(
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_default),
                 selected = !settings.useDynamicColor,
-                onClick = { onChangeTheme(false) }
-            )
+                onClick = { onChangeTheme(false) })
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_dynamic),
                 selected = settings.useDynamicColor,
-                onClick = { onChangeTheme(true) }
-            )
+                onClick = { onChangeTheme(true) })
         }
     }
     SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_dark_mode))
@@ -469,28 +398,19 @@ private fun SettingsPanel(
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_default),
             selected = settings.darkMode == SYSTEM,
-            onClick = { onChangeDarkMode(SYSTEM) }
-        )
+            onClick = { onChangeDarkMode(SYSTEM) })
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_yes),
             selected = settings.darkMode == DARK,
-            onClick = { onChangeDarkMode(DARK) }
-        )
+            onClick = { onChangeDarkMode(DARK) })
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_no),
             selected = settings.darkMode == LIGHT,
-            onClick = { onChangeDarkMode(LIGHT) }
-        )
+            onClick = { onChangeDarkMode(LIGHT) })
     }
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
         SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
-        Switch(
-            checked = settings.includeAdultResults,
-            onCheckedChange = onChangeIncludeAdult
-        )
+        Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
     }
 }
 
@@ -510,8 +430,7 @@ private fun SettingsDialogChooserRow(
     onClick: () -> Unit,
 ) {
     Row(
-        Modifier
-            .fillMaxWidth()
+        Modifier.fillMaxWidth()
             .selectable(
                 selected = selected,
                 role = Role.RadioButton,
@@ -536,28 +455,26 @@ fun supportsDynamicColorTheme() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 @Composable
 private fun YouScreenPreview() {
     YouScreen(
-        uiState = YouUiState(
-            accountDetails = AccountDetails(
-                id = 1,
-                name = "John Doe",
-                username = "johndoe",
-                avatar = "",
-                includeAdult = false,
-                gravatar = "null",
-                iso6391 = "null",
-                iso31661 = "null",
-            ),
-            isLoading = false,
-            isRefreshing = false,
-            isLoggingOut = false,
-            errorMessage = null
-        ),
+        uiState =
+            YouUiState(
+                accountDetails =
+                    AccountDetails(
+                        id = 1,
+                        name = "John Doe",
+                        username = "johndoe",
+                        avatar = "",
+                        includeAdult = false,
+                        gravatar = "null",
+                        iso6391 = "null",
+                        iso31661 = "null",
+                    ),
+                isLoading = false,
+                isRefreshing = false,
+                isLoggingOut = false,
+                errorMessage = null),
         isLoggedIn = true,
-        userSettings = UserSettings(
-            useDynamicColor = true,
-            includeAdultResults = false,
-            darkMode = SYSTEM
-        ),
+        userSettings =
+            UserSettings(useDynamicColor = true, includeAdultResults = false, darkMode = SYSTEM),
         onChangeTheme = {},
         onChangeDarkMode = {},
         onChangeIncludeAdult = {},
@@ -566,21 +483,16 @@ private fun YouScreenPreview() {
         onReloadAccountDetailsClick = {},
         onRefresh = {},
         onLogOutClick = {},
-        onErrorShown = {}
-    )
+        onErrorShown = {})
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun SettingsDialogPreview() {
     SettingsDialog(
-        userSettings = UserSettings(
-            useDynamicColor = true,
-            includeAdultResults = true,
-            darkMode = SYSTEM
-        ),
+        userSettings =
+            UserSettings(useDynamicColor = true, includeAdultResults = true, darkMode = SYSTEM),
         onChangeTheme = {},
         onChangeDarkMode = {},
-        onChangeIncludeAdult = {}
-    ) {}
+        onChangeIncludeAdult = {}) {}
 }

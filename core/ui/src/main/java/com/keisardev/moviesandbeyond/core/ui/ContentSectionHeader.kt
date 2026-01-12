@@ -23,18 +23,15 @@ fun ContentSectionHeader(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = sectionName,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
-        )
+        verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = sectionName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold)
 
-        Icon(
-            imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-            contentDescription = stringResource(id = R.string.see_all),
-            modifier = Modifier.noRippleClickable { onSeeAllClick() }
-        )
-    }
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = stringResource(id = R.string.see_all),
+                modifier = Modifier.noRippleClickable { onSeeAllClick() })
+        }
 }

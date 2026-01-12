@@ -8,15 +8,13 @@ plugins {
 android {
     namespace = "com.keisardev.moviesandbeyond.core.network"
 
-    buildFeatures {
-        buildConfig = true
-    }
+    buildFeatures { buildConfig = true }
 
     defaultConfig {
         val baseUrl = gradleLocalProperties(rootDir, providers).getProperty("BASE_URL") ?: ""
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-        val accessToken = gradleLocalProperties(rootDir, providers)
-            .getProperty("ACCESS_TOKEN") ?: ""
+        val accessToken =
+            gradleLocalProperties(rootDir, providers).getProperty("ACCESS_TOKEN") ?: ""
         buildConfigField("String", "ACCESS_TOKEN", "\"$accessToken\"")
     }
 }

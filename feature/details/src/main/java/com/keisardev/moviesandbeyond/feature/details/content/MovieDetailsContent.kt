@@ -42,20 +42,16 @@ internal fun MovieDetailsContent(
         onWatchlistClick = { onWatchlistClick(movieDetails.asLibraryItem()) },
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
-        onRecommendationClick = { id ->
-            onRecommendationClick("${id},${MediaType.MOVIE}")
-        },
-        onBackdropCollapse = onBackdropCollapse
-    ) {
-        MovieDetailsSection(
-            releaseDate = movieDetails.releaseDate,
-            originalLanguage = movieDetails.originalLanguage,
-            productionCompanies = movieDetails.productionCompanies,
-            productionCountries = movieDetails.productionCountries,
-            budget = movieDetails.budget,
-            revenue = movieDetails.revenue
-        )
-    }
+        onRecommendationClick = { id -> onRecommendationClick("${id},${MediaType.MOVIE}") },
+        onBackdropCollapse = onBackdropCollapse) {
+            MovieDetailsSection(
+                releaseDate = movieDetails.releaseDate,
+                originalLanguage = movieDetails.originalLanguage,
+                productionCompanies = movieDetails.productionCompanies,
+                productionCountries = movieDetails.productionCountries,
+                budget = movieDetails.budget,
+                revenue = movieDetails.revenue)
+        }
 }
 
 @Composable
@@ -69,36 +65,23 @@ private fun MovieDetailsSection(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.padding(bottom = 6.dp)
-    ) {
-        DetailItem(
-            fieldName = stringResource(id = R.string.release_date),
-            value = releaseDate
-        )
+        modifier = Modifier.padding(bottom = 6.dp)) {
+            DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.original_language),
-            value = originalLanguage
-        )
+            DetailItem(
+                fieldName = stringResource(id = R.string.original_language),
+                value = originalLanguage)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.budget),
-            value = "$${budget}"
-        )
+            DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.revenue),
-            value = "$${revenue}"
-        )
+            DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.production_companies),
-            value = productionCompanies
-        )
+            DetailItem(
+                fieldName = stringResource(id = R.string.production_companies),
+                value = productionCompanies)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.production_countries),
-            value = productionCountries
-        )
-    }
+            DetailItem(
+                fieldName = stringResource(id = R.string.production_countries),
+                value = productionCountries)
+        }
 }

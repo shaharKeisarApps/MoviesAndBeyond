@@ -3,9 +3,7 @@ plugins {
     id("moviesandbeyond.android.hilt")
 }
 
-android {
-    namespace = "com.keisardev.moviesandbeyond.data"
-}
+android { namespace = "com.keisardev.moviesandbeyond.data" }
 
 dependencies {
     api(projects.core.model)

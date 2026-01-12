@@ -7,17 +7,13 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
-internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>
-) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     pluginManager.apply("org.jetbrains.kotlin.android")
 
     commonExtension.apply {
         compileSdk = 36
 
-        defaultConfig {
-            minSdk = 28
-        }
+        defaultConfig { minSdk = 28 }
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
@@ -26,8 +22,6 @@ internal fun Project.configureKotlinAndroid(
     }
 
     extensions.configure<KotlinAndroidProjectExtension> {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
+        compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
     }
 }

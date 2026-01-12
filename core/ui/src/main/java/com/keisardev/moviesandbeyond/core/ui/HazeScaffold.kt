@@ -30,111 +30,108 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 @OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun HazeScaffold(
-  modifier: Modifier = Modifier,
-  topBar: @Composable () -> Unit = {},
-  bottomBar: @Composable () -> Unit = {},
-  snackbarHost: @Composable () -> Unit = {},
-  floatingActionButton: @Composable () -> Unit = {},
-  floatingActionButtonPosition: FabPosition = FabPosition.End,
-  containerColor: Color = MaterialTheme.colorScheme.background,
-  contentColor: Color = contentColorFor(containerColor),
-  contentWindowInsets: WindowInsets = WindowInsets.safeDrawing,
-  hazeState: HazeState,
-  hazeStyle: HazeStyle = CupertinoMaterials.ultraThin(MaterialTheme.colorScheme.surface),
-  blurTopBar: Boolean = true,
-  blurBottomBar: Boolean = true,
-  content: @Composable (PaddingValues) -> Unit,
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
+    snackbarHost: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    contentColor: Color = contentColorFor(containerColor),
+    contentWindowInsets: WindowInsets = WindowInsets.safeDrawing,
+    hazeState: HazeState,
+    hazeStyle: HazeStyle = CupertinoMaterials.ultraThin(MaterialTheme.colorScheme.surface),
+    blurTopBar: Boolean = true,
+    blurBottomBar: Boolean = true,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
-  NestedScaffold(
-    modifier = modifier,
-    topBar = {
-      AnimatedVisibility(
-        visible = blurTopBar,
-        enter = slideInVertically(
-          initialOffsetY = { -it / 3 }, // Start slightly off-screen for subtlety
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy, // Subtle overshoot
-            stiffness = Spring.StiffnessMediumLow // Smooth but snappy
-          )
-        ) + fadeIn(
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-          )
-        ),
-        exit = slideOutVertically(
-          targetOffsetY = { -it / 3 }, // Exit slightly off-screen
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-          )
-        ) + fadeOut(
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-          )
-        )
-      ) {
-        Box(
-          modifier = Modifier
-            .hazeEffect(state = hazeState, style = hazeStyle),
-        ) {
-          topBar()
-        }
-      }
-      if (!blurTopBar) {
-        topBar()
-      }
-    },
-    bottomBar = {
-      AnimatedVisibility(
-        visible = blurBottomBar,
-        enter = slideInVertically(
-          initialOffsetY = { it / 2 }, // Start from below for a grounded feel
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy, // Gentle bounce
-            stiffness = Spring.StiffnessLow // Slower, more deliberate
-          )
-        ) + fadeIn(
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMediumLow,
-            visibilityThreshold = 0.01f // Ensure fade completes naturally
-          )
-        ),
-        exit = slideOutVertically(
-          targetOffsetY = { it / 2 }, // Exit downward
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-          )
-        ) + fadeOut(
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-          )
-        )
-      ) {
-        Box(
-          modifier = Modifier
-            .hazeEffect(state = hazeState, style = hazeStyle),
-        ) {
-          bottomBar()
-        }
-      }
-      if (!blurBottomBar) {
-        bottomBar()
-      }
-    },
-    snackbarHost = snackbarHost,
-    floatingActionButton = floatingActionButton,
-    floatingActionButtonPosition = floatingActionButtonPosition,
-    containerColor = containerColor,
-    contentColor = contentColor,
-    contentWindowInsets = contentWindowInsets,
-  ) { contentPadding ->
-    Box(Modifier.hazeSource(state = hazeState)) {
-      content(contentPadding)
+    NestedScaffold(
+        modifier = modifier,
+        topBar = {
+            AnimatedVisibility(
+                visible = blurTopBar,
+                enter =
+                    slideInVertically(
+                        initialOffsetY = { -it / 3 }, // Start slightly off-screen for subtlety
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy, // Subtle overshoot
+                                stiffness = Spring.StiffnessMediumLow // Smooth but snappy
+                                )) +
+                        fadeIn(
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium)),
+                exit =
+                    slideOutVertically(
+                        targetOffsetY = { -it / 3 }, // Exit slightly off-screen
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMedium)) +
+                        fadeOut(
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium))) {
+                    Box(
+                        modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
+                    ) {
+                        topBar()
+                    }
+                }
+            if (!blurTopBar) {
+                topBar()
+            }
+        },
+        bottomBar = {
+            AnimatedVisibility(
+                visible = blurBottomBar,
+                enter =
+                    slideInVertically(
+                        initialOffsetY = { it / 2 }, // Start from below for a grounded feel
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy, // Gentle bounce
+                                stiffness = Spring.StiffnessLow // Slower, more deliberate
+                                )) +
+                        fadeIn(
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow,
+                                    visibilityThreshold = 0.01f // Ensure fade completes naturally
+                                    )),
+                exit =
+                    slideOutVertically(
+                        targetOffsetY = { it / 2 }, // Exit downward
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium)) +
+                        fadeOut(
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium))) {
+                    Box(
+                        modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
+                    ) {
+                        bottomBar()
+                    }
+                }
+            if (!blurBottomBar) {
+                bottomBar()
+            }
+        },
+        snackbarHost = snackbarHost,
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        contentWindowInsets = contentWindowInsets,
+    ) { contentPadding ->
+        Box(Modifier.hazeSource(state = hazeState)) { content(contentPadding) }
     }
-  }
 }

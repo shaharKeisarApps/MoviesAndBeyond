@@ -3,9 +3,7 @@ plugins {
     id("moviesandbeyond.android.hilt")
 }
 
-android {
-    namespace = "com.keisardev.moviesandbeyond.sync"
-}
+android { namespace = "com.keisardev.moviesandbeyond.sync" }
 
 dependencies {
     implementation(projects.data)
