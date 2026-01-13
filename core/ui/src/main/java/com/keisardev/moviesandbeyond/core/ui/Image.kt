@@ -34,6 +34,12 @@ private val listImageOptions =
 private val personImageOptions =
     ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(300, 300))
 
+private val backdropImageOptions =
+    ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(1280, 720))
+
+private val profileImageOptions =
+    ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(185, 278))
+
 /**
  * Reusable image component for person/cast profile images. Uses CircularRevealPlugin for animated
  * reveal effect.
@@ -172,5 +178,87 @@ fun TmdbListImage(
                         modifier = Modifier.align(Alignment.Center))
                 }
             })
+    }
+}
+
+/**
+ * Optimized TMDB backdrop image component for backdrop cards and hero sections. Uses 16:9 aspect
+ * ratio images at 1280px width.
+ *
+ * @param imageUrl The TMDB image path (without base URL)
+ * @param modifier Modifier for the image container
+ * @param contentScale How the image should be scaled (default: Crop)
+ * @param contentDescription Accessibility description for the image
+ */
+@Suppress("UnusedParameter")
+@Composable
+fun TmdbBackdropImage(
+    imageUrl: String,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    contentDescription: String? = null
+) {
+    if (imageUrl.isEmpty()) {
+        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray)) {
+            Text(
+                text = stringResource(id = R.string.no_image_available),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center))
+        }
+    } else {
+        val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w1280$imageUrl" }
+
+        val component = rememberImageComponent {
+            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+            +CrossfadePlugin(duration = 300)
+        }
+
+        LandscapistImage(
+            imageModel = { fullUrl },
+            imageOptions = backdropImageOptions.copy(contentScale = contentScale),
+            modifier = modifier.fillMaxSize(),
+            component = component,
+            failure = {
+                Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) {
+                    Text(
+                        text = stringResource(id = R.string.no_image_available),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center))
+                }
+            })
+    }
+}
+
+/**
+ * TMDB profile image component for cast/crew circular avatars. Optimized for small profile images
+ * with 185px width.
+ *
+ * @param imageUrl The TMDB image path (without base URL)
+ * @param modifier Modifier for the image container
+ * @param contentDescription Accessibility description for the image
+ */
+@Suppress("UnusedParameter")
+@Composable
+fun TmdbProfileImage(
+    imageUrl: String,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null
+) {
+    if (imageUrl.isEmpty()) {
+        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray))
+    } else {
+        val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w185$imageUrl" }
+
+        val component = rememberImageComponent {
+            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+            +CircularRevealPlugin(duration = 250)
+        }
+
+        LandscapistImage(
+            imageModel = { fullUrl },
+            imageOptions = profileImageOptions,
+            modifier = modifier.fillMaxSize(),
+            component = component,
+            failure = { Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) })
     }
 }

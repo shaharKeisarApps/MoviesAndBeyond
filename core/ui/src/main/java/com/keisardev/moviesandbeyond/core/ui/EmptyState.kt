@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
@@ -66,3 +67,19 @@ fun EmptyState(
             }
     }
 }
+
+// region Previews
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyStatePreview() {
+    MaterialTheme { EmptyState(title = "No results found", subtitle = "Try a different search") }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyStateNoSubtitlePreview() {
+    MaterialTheme { EmptyState(title = "No favorites yet") }
+}
+
+// endregion

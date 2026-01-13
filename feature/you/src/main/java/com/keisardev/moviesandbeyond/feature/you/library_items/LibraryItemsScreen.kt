@@ -1,7 +1,7 @@
 package com.keisardev.moviesandbeyond.feature.you.library_items
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,13 +17,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -34,8 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +52,7 @@ import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
 import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.you.R
 import kotlinx.coroutines.launch
@@ -131,6 +136,7 @@ internal fun LibraryItemsScreen(
                             LibraryMediaType.MOVIE -> {
                                 LibraryContent(
                                     content = movieItems,
+                                    libraryItemType = libraryItemType,
                                     onItemClick = onItemClick,
                                     onDeleteClick = onDeleteItem)
                             }
@@ -138,6 +144,7 @@ internal fun LibraryItemsScreen(
                             LibraryMediaType.TV -> {
                                 LibraryContent(
                                     content = tvItems,
+                                    libraryItemType = libraryItemType,
                                     onItemClick = onItemClick,
                                     onDeleteClick = onDeleteItem)
                             }
@@ -151,19 +158,43 @@ internal fun LibraryItemsScreen(
 @Composable
 private fun LibraryContent(
     content: List<LibraryItem>,
+    libraryItemType: LibraryItemType?,
     onItemClick: (String) -> Unit,
     onDeleteClick: (LibraryItem) -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
         if (content.isEmpty()) {
-            Text(
-                text = stringResource(id = R.string.no_items),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.align(Alignment.Center))
+            // Empty state with icon and message
+            Column(
+                modifier = Modifier.align(Alignment.Center).padding(Spacing.screenPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Icon(
+                        imageVector =
+                            if (libraryItemType == LibraryItemType.FAVORITE) {
+                                Icons.Rounded.Favorite
+                            } else {
+                                Icons.Rounded.Bookmark
+                            },
+                        contentDescription = null,
+                        modifier = Modifier.size(Dimens.iconSizeLarge),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(Spacing.xs))
+                    Text(
+                        text = stringResource(id = R.string.no_items),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        text = stringResource(id = R.string.no_items_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center)
+                }
         } else {
             LazyVerticalContentGrid(
                 pagingEnabled = false,
-                contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) {
+                contentPadding =
+                    PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
                     items(items = content, key = { it.id }) { item ->
                         // Convert string media type to SharedMediaType for shared elements
                         val sharedMediaType =
@@ -192,6 +223,7 @@ private fun LibraryContent(
     }
 }
 
+/** Library item card with delete button overlay. */
 @Composable
 private fun LibraryItemCard(
     posterPath: String,
@@ -203,15 +235,22 @@ private fun LibraryItemCard(
         MediaItemCard(
             posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
 
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
-            modifier = Modifier.align(Alignment.TopEnd).size(42.dp).padding(4.dp)) {
+        // Delete button with modern styling
+        IconButton(
+            onClick = onDeleteClick,
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
+            modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .padding(Spacing.xxs)
+                    .size(32.dp)
+                    .clip(CircleShape)) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(id = R.string.delete),
-                    tint = Color.Black,
-                    modifier = Modifier.clickable(onClick = onDeleteClick).padding(4.dp))
+                    modifier = Modifier.size(Dimens.iconSizeSmall))
             }
     }
 }

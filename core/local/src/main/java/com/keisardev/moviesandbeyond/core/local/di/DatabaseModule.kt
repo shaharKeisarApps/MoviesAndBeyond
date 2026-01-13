@@ -3,7 +3,11 @@ package com.keisardev.moviesandbeyond.core.local.di
 import android.content.Context
 import androidx.room.Room
 import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase
+import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase.Companion.MIGRATION_1_2
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedContentDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedMovieDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedTvDetailsDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.FavoriteContentDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import dagger.Module
@@ -23,18 +27,7 @@ internal object DatabaseModule {
     ): MoviesAndBeyondDatabase {
         return Room.databaseBuilder(
                 context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
-            /*.addMigrations(
-                MIGRATION_1_2,
-                MIGRATION_2_3,
-                MIGRATION_3_4,
-                MIGRATION_4_5,
-                MIGRATION_6_7,
-                MIGRATION_7_8,
-                MIGRATION_8_9,
-                MIGRATION_9_10,
-                MIGRATION_10_11,
-                MIGRATION_11_12
-            )*/
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 
@@ -54,5 +47,23 @@ internal object DatabaseModule {
     @Provides
     fun provideAccountDetailsDao(db: MoviesAndBeyondDatabase): AccountDetailsDao {
         return db.accountDetailsDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedContentDao(db: MoviesAndBeyondDatabase): CachedContentDao {
+        return db.cachedContentDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedMovieDetailsDao(db: MoviesAndBeyondDatabase): CachedMovieDetailsDao {
+        return db.cachedMovieDetailsDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedTvDetailsDao(db: MoviesAndBeyondDatabase): CachedTvDetailsDao {
+        return db.cachedTvDetailsDao()
     }
 }

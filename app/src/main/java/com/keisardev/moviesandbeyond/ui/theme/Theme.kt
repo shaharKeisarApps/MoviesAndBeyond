@@ -10,7 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.keisardev.moviesandbeyond.feature.you.supportsDynamicColorTheme
 
-private val lightScheme =
+/** Cinematic Light Color Scheme. Secondary option for users who prefer light mode. */
+private val cinematicLightScheme =
     lightColorScheme(
         primary = primaryLight,
         onPrimary = onPrimaryLight,
@@ -49,7 +50,11 @@ private val lightScheme =
         surfaceContainerHighest = surfaceContainerHighestLight,
     )
 
-private val darkScheme =
+/**
+ * Cinematic Dark Color Scheme. Primary theme - movies look best on dark backgrounds. Features deep
+ * blacks with blue tint for immersive cinema feel.
+ */
+private val cinematicDarkScheme =
     darkColorScheme(
         primary = primaryDark,
         onPrimary = onPrimaryDark,
@@ -88,6 +93,20 @@ private val darkScheme =
         surfaceContainerHighest = surfaceContainerHighestDark,
     )
 
+/**
+ * MoviesAndBeyond app theme with cinematic design system.
+ *
+ * Features:
+ * - Dark-first theme optimized for movie content
+ * - Electric blue primary, cinema red secondary, gold tertiary
+ * - Deep surface hierarchy for immersive feel
+ * - Cinematic typography scale
+ * - Premium rounded shapes
+ *
+ * @param darkTheme Whether to use dark theme (default: system preference)
+ * @param dynamicColor Whether to use Material You dynamic colors on Android 12+
+ * @param content The composable content to apply theme to
+ */
 @Composable
 fun MoviesAndBeyondTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -101,10 +120,13 @@ fun MoviesAndBeyondTheme(
                 val context = LocalContext.current
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             }
-
-            darkTheme -> darkScheme
-            else -> lightScheme
+            darkTheme -> cinematicDarkScheme
+            else -> cinematicLightScheme
         }
 
-    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = CinematicM3Typography,
+        shapes = CinematicM3Shapes,
+        content = content)
 }

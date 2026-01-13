@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,9 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 /**
@@ -63,8 +66,27 @@ fun shimmerBrush(): Brush {
  * state replacement for individual content cards.
  *
  * @param modifier Modifier to apply to the card
- * @param width Card width (defaults to Dimens.cardWidth)
- * @param height Card height (defaults to Dimens.cardHeight)
+ * @param size Poster size variant (SMALL, MEDIUM, LARGE)
+ */
+@Composable
+fun ShimmerCard(modifier: Modifier = Modifier, size: PosterSize = PosterSize.MEDIUM) {
+    val brush = shimmerBrush()
+
+    Box(
+        modifier =
+            modifier
+                .size(width = size.width, height = size.height)
+                .graphicsLayer { clip = true }
+                .clip(RoundedCornerShape(12.dp))
+                .background(brush))
+}
+
+/**
+ * Single shimmer card with custom dimensions.
+ *
+ * @param modifier Modifier to apply to the card
+ * @param width Card width
+ * @param height Card height
  */
 @Composable
 fun ShimmerCard(
@@ -80,7 +102,7 @@ fun ShimmerCard(
                 .width(width)
                 .height(height)
                 .graphicsLayer { clip = true }
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(brush))
 }
 
@@ -89,12 +111,14 @@ fun ShimmerCard(
  * spacing.
  *
  * @param cardCount Number of shimmer cards to display (default: 4)
+ * @param size Poster size variant for each card
  * @param contentPadding Padding around the row content
  * @param modifier Modifier to apply to the row
  */
 @Composable
 fun ShimmerRow(
     cardCount: Int = 4,
+    size: PosterSize = PosterSize.MEDIUM,
     contentPadding: PaddingValues = PaddingValues(horizontal = Spacing.screenPadding),
     modifier: Modifier = Modifier
 ) {
@@ -103,7 +127,7 @@ fun ShimmerRow(
         horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
         userScrollEnabled = false,
         modifier = modifier) {
-            items(cardCount) { ShimmerCard() }
+            items(cardCount) { ShimmerCard(size = size) }
         }
 }
 
@@ -122,7 +146,7 @@ fun ShimmerGridCard(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .height(Dimens.cardHeight)
                 .graphicsLayer { clip = true }
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(brush))
 }
 
@@ -130,17 +154,83 @@ fun ShimmerGridCard(modifier: Modifier = Modifier) {
  * Shimmer card sized for lazy row content sections. Fills the available height of the parent row.
  *
  * @param modifier Modifier to apply to the card
+ * @param size Poster size variant
  */
 @Composable
-fun ShimmerRowCard(modifier: Modifier = Modifier) {
+fun ShimmerRowCard(modifier: Modifier = Modifier, size: PosterSize = PosterSize.MEDIUM) {
     val brush = shimmerBrush()
 
     Box(
         modifier =
             modifier
-                .width(Dimens.cardWidth)
+                .width(size.width)
                 .fillMaxHeight()
                 .graphicsLayer { clip = true }
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(brush))
 }
+
+/**
+ * Shimmer backdrop card for loading states in trending/featured sections.
+ *
+ * @param modifier Modifier to apply to the card
+ */
+@Composable
+fun ShimmerBackdropCard(modifier: Modifier = Modifier) {
+    val brush = shimmerBrush()
+
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(Dimens.backdropCardHeight)
+                .graphicsLayer { clip = true }
+                .clip(RoundedCornerShape(16.dp))
+                .background(brush))
+}
+
+/**
+ * Shimmer person card for cast/crew loading states.
+ *
+ * @param modifier Modifier to apply to the card
+ */
+@Composable
+fun ShimmerPersonCard(modifier: Modifier = Modifier) {
+    val brush = shimmerBrush()
+
+    Box(
+        modifier =
+            modifier
+                .size(Dimens.personAvatarSize)
+                .graphicsLayer { clip = true }
+                .clip(RoundedCornerShape(50))
+                .background(brush))
+}
+
+// region Previews
+
+@Preview(showBackground = true)
+@Composable
+private fun ShimmerCardPreview() {
+    MaterialTheme { ShimmerCard(size = PosterSize.MEDIUM) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ShimmerRowPreview() {
+    MaterialTheme { ShimmerRow(cardCount = 3, size = PosterSize.SMALL) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ShimmerBackdropCardPreview() {
+    MaterialTheme { ShimmerBackdropCard() }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ShimmerPersonCardPreview() {
+    MaterialTheme { ShimmerPersonCard() }
+}
+
+// endregion

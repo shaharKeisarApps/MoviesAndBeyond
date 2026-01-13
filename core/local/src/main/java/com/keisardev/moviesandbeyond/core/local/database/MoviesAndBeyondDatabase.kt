@@ -7,16 +7,28 @@ import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedContentDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedMovieDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedTvDetailsDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.FavoriteContentDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import com.keisardev.moviesandbeyond.core.local.database.entity.AccountDetailsEntity
+import com.keisardev.moviesandbeyond.core.local.database.entity.CachedContentEntity
+import com.keisardev.moviesandbeyond.core.local.database.entity.CachedMovieDetailsEntity
+import com.keisardev.moviesandbeyond.core.local.database.entity.CachedTvDetailsEntity
 import com.keisardev.moviesandbeyond.core.local.database.entity.FavoriteContentEntity
 import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContentEntity
 
 @Database(
     entities =
-        [FavoriteContentEntity::class, WatchlistContentEntity::class, AccountDetailsEntity::class],
-    version = 1,
+        [
+            FavoriteContentEntity::class,
+            WatchlistContentEntity::class,
+            AccountDetailsEntity::class,
+            CachedContentEntity::class,
+            CachedMovieDetailsEntity::class,
+            CachedTvDetailsEntity::class],
+    version = 2,
     /*autoMigrations = [
         AutoMigration(from = 5, to = 6, spec = MoviesAndBeyondDatabase.Companion.Migration5to6::class)
     ],
@@ -29,8 +41,68 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
 
     abstract fun accountDetailsDao(): AccountDetailsDao
 
+    abstract fun cachedContentDao(): CachedContentDao
+
+    abstract fun cachedMovieDetailsDao(): CachedMovieDetailsDao
+
+    abstract fun cachedTvDetailsDao(): CachedTvDetailsDao
+
     companion object {
+        /** Migration from version 1 to 2: Add Store5 cache tables for offline-first support. */
         val MIGRATION_1_2 =
+            object : Migration(1, 2) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Create cached_content table for movie/TV show lists
+                    db.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS cached_content (
+                            content_id INTEGER NOT NULL,
+                            category TEXT NOT NULL,
+                            page INTEGER NOT NULL,
+                            position INTEGER NOT NULL,
+                            image_path TEXT NOT NULL,
+                            name TEXT NOT NULL,
+                            backdrop_path TEXT,
+                            rating REAL,
+                            release_date TEXT,
+                            overview TEXT,
+                            fetched_at INTEGER NOT NULL,
+                            PRIMARY KEY(content_id, category)
+                        )
+                        """
+                            .trimIndent())
+                    db.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_cached_content_category ON cached_content (category)")
+                    db.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_cached_content_fetched_at ON cached_content (fetched_at)")
+
+                    // Create cached_movie_details table
+                    db.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS cached_movie_details (
+                            id INTEGER PRIMARY KEY NOT NULL,
+                            details_json TEXT NOT NULL,
+                            fetched_at INTEGER NOT NULL
+                        )
+                        """
+                            .trimIndent())
+
+                    // Create cached_tv_details table
+                    db.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS cached_tv_details (
+                            id INTEGER PRIMARY KEY NOT NULL,
+                            details_json TEXT NOT NULL,
+                            fetched_at INTEGER NOT NULL
+                        )
+                        """
+                            .trimIndent())
+                }
+            }
+
+        // Legacy migrations below (kept for reference, no longer used)
+        @Deprecated("Legacy migration - database was reset to version 1")
+        val LEGACY_MIGRATION_1_2 =
             object : Migration(1, 2) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(

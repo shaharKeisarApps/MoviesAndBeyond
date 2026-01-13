@@ -23,15 +23,20 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Section header with expressive "See All" arrow animation. The arrow scales down and translates
  * right on press for delightful feedback.
+ *
+ * @param sectionName The title to display for this section
+ * @param onSeeAllClick Callback for "See All" action. If null, the arrow is hidden.
+ * @param modifier Modifier for the header row
  */
 @Composable
 fun ContentSectionHeader(
     sectionName: String,
-    onSeeAllClick: () -> Unit,
+    onSeeAllClick: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     // Expressive press state for arrow
@@ -64,23 +69,41 @@ fun ContentSectionHeader(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold)
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                contentDescription = stringResource(id = R.string.see_all),
-                modifier =
-                    Modifier.graphicsLayer {
-                            scaleX = arrowScale
-                            scaleY = arrowScale
-                            translationX = arrowTranslateX
-                        }
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    isArrowPressed = true
-                                    tryAwaitRelease()
-                                    isArrowPressed = false
-                                },
-                                onTap = { onSeeAllClick() })
-                        })
+            if (onSeeAllClick != null) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = stringResource(id = R.string.see_all),
+                    modifier =
+                        Modifier.graphicsLayer {
+                                scaleX = arrowScale
+                                scaleY = arrowScale
+                                translationX = arrowTranslateX
+                            }
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onPress = {
+                                        isArrowPressed = true
+                                        tryAwaitRelease()
+                                        isArrowPressed = false
+                                    },
+                                    onTap = { onSeeAllClick() })
+                            })
+            }
         }
 }
+
+// region Previews
+
+@Preview(showBackground = true)
+@Composable
+private fun ContentSectionHeaderPreview() {
+    MaterialTheme { ContentSectionHeader(sectionName = "Popular", onSeeAllClick = {}) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ContentSectionHeaderNoArrowPreview() {
+    MaterialTheme { ContentSectionHeader(sectionName = "Featured", onSeeAllClick = null) }
+}
+
+// endregion

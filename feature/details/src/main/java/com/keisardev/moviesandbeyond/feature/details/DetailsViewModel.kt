@@ -9,6 +9,7 @@ import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
+import com.keisardev.moviesandbeyond.data.coroutines.WhileSubscribedOrRetained
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
@@ -17,7 +18,6 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -83,7 +83,7 @@ constructor(
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
+                started = WhileSubscribedOrRetained,
                 initialValue = ContentDetailUiState.Loading)
 
     fun addOrRemoveFavorite(libraryItem: LibraryItem) {

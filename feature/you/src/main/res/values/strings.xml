@@ -18,7 +18,8 @@
     <string name="watchlist">Watchlist</string>
     <string name="movies">Movies</string>
     <string name="tv_shows">Tv Shows</string>
-    <string name="no_items">No Items</string>
+    <string name="no_items">No items yet</string>
+    <string name="no_items_description">Add movies and TV shows from the details screen to see them here</string>
     <string name="delete">Delete</string>
     <string name="attribution_info">Attribution Info</string>
     <string name="attribution_text">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>

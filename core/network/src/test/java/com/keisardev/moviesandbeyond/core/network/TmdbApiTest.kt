@@ -47,6 +47,12 @@ class TmdbApiTest {
                 title = "Ant-Man and the Wasp: Quantumania",
                 name = null,
                 posterPath = "/ngl2FKBlU4fhbdsrtdom9LVLBXw.jpg",
+                backdropPath = "/gMJngTNfaqCSCqGD4y8lVMZXKDn.jpg",
+                voteAverage = 6.5,
+                releaseDate = "2023-02-15",
+                firstAirDate = null,
+                overview =
+                    "Super-Hero partners Scott Lang and Hope van Dyne, along with with Hope's parents Janet van Dyne and Hank Pym, and Scott's daughter Cassie Lang, find themselves exploring the Quantum Realm, interacting with strange new creatures and embarking on an adventure that will push them beyond the limits of what they thought possible.",
             ),
             content.results.first())
     }
