@@ -1,4 +1,4 @@
-plugins { id("moviesandbeyond.android.feature") }
+plugins { alias(libs.plugins.moviesandbeyond.android.feature) }
 
 android { namespace = "com.keisardev.moviesandbeyond.feature.tv" }
 
