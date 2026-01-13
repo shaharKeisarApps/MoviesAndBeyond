@@ -4,12 +4,12 @@
 
 | # | Task | Branch | Worktree | Status | PR | CI | Merged | Cleaned |
 |---|------|--------|----------|--------|----|----|--------|---------|
-| 1 | Type-Safe Plugins | feature/type-safe-plugins | ../movies-worktree-plugins | 🟢 | #62 | ✅ | 🟢 | ⬜ |
-| 2 | Dynamic Theme | feature/dynamic-theme | ../movies-worktree-theme | 🟢 | #61 | ✅ | 🟢 | ⬜ |
-| 3 | README + CI | feature/readme-ci | ../movies-worktree-readme | 🟢 | #57 | ✅ | 🟢 | ⬜ |
-| 4 | Splash + Icon | feature/splash-icon | ../movies-worktree-splash | 🟢 | #58 | ✅ | 🟢 | ⬜ |
-| 5 | Local User | feature/local-user | ../movies-worktree-localuser | 🟢 | #59 | ✅ | 🟢 | ⬜ |
-| 6 | Benchmarks | feature/benchmarks | ../movies-worktree-benchmarks | 🟢 | #60 | ✅ | 🟢 | ⬜ |
+| 1 | Type-Safe Plugins | feature/type-safe-plugins | ../movies-worktree-plugins | 🟢 | #62 | ✅ | 🟢 | 🟢 |
+| 2 | Dynamic Theme | feature/dynamic-theme | ../movies-worktree-theme | 🟢 | #61 | ✅ | 🟢 | 🟢 |
+| 3 | README + CI | feature/readme-ci | ../movies-worktree-readme | 🟢 | #57 | ✅ | 🟢 | 🟢 |
+| 4 | Splash + Icon | feature/splash-icon | ../movies-worktree-splash | 🟢 | #58 | ✅ | 🟢 | 🟢 |
+| 5 | Local User | feature/local-user | ../movies-worktree-localuser | 🟢 | #59 | ✅ | 🟢 | 🟢 |
+| 6 | Benchmarks | feature/benchmarks | ../movies-worktree-benchmarks | 🟢 | #60 | ✅ | 🟢 | 🟢 |
 | 7 | Metro DI | feature/metro-di | ../movies-worktree-metro | ⬜ | - | - | ⬜ | ⬜ |
 
 **Legend**: ⬜ Pending | 🟡 In Progress | 🟢 Done | ❌ Failed
@@ -27,7 +27,7 @@
 - [x] PR created (#62)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 
 ### Implementation Notes
 - Migrated all modules from `id("moviesandbeyond.xxx")` to `alias(libs.plugins.moviesandbeyond.xxx)`
@@ -54,7 +54,7 @@
 - [x] PR created (#61)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 
 ### Implementation Notes
 - Created SeedColor enum with 8 preset colors
@@ -77,7 +77,7 @@
 - [x] PR created (#57)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 - [ ] First APK released to GitHub Releases
 
 ### Implementation Notes
@@ -100,7 +100,7 @@
 - [x] PR created (#58)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 
 ### Implementation Notes
 - Implemented Android 12+ Splash Screen API
@@ -124,7 +124,7 @@
 - [x] PR created (#59)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 
 ### Implementation Notes
 - Implemented local-only favorites/watchlist with Room database
@@ -147,7 +147,7 @@
 - [x] PR created (#60)
 - [x] CI passed
 - [x] Merged to main
-- [ ] Worktree deleted
+- [x] Worktree deleted
 
 ### Implementation Notes
 - Created benchmarks module with StartupBenchmark
