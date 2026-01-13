@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
-import com.keisardev.moviesandbeyond.data.coroutines.WhileSubscribedOrRetained
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import com.keisardev.moviesandbeyond.data.store.errorMessageOrNull
 import com.keisardev.moviesandbeyond.data.store.isFromCache
@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -59,9 +58,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 category = TvShowListCategory.AIRING_TODAY,
                 pageFlow = _airingTodayPage,
                 accumulatedFlow = _airingTodayAccumulated)
-            .stateIn(
+            .stateInWhileSubscribed(
                 scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
                 initialValue = ContentUiState(TvShowListCategory.AIRING_TODAY))
 
     // On Air TV Shows with offline-first support
@@ -70,9 +68,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 category = TvShowListCategory.ON_THE_AIR,
                 pageFlow = _onAirPage,
                 accumulatedFlow = _onAirAccumulated)
-            .stateIn(
+            .stateInWhileSubscribed(
                 scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
                 initialValue = ContentUiState(TvShowListCategory.ON_THE_AIR))
 
     // Popular TV Shows with offline-first support
@@ -81,10 +78,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 category = TvShowListCategory.POPULAR,
                 pageFlow = _popularPage,
                 accumulatedFlow = _popularAccumulated)
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentUiState(TvShowListCategory.POPULAR))
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentUiState(TvShowListCategory.POPULAR))
 
     // Top Rated TV Shows with offline-first support
     val topRatedTvShows: StateFlow<ContentUiState> =
@@ -92,10 +87,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 category = TvShowListCategory.TOP_RATED,
                 pageFlow = _topRatedPage,
                 accumulatedFlow = _topRatedAccumulated)
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentUiState(TvShowListCategory.TOP_RATED))
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentUiState(TvShowListCategory.TOP_RATED))
 
     /**
      * Creates a Flow that observes content from Store5 and combines it with accumulated items for

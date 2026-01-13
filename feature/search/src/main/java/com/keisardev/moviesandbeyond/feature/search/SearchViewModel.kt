@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.model.SearchItem
-import com.keisardev.moviesandbeyond.data.coroutines.WhileSubscribedOrRetained
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.SearchRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -60,10 +59,7 @@ constructor(
                     }
                 }
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = emptyList())
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
 
     fun changeSearchQuery(query: String) {
         _searchQuery.update { query }

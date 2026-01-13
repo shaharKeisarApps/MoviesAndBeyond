@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
-import com.keisardev.moviesandbeyond.data.coroutines.WhileSubscribedOrRetained
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import com.keisardev.moviesandbeyond.data.store.errorMessageOrNull
 import com.keisardev.moviesandbeyond.data.store.isFromCache
@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -59,9 +58,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                 category = MovieListCategory.NOW_PLAYING,
                 pageFlow = _nowPlayingPage,
                 accumulatedFlow = _nowPlayingAccumulated)
-            .stateIn(
+            .stateInWhileSubscribed(
                 scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
                 initialValue = ContentUiState(MovieListCategory.NOW_PLAYING))
 
     // Popular Movies with offline-first support
@@ -70,10 +68,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                 category = MovieListCategory.POPULAR,
                 pageFlow = _popularPage,
                 accumulatedFlow = _popularAccumulated)
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentUiState(MovieListCategory.POPULAR))
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.POPULAR))
 
     // Top Rated Movies with offline-first support
     val topRatedMovies: StateFlow<ContentUiState> =
@@ -81,10 +77,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                 category = MovieListCategory.TOP_RATED,
                 pageFlow = _topRatedPage,
                 accumulatedFlow = _topRatedAccumulated)
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentUiState(MovieListCategory.TOP_RATED))
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.TOP_RATED))
 
     // Upcoming Movies with offline-first support
     val upcomingMovies: StateFlow<ContentUiState> =
@@ -92,10 +86,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                 category = MovieListCategory.UPCOMING,
                 pageFlow = _upcomingPage,
                 accumulatedFlow = _upcomingAccumulated)
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentUiState(MovieListCategory.UPCOMING))
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.UPCOMING))
 
     /**
      * Creates a Flow that observes content from Store5 and combines it with accumulated items for
