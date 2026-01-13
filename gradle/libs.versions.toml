@@ -127,14 +127,13 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
 
-# Convention plugins
-moviesandbeyond-android-application = { id = "moviesandbeyond.android.application", version = "unspecified" }
-moviesandbeyond-android-application-compose = { id = "moviesandbeyond.android.application.compose", version = "unspecified" }
-moviesandbeyond-android-library = { id = "moviesandbeyond.android.library", version = "unspecified" }
-moviesandbeyond-android-library-compose = { id = "moviesandbeyond.android.library.compose", version = "unspecified" }
-moviesandbeyond-android-hilt = { id = "moviesandbeyond.android.hilt", version = "unspecified" }
-moviesandbeyond-android-feature = { id = "moviesandbeyond.android.feature", version = "unspecified" }
-moviesandbeyond-android-screenshot-test = { id = "moviesandbeyond.android.screenshot.test", version = "unspecified" }
+# Convention plugins (no version needed - they're local)
+moviesandbeyond-android-application = { id = "moviesandbeyond.android.application" }
+moviesandbeyond-android-application-compose = { id = "moviesandbeyond.android.application.compose" }
+moviesandbeyond-android-library = { id = "moviesandbeyond.android.library" }
+moviesandbeyond-android-library-compose = { id = "moviesandbeyond.android.library.compose" }
+moviesandbeyond-android-hilt = { id = "moviesandbeyond.android.hilt" }
+moviesandbeyond-android-feature = { id = "moviesandbeyond.android.feature" }
 
 [bundles]
 

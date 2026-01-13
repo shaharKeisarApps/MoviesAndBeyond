@@ -1,8 +1,8 @@
 import com.google.protobuf.gradle.GenerateProtoTask
 
 plugins {
-    id("moviesandbeyond.android.library")
-    id("moviesandbeyond.android.hilt")
+    alias(libs.plugins.moviesandbeyond.android.library)
+    alias(libs.plugins.moviesandbeyond.android.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.protobuf)
 }

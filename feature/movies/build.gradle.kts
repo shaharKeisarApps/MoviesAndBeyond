@@ -1,5 +1,5 @@
 plugins {
-    id("moviesandbeyond.android.feature")
+    alias(libs.plugins.moviesandbeyond.android.feature)
     alias(libs.plugins.screenshot)
 }
 

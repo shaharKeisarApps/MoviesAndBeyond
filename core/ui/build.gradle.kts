@@ -1,6 +1,6 @@
 plugins {
-    id("moviesandbeyond.android.library")
-    id("moviesandbeyond.android.library.compose")
+    alias(libs.plugins.moviesandbeyond.android.library)
+    alias(libs.plugins.moviesandbeyond.android.library.compose)
     alias(libs.plugins.screenshot)
 }
 

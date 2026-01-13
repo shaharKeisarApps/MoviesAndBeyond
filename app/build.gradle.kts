@@ -1,7 +1,7 @@
 plugins {
-    id("moviesandbeyond.android.application")
-    id("moviesandbeyond.android.application.compose")
-    id("moviesandbeyond.android.hilt")
+    alias(libs.plugins.moviesandbeyond.android.application)
+    alias(libs.plugins.moviesandbeyond.android.application.compose)
+    alias(libs.plugins.moviesandbeyond.android.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
 

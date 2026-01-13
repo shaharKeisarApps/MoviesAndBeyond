@@ -1,8 +1,8 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id("moviesandbeyond.android.library")
-    id("moviesandbeyond.android.hilt")
+    alias(libs.plugins.moviesandbeyond.android.library)
+    alias(libs.plugins.moviesandbeyond.android.hilt)
 }
 
 android {
