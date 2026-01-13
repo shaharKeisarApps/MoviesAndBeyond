@@ -39,6 +39,7 @@ screenshot = "0.0.1-alpha12"
 benchmark-macro = "1.3.3"
 profileinstaller = "1.4.1"
 uiautomator = "2.3.0"
+material-kolor = "4.0.0"
 
 [libraries]
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -106,6 +107,7 @@ ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+material-color-utilities = { group = "com.materialkolor", name = "material-color-utilities", version.ref = "material-kolor" }
 
 # Benchmark dependencies
 benchmark-macro = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro" }

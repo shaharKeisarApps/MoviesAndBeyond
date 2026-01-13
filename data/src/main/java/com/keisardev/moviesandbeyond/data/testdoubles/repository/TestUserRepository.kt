@@ -1,6 +1,7 @@
 package com.keisardev.moviesandbeyond.data.testdoubles.repository
 
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.model.user.UserData
@@ -14,7 +15,8 @@ val testUserData =
         useDynamicColor = false,
         includeAdultResults = false,
         darkMode = SelectedDarkMode.SYSTEM,
-        hideOnboarding = false)
+        hideOnboarding = false,
+        seedColor = SeedColor.DEFAULT)
 
 val testAccountDetails =
     AccountDetails(
@@ -46,6 +48,10 @@ class TestUserRepository : UserRepository {
 
     override suspend fun setDarkModePreference(selectedDarkMode: SelectedDarkMode) {
         _userData.update { it.copy(darkMode = selectedDarkMode) }
+    }
+
+    override suspend fun setSeedColorPreference(seedColor: SeedColor) {
+        _userData.update { it.copy(seedColor = seedColor) }
     }
 
     override suspend fun updateAccountDetails(accountId: Int): NetworkResponse<Unit> {

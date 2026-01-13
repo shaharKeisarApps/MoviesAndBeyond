@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.data.repository
 
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.model.user.UserData
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,8 @@ interface UserRepository {
     suspend fun setDarkModePreference(
         selectedDarkMode: com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
     )
+
+    suspend fun setSeedColorPreference(seedColor: SeedColor)
 
     suspend fun updateAccountDetails(
         accountId: Int

@@ -10,6 +10,7 @@ message UserPreferences {
   DarkMode darkMode = 2;
   bool includeAdultResults = 3;
   bool hideOnboarding = 8;
+  string seedColor = 9;
 
-  // Next available number = 9
+  // Next available number = 10
 }

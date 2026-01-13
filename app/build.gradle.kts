@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.ui)
     implementation(libs.ui.graphics)
+    implementation(libs.material.color.utilities)
 
     // Baseline profile support
     implementation(libs.profileinstaller)
