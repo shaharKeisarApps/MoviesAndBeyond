@@ -11,11 +11,7 @@ data class LoginRequest(
 )
 
 @JsonClass(generateAdapter = true)
-data class SessionRequest(
-    @Json(name = "request_token") val requestToken: String
-)
+data class SessionRequest(@Json(name = "request_token") val requestToken: String)
 
 @JsonClass(generateAdapter = true)
-data class DeleteSessionRequest(
-    @Json(name = "session_id") val sessionId: String
-)
+data class DeleteSessionRequest(@Json(name = "session_id") val sessionId: String)

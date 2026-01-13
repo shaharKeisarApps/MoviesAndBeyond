@@ -10,12 +10,7 @@ data class RequestTokenResponse(
 )
 
 @JsonClass(generateAdapter = true)
-data class LoginResponse(
-    @Json(name = "request_token") val requestToken: String
-)
+data class LoginResponse(@Json(name = "request_token") val requestToken: String)
 
 @JsonClass(generateAdapter = true)
-data class SessionResponse(
-    val success: Boolean,
-    @Json(name = "session_id") val sessionId: String
-)
+data class SessionResponse(val success: Boolean, @Json(name = "session_id") val sessionId: String)

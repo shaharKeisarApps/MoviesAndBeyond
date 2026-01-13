@@ -5,7 +5,7 @@ import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.data.repository.SearchRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.testSearchResults
 
-class TestSearchRepository: SearchRepository {
+class TestSearchRepository : SearchRepository {
     private var generateError = false
 
     override suspend fun getSearchSuggestions(

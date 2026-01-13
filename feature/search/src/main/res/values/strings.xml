@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <string name="search_hint">Search for movies, TV shows, and people</string>
+    <string name="search_description">Find your favorite content</string>
+    <string name="no_results_title">No results found</string>
+    <string name="no_results_description">We couldn\'t find anything for \"%1$s\".\nTry a different search term.</string>
 </resources>

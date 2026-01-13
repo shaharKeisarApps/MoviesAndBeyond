@@ -7,11 +7,11 @@ import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.movieMediaType
 import com.keisardev.moviesandbeyond.data.testdoubles.testLibraryItems
 import com.keisardev.moviesandbeyond.data.testdoubles.tvMediaType
+import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.io.IOException
 
 class TestLibraryRepository : LibraryRepository {
     private var generateError = false
@@ -30,17 +30,11 @@ class TestLibraryRepository : LibraryRepository {
 
     override val tvShowsWatchlist: Flow<List<LibraryItem>> = _tvShows.asStateFlow()
 
-    override suspend fun itemInFavoritesExists(
-        mediaId: Int,
-        mediaType: MediaType
-    ): Boolean {
+    override suspend fun itemInFavoritesExists(mediaId: Int, mediaType: MediaType): Boolean {
         return testLibraryItems.find { it.id == mediaId } != null
     }
 
-    override suspend fun itemInWatchlistExists(
-        mediaId: Int,
-        mediaType: MediaType
-    ): Boolean {
+    override suspend fun itemInWatchlistExists(mediaId: Int, mediaType: MediaType): Boolean {
         return testLibraryItems.find { it.id == mediaId } != null
     }
 

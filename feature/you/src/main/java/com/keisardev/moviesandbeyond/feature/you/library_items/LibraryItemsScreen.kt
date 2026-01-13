@@ -1,7 +1,7 @@
 package com.keisardev.moviesandbeyond.feature.you.library_items
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,13 +17,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -34,8 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,12 +47,18 @@ import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.ui.LazyVerticalContentGrid
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.you.R
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun LibraryItemsRoute(
+fun LibraryItemsRoute(
     onBackClick: () -> Unit,
     navigateToDetails: (String) -> Unit,
     viewModel: LibraryItemsViewModel = hiltViewModel()
@@ -66,8 +76,7 @@ internal fun LibraryItemsRoute(
         onDeleteItem = viewModel::deleteItem,
         onBackClick = onBackClick,
         onItemClick = navigateToDetails,
-        onErrorShown = viewModel::onErrorShown
-    )
+        onErrorShown = viewModel::onErrorShown)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -90,145 +99,158 @@ internal fun LibraryItemsScreen(
         onErrorShown()
     }
 
-    val libraryItemTitle = when (libraryItemType) {
-        LibraryItemType.FAVORITE -> stringResource(id = R.string.favorites)
-        LibraryItemType.WATCHLIST -> stringResource(id = R.string.watchlist)
-        else -> null
-    }
+    val libraryItemTitle =
+        when (libraryItemType) {
+            LibraryItemType.FAVORITE -> stringResource(id = R.string.favorites)
+            LibraryItemType.WATCHLIST -> stringResource(id = R.string.watchlist)
+            else -> null
+        }
 
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = {
-                    libraryItemTitle?.let { Text(text = it) }
-                },
-                onBackClick = onBackClick
-            )
+                title = { libraryItemTitle?.let { Text(text = it) } }, onBackClick = onBackClick)
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            val libraryMediaTabs = LibraryMediaType.entries
-            val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                val libraryMediaTabs = LibraryMediaType.entries
+                val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
 
-            val selectedTabIndex by remember(pagerState.currentPage) {
-                mutableIntStateOf(pagerState.currentPage)
-            }
+                val selectedTabIndex by
+                    remember(pagerState.currentPage) { mutableIntStateOf(pagerState.currentPage) }
 
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = { Text(text = stringResource(id = mediaTypeTab.displayName)) }
-                    )
+                TabRow(selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()) {
+                    libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            text = { Text(text = stringResource(id = mediaTypeTab.displayName)) })
+                    }
                 }
-            }
 
-            Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Spacing.xs))
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
-                Column(Modifier.fillMaxSize()) {
-                    when (libraryMediaTabs[page]) {
-                        LibraryMediaType.MOVIE -> {
-                            LibraryContent(
-                                content = movieItems,
-                                onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem
-                            )
-                        }
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                    Column(Modifier.fillMaxSize()) {
+                        when (libraryMediaTabs[page]) {
+                            LibraryMediaType.MOVIE -> {
+                                LibraryContent(
+                                    content = movieItems,
+                                    libraryItemType = libraryItemType,
+                                    onItemClick = onItemClick,
+                                    onDeleteClick = onDeleteItem)
+                            }
 
-                        LibraryMediaType.TV -> {
-                            LibraryContent(
-                                content = tvItems,
-                                onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem
-                            )
+                            LibraryMediaType.TV -> {
+                                LibraryContent(
+                                    content = tvItems,
+                                    libraryItemType = libraryItemType,
+                                    onItemClick = onItemClick,
+                                    onDeleteClick = onDeleteItem)
+                            }
                         }
                     }
                 }
             }
         }
-    }
 }
 
 @Composable
 private fun LibraryContent(
     content: List<LibraryItem>,
+    libraryItemType: LibraryItemType?,
     onItemClick: (String) -> Unit,
     onDeleteClick: (LibraryItem) -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
         if (content.isEmpty()) {
-            Text(
-                text = stringResource(id = R.string.no_items),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.align(Alignment.Center)
-            )
+            // Empty state with icon and message
+            Column(
+                modifier = Modifier.align(Alignment.Center).padding(Spacing.screenPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Icon(
+                        imageVector =
+                            if (libraryItemType == LibraryItemType.FAVORITE) {
+                                Icons.Rounded.Favorite
+                            } else {
+                                Icons.Rounded.Bookmark
+                            },
+                        contentDescription = null,
+                        modifier = Modifier.size(Dimens.iconSizeLarge),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(Spacing.xs))
+                    Text(
+                        text = stringResource(id = R.string.no_items),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        text = stringResource(id = R.string.no_items_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center)
+                }
         } else {
             LazyVerticalContentGrid(
                 pagingEnabled = false,
-                contentPadding = PaddingValues(horizontal = 10.dp)
-            ) {
-                items(
-                    items = content,
-                    key = { it.id }
-                ) {
-                    LibraryItem(
-                        posterPath = it.imagePath,
-                        onItemClick = {
-                            onItemClick("${it.id},${it.mediaType.uppercase()}")
-                        },
-                        onDeleteClick = { onDeleteClick(it) }
-                    )
+                contentPadding =
+                    PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
+                    items(items = content, key = { it.id }) { item ->
+                        // Convert string media type to SharedMediaType for shared elements
+                        val sharedMediaType =
+                            when (item.mediaType.lowercase()) {
+                                "movie" -> SharedMediaType.Movie
+                                "tv" -> SharedMediaType.TvShow
+                                else -> null
+                            }
+                        LibraryItemCard(
+                            posterPath = item.imagePath,
+                            sharedElementKey =
+                                sharedMediaType?.let {
+                                    MediaSharedElementKey(
+                                        mediaId = item.id.toLong(),
+                                        mediaType = it,
+                                        origin = SharedElementOrigin.LIBRARY,
+                                        elementType = SharedElementType.Image)
+                                },
+                            onItemClick = {
+                                onItemClick("${item.id},${item.mediaType.uppercase()}")
+                            },
+                            onDeleteClick = { onDeleteClick(item) })
+                    }
                 }
-            }
         }
     }
 }
 
+/** Library item card with delete button overlay. */
 @Composable
-private fun LibraryItem(
+private fun LibraryItemCard(
     posterPath: String,
+    sharedElementKey: MediaSharedElementKey? = null,
     onItemClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Box {
         MediaItemCard(
-            posterPath = posterPath,
-            onItemClick = onItemClick
-        )
+            posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
 
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(42.dp)
-                .padding(4.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(id = R.string.delete),
-                tint = Color.Black,
-                modifier = Modifier
-                    .clickable(onClick = onDeleteClick)
-                    .padding(4.dp)
-            )
-        }
+        // Delete button with modern styling
+        IconButton(
+            onClick = onDeleteClick,
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
+            modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .padding(Spacing.xxs)
+                    .size(32.dp)
+                    .clip(CircleShape)) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delete),
+                    modifier = Modifier.size(Dimens.iconSizeSmall))
+            }
     }
 }

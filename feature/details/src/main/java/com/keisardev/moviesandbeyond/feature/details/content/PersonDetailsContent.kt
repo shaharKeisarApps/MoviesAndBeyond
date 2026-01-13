@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
-import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
@@ -38,52 +38,41 @@ internal fun PersonDetailsContent(
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = {
-                    Text(
-                        text = personDetails.name,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                onBackClick = onBackClick
-            )
+                title = { Text(text = personDetails.name, fontWeight = FontWeight.SemiBold) },
+                onBackClick = onBackClick)
         },
-        modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection)
-    ) { paddingValues ->
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-        ) {
-            item {
-                Row(Modifier.fillMaxWidth()) {
-                    MediaItemCard(
-                        personDetails.profilePath,
-                        modifier = Modifier.size(height = 200.dp, width = 140.dp)
-                    )
+        modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection)) {
+            paddingValues ->
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = modifier.fillMaxWidth().padding(paddingValues)) {
+                    item {
+                        Row(Modifier.fillMaxWidth()) {
+                            // Person profile image - doesn't need shared element transitions
+                            SimpleMediaItemCard(
+                                posterPath = personDetails.profilePath,
+                                modifier = Modifier.size(height = 200.dp, width = 140.dp))
 
-                    Spacer(Modifier.width(10.dp))
+                            Spacer(Modifier.width(10.dp))
 
-                    PersonInfoSection(
-                        name = personDetails.name,
-                        gender = personDetails.gender,
-                        birthday = personDetails.birthday,
-                        deathday = personDetails.deathday,
-                        department = personDetails.knownForDepartment
-                    )
+                            PersonInfoSection(
+                                name = personDetails.name,
+                                gender = personDetails.gender,
+                                birthday = personDetails.birthday,
+                                deathday = personDetails.deathday,
+                                department = personDetails.knownForDepartment)
+                        }
+                    }
+
+                    item {
+                        PersonDetailsSection(
+                            alsoKnownAs = personDetails.alsoKnownAs,
+                            placeOfBirth = personDetails.placeOfBirth)
+                    }
+
+                    item { OverviewSection(personDetails.biography) }
                 }
-            }
-
-            item {
-                PersonDetailsSection(
-                    alsoKnownAs = personDetails.alsoKnownAs,
-                    placeOfBirth = personDetails.placeOfBirth
-                )
-            }
-
-            item { OverviewSection(personDetails.biography) }
         }
-    }
 }
 
 @Composable
@@ -94,54 +83,26 @@ private fun PersonInfoSection(
     deathday: String?,
     department: String
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold
-        )
+            fontWeight = FontWeight.SemiBold)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.gender),
-            value = gender
-        )
+        DetailItem(fieldName = stringResource(id = R.string.gender), value = gender)
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.born),
-            value = birthday
-        )
+        DetailItem(fieldName = stringResource(id = R.string.born), value = birthday)
 
-        deathday?.let {
-            DetailItem(
-                fieldName = stringResource(id = R.string.died),
-                value = it
-            )
-        }
+        deathday?.let { DetailItem(fieldName = stringResource(id = R.string.died), value = it) }
 
-        DetailItem(
-            fieldName = stringResource(id = R.string.known_for),
-            value = department
-        )
+        DetailItem(fieldName = stringResource(id = R.string.known_for), value = department)
     }
 }
 
 @Composable
-private fun PersonDetailsSection(
-    alsoKnownAs: String,
-    placeOfBirth: String
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        DetailItem(
-            fieldName = stringResource(id = R.string.birth_place),
-            value = placeOfBirth
-        )
-        DetailItem(
-            fieldName = stringResource(id = R.string.also_known_as),
-            value = alsoKnownAs
-        )
+private fun PersonDetailsSection(alsoKnownAs: String, placeOfBirth: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        DetailItem(fieldName = stringResource(id = R.string.birth_place), value = placeOfBirth)
+        DetailItem(fieldName = stringResource(id = R.string.also_known_as), value = alsoKnownAs)
     }
 }

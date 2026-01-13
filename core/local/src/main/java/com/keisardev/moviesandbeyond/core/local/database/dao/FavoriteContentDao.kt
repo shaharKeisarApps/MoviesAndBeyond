@@ -24,17 +24,16 @@ interface FavoriteContentDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFavoriteItem(favoriteContentEntity: FavoriteContentEntity)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_content WHERE media_id = :mediaId AND media_type = :mediaType)")
+    @Query(
+        "SELECT EXISTS(SELECT 1 FROM favorite_content WHERE media_id = :mediaId AND media_type = :mediaType)")
     suspend fun checkFavoriteItemExists(mediaId: Int, mediaType: String): Boolean
 
     @Query("DELETE FROM favorite_content WHERE media_id = :mediaId AND media_type = :mediaType ")
     suspend fun deleteFavoriteItem(mediaId: Int, mediaType: String)
 
-    @Query("DELETE FROM favorite_content")
-    suspend fun deleteAllFavoriteItems()
+    @Query("DELETE FROM favorite_content") suspend fun deleteAllFavoriteItems()
 
-    @Upsert
-    suspend fun upsertFavoriteItems(items: List<FavoriteContentEntity>)
+    @Upsert suspend fun upsertFavoriteItems(items: List<FavoriteContentEntity>)
 
     @Transaction
     suspend fun syncFavoriteItems(
@@ -42,8 +41,6 @@ interface FavoriteContentDao {
         deleteItems: List<Pair<Int, String>>
     ) {
         upsertFavoriteItems(upsertItems)
-        deleteItems.forEach {
-            deleteFavoriteItem(mediaId = it.first, mediaType = it.second)
-        }
+        deleteItems.forEach { deleteFavoriteItem(mediaId = it.first, mediaType = it.second) }
     }
 }

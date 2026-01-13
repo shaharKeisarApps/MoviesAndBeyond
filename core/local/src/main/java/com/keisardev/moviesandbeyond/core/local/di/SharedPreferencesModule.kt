@@ -19,15 +19,13 @@ internal object SharedPreferencesModule {
     fun provideEncryptedSharedPreferences(
         @ApplicationContext appContext: Context
     ): SharedPreferences {
-        val masterKey = MasterKey.Builder(appContext)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val masterKey =
+            MasterKey.Builder(appContext).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
         return EncryptedSharedPreferences.create(
             appContext,
             "secret_shared_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
     }
 }

@@ -22,7 +22,6 @@ private val LocalScaffoldContentPadding = staticCompositionLocalOf { PaddingValu
 
 /**
  * A copy of Material 3's [Scaffold] composable, but with a few tweaks:
- *
  * - Supports being used nested. The `contentPadding` is compounded on each level.
  */
 @OptIn(ExperimentalLayoutApi::class)

@@ -13,30 +13,20 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-
-
         consumerProguardFiles("consumer-proguard-rules.pro")
     }
 }
 
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-}
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 protobuf {
-    protoc {
-        artifact = libs.protobuf.protoc.get().toString()
-    }
+    protoc { artifact = libs.protobuf.protoc.get().toString() }
 
     generateProtoTasks {
         all().forEach { task ->
             task.builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin") {
-                    option("lite")
-                }
+                create("java") { option("lite") }
+                create("kotlin") { option("lite") }
             }
         }
     }
@@ -46,13 +36,16 @@ androidComponents {
     onVariants(selector().all()) { variant ->
         afterEvaluate {
             val protoTask =
-                project.tasks.getByName("generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto") as GenerateProtoTask
+                project.tasks.getByName(
+                    "generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto")
+                    as GenerateProtoTask
 
-            project.tasks.getByName("ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
-                dependsOn(protoTask)
-                // Remove the casting and use a different approach to set source
-                inputs.files(protoTask.outputBaseDir)
-            }
+            project.tasks.getByName(
+                "ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
+                    dependsOn(protoTask)
+                    // Remove the casting and use a different approach to set source
+                    inputs.files(protoTask.outputBaseDir)
+                }
         }
     }
 }

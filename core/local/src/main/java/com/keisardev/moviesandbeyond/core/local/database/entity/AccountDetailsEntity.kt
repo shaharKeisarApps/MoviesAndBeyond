@@ -16,14 +16,14 @@ data class AccountDetailsEntity(
     @ColumnInfo(name = "tmdb_avatar_path") val tmdbAvatarPath: String?,
     val username: String,
 ) {
-    fun asModel() = AccountDetails(
-        id = id,
-        gravatar = gravatarHash,
-        includeAdult = includeAdult,
-        iso6391 = iso6391,
-        iso31661 = iso31661,
-        name = name,
-        avatar = tmdbAvatarPath,
-        username = username
-    )
+    fun asModel() =
+        AccountDetails(
+            id = id,
+            gravatar = gravatarHash,
+            includeAdult = includeAdult,
+            iso6391 = iso6391,
+            iso31661 = iso31661,
+            name = name,
+            avatar = tmdbAvatarPath,
+            username = username)
 }

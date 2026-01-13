@@ -1,13 +1,13 @@
 package com.keisardev.moviesandbeyond.feature.details.content
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,20 +16,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,8 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -55,27 +58,32 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.details.people.Cast
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
+import com.keisardev.moviesandbeyond.core.ui.GenreChipRow
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.LibraryActionButton
-import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
-import com.keisardev.moviesandbeyond.core.ui.Rating
-import com.keisardev.moviesandbeyond.core.ui.TmdbImage
+import com.keisardev.moviesandbeyond.core.ui.RatingBadge
+import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.TmdbBackdropImage
+import com.keisardev.moviesandbeyond.core.ui.TmdbProfileImage
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
-import com.keisardev.moviesandbeyond.feature.details.horizontalPadding
-import com.keisardev.moviesandbeyond.feature.details.verticalPadding
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
-private val backdropExpandedHeight = 220.dp
-private val collapsedHeight = 64.dp
+// Enhanced immersive hero dimensions
+private val backdropExpandedHeight = Dimens.detailBackdropExpanded
+private val collapsedHeight = Dimens.detailBackdropCollapsed
 private val heightToCollapse = backdropExpandedHeight - collapsedHeight
 
 @OptIn(FlowPreview::class)
@@ -107,9 +115,8 @@ internal fun MediaDetailsContent(
     // persist collapse offset between different Details screen
     var savedCollapseOffsetPx by rememberSaveable { mutableFloatStateOf(0f) }
 
-    val nestedScrollConnection = remember(heightToCollapsePx) {
-        ExitOnlyCollapseNestedConnection(heightToCollapsePx)
-    }
+    val nestedScrollConnection =
+        remember(heightToCollapsePx) { ExitOnlyCollapseNestedConnection(heightToCollapsePx) }
 
     LaunchedEffect(Unit) {
         // set value of savedCollapseOffsetPx when returning from different Details screen
@@ -118,88 +125,71 @@ internal fun MediaDetailsContent(
         // whenever backdrop collapses or expands, save collapse offset
         snapshotFlow { nestedScrollConnection.collapseOffsetPx }
             .debounce(500L)
-            .collect { offset ->
-                savedCollapseOffsetPx = offset
-            }
+            .collect { offset -> savedCollapseOffsetPx = offset }
     }
 
-    val backdropHeight = with(LocalDensity.current) {
-        (backdropExpandedHeight.toPx() + nestedScrollConnection.collapseOffsetPx).toDp()
-    }
-    val isBackdropCollapsed by remember(backdropHeight) {
-        derivedStateOf { backdropHeight == collapsedHeight }
-    }
-    LaunchedEffect(isBackdropCollapsed) {
-        onBackdropCollapse(isBackdropCollapsed)
-    }
+    val backdropHeight =
+        with(LocalDensity.current) {
+            (backdropExpandedHeight.toPx() + nestedScrollConnection.collapseOffsetPx).toDp()
+        }
+    val isBackdropCollapsed by
+        remember(backdropHeight) { derivedStateOf { backdropHeight == collapsedHeight } }
+    LaunchedEffect(isBackdropCollapsed) { onBackdropCollapse(isBackdropCollapsed) }
 
     val scrollValue = 1 - ((backdropExpandedHeight - backdropHeight) / heightToCollapse)
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .nestedScroll(nestedScrollConnection)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)) {
         BackdropImageSection(
             path = backdropPath,
             scrollValue = scrollValue,
-            modifier = Modifier.height(backdropHeight)
-        )
+            modifier = Modifier.height(backdropHeight))
         LazyColumn(
-            contentPadding = PaddingValues(
-                horizontal = horizontalPadding,
-                vertical = verticalPadding
-            ),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            item {
-                InfoSection(
-                    voteCount = voteCount,
-                    name = name,
-                    rating = rating,
-                    releaseYear = releaseYear,
-                    runtime = runtime,
-                    tagline = tagline
-                )
+            contentPadding =
+                PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
+            modifier = Modifier.fillMaxWidth()) {
+                item {
+                    InfoSection(
+                        voteCount = voteCount,
+                        name = name,
+                        rating = rating,
+                        releaseYear = releaseYear,
+                        runtime = runtime,
+                        tagline = tagline)
+                }
+
+                item { GenreSection(genres) }
+
+                item {
+                    LibraryActions(
+                        isFavorite = isFavorite,
+                        isAddedToWatchList = isAddedToWatchList,
+                        onFavoriteClick = onFavoriteClick,
+                        onWatchlistClick = onWatchlistClick)
+                }
+
+                item {
+                    TopBilledCast(
+                        cast = cast,
+                        onCastClick = onCastClick,
+                        onSeeAllCastClick = onSeeAllCastClick)
+                }
+
+                item { OverviewSection(overview) }
+
+                item { content() }
+
+                item {
+                    Recommendations(
+                        recommendations = recommendations,
+                        onRecommendationClick = onRecommendationClick)
+                }
             }
-
-            item { GenreSection(genres) }
-
-            item {
-                LibraryActions(
-                    isFavorite = isFavorite,
-                    isAddedToWatchList = isAddedToWatchList,
-                    onFavoriteClick = onFavoriteClick,
-                    onWatchlistClick = onWatchlistClick
-                )
-            }
-
-            item {
-                TopBilledCast(
-                    cast = cast,
-                    onCastClick = onCastClick,
-                    onSeeAllCastClick = onSeeAllCastClick
-                )
-            }
-
-            item { OverviewSection(overview) }
-
-            item { content() }
-
-            item {
-                Recommendations(
-                    recommendations = recommendations,
-                    onRecommendationClick = onRecommendationClick
-                )
-            }
-        }
     }
 }
 
-private class ExitOnlyCollapseNestedConnection(
-    private val heightToCollapse: Float
-) : NestedScrollConnection {
+private class ExitOnlyCollapseNestedConnection(private val heightToCollapse: Float) :
+    NestedScrollConnection {
     var collapseOffsetPx by mutableFloatStateOf(0f)
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -238,35 +228,51 @@ private class ExitOnlyCollapseNestedConnection(
 }
 
 @Composable
-internal fun DetailItem(
-    fieldName: String,
-    value: String
-) {
+internal fun DetailItem(fieldName: String, value: String) {
     val text = buildAnnotatedString {
-        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
-            append(fieldName)
-        }
+        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(fieldName) }
         append(value)
     }
     Text(text)
 }
 
+/**
+ * Immersive backdrop section with parallax scrolling and gradient overlay. Creates a cinematic hero
+ * effect for the details screen.
+ */
 @Composable
-private fun BackdropImageSection(
-    path: String,
-    scrollValue: Float,
-    modifier: Modifier = Modifier
-) {
-    Surface(modifier.fillMaxWidth()) {
-        TmdbImage(
-            width = 1280,
+private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Modifier = Modifier) {
+    // Parallax offset - backdrop moves slower than scroll for depth effect
+    val parallaxOffset = (1f - scrollValue) * 50f
+
+    Box(modifier.fillMaxWidth()) {
+        TmdbBackdropImage(
             imageUrl = path,
-            contentScale = ContentScale.Crop,
-            alpha = scrollValue
-        )
+            modifier =
+                Modifier.fillMaxSize().graphicsLayer {
+                    translationY = parallaxOffset
+                    alpha = scrollValue.coerceIn(0.3f, 1f)
+                },
+            contentScale = ContentScale.Crop)
+
+        // Gradient overlay for better text readability
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    Color.Transparent,
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                                    MaterialTheme.colorScheme.background),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY)))
     }
 }
 
+/** Enhanced info section with prominent title, color-coded rating badge, and meta info. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun InfoSection(
@@ -279,59 +285,78 @@ private fun InfoSection(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (runtime.isNotEmpty()) {
-                Text(runtime)
-                if (releaseYear.toString().isNotEmpty()) {
-                    Text("|")
-                    Text("$releaseYear")
-                }
-            } else {
-                Text("$releaseYear")
-            }
-        }
-
-        Rating(rating = rating, count = voteCount)
-
-        if (tagline.isNotEmpty()) {
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+        modifier = Modifier.fillMaxWidth()) {
+            // Title - prominent headline style
             Text(
-                text = tagline,
+                text = name,
+                style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
-                fontStyle = FontStyle.Italic
-            )
-        }
-    }
-}
+                fontWeight = FontWeight.Bold,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis)
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun GenreSection(
-    genres: List<String>
-) {
-    if (genres.isNotEmpty()) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            genres.forEach {
-                GenreButton(name = it)
+            // Meta info row - year, runtime
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically) {
+                    if (releaseYear > 0) {
+                        Text(
+                            text = "$releaseYear",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (runtime.isNotEmpty() && releaseYear > 0) {
+                        Text(
+                            text = "•",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (runtime.isNotEmpty()) {
+                        Text(
+                            text = runtime,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+
+            // Color-coded rating badge
+            if (rating > 0) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically) {
+                        RatingBadge(rating = rating, size = RatingBadgeSize.MEDIUM)
+                        if (voteCount > 0) {
+                            Text(
+                                text = "($voteCount votes)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+            }
+
+            // Tagline - italic style
+            if (tagline.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(Spacing.xxs))
+                Text(
+                    text = "\"$tagline\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+}
+
+/** Genre section using styled chips with flow layout. */
+@Composable
+private fun GenreSection(genres: List<String>) {
+    if (genres.isNotEmpty()) {
+        GenreChipRow(genres = genres)
     }
 }
 
+/** Top billed cast section with modern circular avatar cards. */
 @Composable
 private fun TopBilledCast(
     cast: List<Cast>,
@@ -339,46 +364,53 @@ private fun TopBilledCast(
     onSeeAllCastClick: () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        ContentSectionHeader(
-            sectionName = stringResource(id = R.string.top_billed_cast),
-            onSeeAllClick = onSeeAllCastClick
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .height(IntrinsicSize.Max)
-                .padding(bottom = 2.dp)
-        ) {
-            cast.forEach {
-                CastItem(
-                    id = it.id,
-                    imagePath = it.profilePath,
-                    name = it.name,
-                    characterName = it.character,
-                    onItemClick = onCastClick
-                )
-            }
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        modifier = Modifier.fillMaxWidth()) {
+            ContentSectionHeader(
+                sectionName = stringResource(id = R.string.top_billed_cast),
+                onSeeAllClick = onSeeAllCastClick)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                modifier =
+                    Modifier.horizontalScroll(rememberScrollState())
+                        .padding(bottom = Spacing.xxs)) {
+                    cast.forEach {
+                        CastItemCard(
+                            id = it.id,
+                            imagePath = it.profilePath,
+                            name = it.name,
+                            characterName = it.character,
+                            onItemClick = onCastClick)
+                    }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(130.dp)
-                    .noRippleClickable { onSeeAllCastClick() }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.view_all),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .noRippleClickable { onSeeAllCastClick() }
-                )
-            }
+                    // View all button
+                    Column(
+                        modifier =
+                            Modifier.width(Dimens.personCardWidth).noRippleClickable {
+                                onSeeAllCastClick()
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                            Box(
+                                modifier =
+                                    Modifier.size(Dimens.personAvatarSize)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "→",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            Spacer(modifier = Modifier.height(Spacing.xxs))
+                            Text(
+                                text = stringResource(id = R.string.view_all),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center)
+                        }
+                }
         }
-    }
 }
 
 @Composable
@@ -392,8 +424,7 @@ private fun Recommendations(
             Text(
                 text = stringResource(id = R.string.recommendations),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
-            )
+                fontWeight = FontWeight.SemiBold)
         },
         rowContent = {
             if (recommendations.isEmpty()) {
@@ -401,28 +432,25 @@ private fun Recommendations(
                     Box(Modifier.fillMaxSize()) {
                         Text(
                             text = stringResource(id = R.string.not_available),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                            modifier = Modifier.align(Alignment.Center))
                     }
                 }
             } else {
-                items(
-                    items = recommendations,
-                    key = { it.id }
-                ) {
-                    MediaItemCard(
-                        posterPath = it.imagePath,
-                        onItemClick = { onRecommendationClick("${it.id}") }
-                    )
+                items(items = recommendations, key = { it.id }) { item ->
+                    // Use SimpleMediaItemCard for recommendations (no shared element transitions
+                    // since these navigate to a new detail screen, not back to a list)
+                    SimpleMediaItemCard(
+                        posterPath = item.imagePath,
+                        onItemClick = { onRecommendationClick("${item.id}") })
                 }
             }
         },
-        modifier = Modifier.padding(bottom = 4.dp)
-    )
+        modifier = Modifier.padding(bottom = 4.dp))
 }
 
+/** Modern cast item card with circular avatar and centered text. */
 @Composable
-private fun CastItem(
+private fun CastItemCard(
     id: Int,
     imagePath: String,
     name: String,
@@ -430,44 +458,55 @@ private fun CastItem(
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        shape = RoundedCornerShape(6.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(130.dp)
-                .noRippleClickable {
-                    onItemClick("${id},${MediaType.PERSON}")
-                }
-        ) {
-            TmdbImage(
-                width = 500,
-                imageUrl = imagePath,
-                modifier = modifier
-                    .height(140.dp)
-                    .noRippleClickable {
-                        onItemClick("${id},${MediaType.PERSON}")
+    Column(
+        modifier =
+            modifier.width(Dimens.personCardWidth).noRippleClickable {
+                onItemClick("$id,${MediaType.PERSON}")
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
+            // Circular avatar
+            if (imagePath.isNotEmpty()) {
+                TmdbProfileImage(
+                    imageUrl = imagePath,
+                    modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape))
+            } else {
+                // Placeholder for missing image
+                Box(
+                    modifier =
+                        Modifier.size(Dimens.personAvatarSize)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center) {
+                        Text(
+                            text = name.take(1).uppercase(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-            )
-            Spacer(Modifier.height(4.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(
-                    text = name,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(text = characterName)
             }
+
+            // Name
+            Text(
+                text = name,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center)
+
+            // Character name
+            Text(
+                text = characterName,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center)
         }
-    }
 }
 
+/** Library action buttons with improved styling. */
 @Composable
 private fun LibraryActions(
     isFavorite: Boolean,
@@ -476,64 +515,49 @@ private fun LibraryActions(
     onWatchlistClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Max)
-            .padding(top = 6.dp, bottom = 4.dp)
-    ) {
-        LibraryActionButton(
-            name = if (isFavorite) {
-                stringResource(id = R.string.remove_from_favorites)
-            } else {
-                stringResource(id = R.string.add_to_favorites)
-            },
-            icon = Icons.Rounded.Favorite,
-            iconTint = if (isFavorite) {
-                Color.Red
-            } else {
-                MaterialTheme.colorScheme.onPrimary
-            },
-            onClick = onFavoriteClick,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
-        Spacer(Modifier.width(8.dp))
-        LibraryActionButton(
-            name = if (isAddedToWatchList) {
-                stringResource(id = R.string.remove_from_watchlist)
-            } else {
-                stringResource(id = R.string.add_to_watchlist)
-            },
-            icon = if (isAddedToWatchList) {
-                Icons.Rounded.Bookmark
-            } else {
-                Icons.Outlined.BookmarkBorder
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ),
-            border = BorderStroke(1.dp, Color.Black),
-            onClick = onWatchlistClick,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
-    }
-}
+        modifier =
+            Modifier.fillMaxWidth()
+                .height(IntrinsicSize.Max)
+                .padding(top = Spacing.sm, bottom = Spacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            // Favorite button
+            LibraryActionButton(
+                name =
+                    if (isFavorite) {
+                        stringResource(id = R.string.remove_from_favorites)
+                    } else {
+                        stringResource(id = R.string.add_to_favorites)
+                    },
+                icon = Icons.Rounded.Favorite,
+                iconTint =
+                    if (isFavorite) {
+                        Color.Red
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary
+                    },
+                onClick = onFavoriteClick,
+                modifier = Modifier.fillMaxHeight().weight(1f))
 
-@Composable
-private fun GenreButton(
-    name: String
-) {
-    Surface(
-        shape = RoundedCornerShape(10.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer
-    ) {
-        Text(
-            text = name,
-            modifier = Modifier.padding(8.dp)
-        )
-    }
+            // Watchlist button
+            LibraryActionButton(
+                name =
+                    if (isAddedToWatchList) {
+                        stringResource(id = R.string.remove_from_watchlist)
+                    } else {
+                        stringResource(id = R.string.add_to_watchlist)
+                    },
+                icon =
+                    if (isAddedToWatchList) {
+                        Icons.Rounded.Bookmark
+                    } else {
+                        Icons.Outlined.BookmarkBorder
+                    },
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                onClick = onWatchlistClick,
+                modifier = Modifier.fillMaxHeight().weight(1f))
+        }
 }

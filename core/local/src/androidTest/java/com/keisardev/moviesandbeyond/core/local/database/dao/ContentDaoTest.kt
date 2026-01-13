@@ -21,73 +21,39 @@ class ContentDaoTest {
     @Before
     fun setUp() {
         val testContext = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(
-            testContext, MoviesAndBeyondDatabase::class.java
-        ).build()
+        db = Room.inMemoryDatabaseBuilder(testContext, MoviesAndBeyondDatabase::class.java).build()
         favoriteContentDao = db.favoriteContentDao()
         watchlistContentDao = db.watchlistContentDao()
     }
 
     @Test
     fun favoriteContentDao_sameId_differentMediaType_inserted_separately() = runTest {
-        val favoriteItems = listOf(
-            FavoriteContentEntity(
-                id = 1,
-                mediaId = 1,
-                mediaType = "movie",
-                name = "",
-                imagePath = ""
-            ),
-            FavoriteContentEntity(
-                id = 2,
-                mediaId = 1,
-                mediaType = "tv",
-                name = "",
-                imagePath = ""
-            )
-        )
+        val favoriteItems =
+            listOf(
+                FavoriteContentEntity(
+                    id = 1, mediaId = 1, mediaType = "movie", name = "", imagePath = ""),
+                FavoriteContentEntity(
+                    id = 2, mediaId = 1, mediaType = "tv", name = "", imagePath = ""))
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
-        assertEquals(
-            listOf(favoriteItems[0]),
-            favoriteContentDao.getFavoriteMovies().first()
-        )
+        assertEquals(listOf(favoriteItems[0]), favoriteContentDao.getFavoriteMovies().first())
 
-        assertEquals(
-            listOf(favoriteItems[1]),
-            favoriteContentDao.getFavoriteTvShows().first()
-        )
+        assertEquals(listOf(favoriteItems[1]), favoriteContentDao.getFavoriteTvShows().first())
     }
 
     @Test
     fun watchlistContentDao_sameId_differentMediaType_inserted_separately() = runTest {
-        val watchlistItems = listOf(
-            WatchlistContentEntity(
-                id = 1,
-                mediaId = 1,
-                mediaType = "movie",
-                name = "",
-                imagePath = ""
-            ),
-            WatchlistContentEntity(
-                id = 2,
-                mediaId = 1,
-                mediaType = "tv",
-                name = "",
-                imagePath = ""
-            )
-        )
+        val watchlistItems =
+            listOf(
+                WatchlistContentEntity(
+                    id = 1, mediaId = 1, mediaType = "movie", name = "", imagePath = ""),
+                WatchlistContentEntity(
+                    id = 2, mediaId = 1, mediaType = "tv", name = "", imagePath = ""))
         watchlistContentDao.upsertWatchlistItems(watchlistItems)
 
-        assertEquals(
-            listOf(watchlistItems[0]),
-            watchlistContentDao.getMoviesWatchlist().first()
-        )
+        assertEquals(listOf(watchlistItems[0]), watchlistContentDao.getMoviesWatchlist().first())
 
-        assertEquals(
-            listOf(watchlistItems[1]),
-            watchlistContentDao.getTvShowsWatchlist().first()
-        )
+        assertEquals(listOf(watchlistItems[1]), watchlistContentDao.getTvShowsWatchlist().first())
     }
 
     @After

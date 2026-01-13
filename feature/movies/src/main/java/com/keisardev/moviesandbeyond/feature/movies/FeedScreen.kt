@@ -2,18 +2,18 @@ package com.keisardev.moviesandbeyond.feature.movies
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,19 +22,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
+import com.keisardev.moviesandbeyond.core.ui.HeroCarouselItem
 import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
+import com.keisardev.moviesandbeyond.core.ui.MediaHeroCarousel
 import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
+import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
+import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
+import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
+import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import kotlinx.coroutines.launch
 
-private val horizontalPadding = 8.dp
-
 @Composable
-internal fun FeedRoute(
+fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
     viewModel: MoviesViewModel,
@@ -56,10 +64,10 @@ internal fun FeedRoute(
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
         onErrorShown = viewModel::onErrorShown,
-        modifier = modifier
-    )
+        modifier = modifier)
 }
 
+@Suppress("LongMethod")
 @Composable
 internal fun FeedScreen(
     nowPlayingMovies: ContentUiState,
@@ -80,97 +88,88 @@ internal fun FeedScreen(
         scope.launch { snackbarState.showSnackbar(it) }
         onErrorShown()
     }
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(WindowInsets.safeDrawing.asPaddingValues()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        item {
-            ContentSection(
-                content = nowPlayingMovies,
-                sectionName = stringResource(id = R.string.now_playing),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-        item {
-            ContentSection(
-                content = popularMovies,
-                sectionName = stringResource(id = R.string.popular),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-        item {
-            ContentSection(
-                content = topRatedMovies,
-                sectionName = stringResource(id = R.string.top_rated),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-        item {
-            ContentSection(
-                content = upcomingMovies,
-                sectionName = stringResource(id = R.string.upcoming),
-                appendItems = appendItems,
-                onItemClick = onItemClick,
-                onSeeAllClick = onSeeAllClick
-            )
-        }
-    }
-    /*Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarState) },
-    ) { paddingValues ->
+
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
         LazyColumn(
-            contentPadding = paddingValues,
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            item {
-                ContentSection(
-                    content = nowPlayingMovies,
-                    sectionName = stringResource(id = R.string.now_playing),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
+            contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
+            modifier = modifier.fillMaxWidth().padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing)) {
+                // Hero carousel with popular movies
+                item(key = "hero") {
+                    if (popularMovies.items.isNotEmpty()) {
+                        val heroItems =
+                            remember(popularMovies.items) {
+                                popularMovies.items.take(5).map { item ->
+                                    HeroCarouselItem(
+                                        id = item.id,
+                                        title = item.name,
+                                        posterPath = item.imagePath,
+                                        backdropPath = item.backdropPath,
+                                        rating = item.rating,
+                                        releaseYear = item.releaseDate?.take(4),
+                                        overview = item.overview)
+                                }
+                            }
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                            ContentSectionHeader(
+                                sectionName = stringResource(id = R.string.popular),
+                                onSeeAllClick = null,
+                                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
+                            MediaHeroCarousel(
+                                items = heroItems,
+                                onItemClick = { itemId ->
+                                    onItemClick("$itemId,${MediaType.MOVIE}")
+                                })
+                        }
+                    }
+                }
+
+                // Now Playing section - Large cards for prominence
+                item(key = "now_playing") {
+                    ContentSection(
+                        content = nowPlayingMovies,
+                        sectionName = stringResource(id = R.string.now_playing),
+                        posterSize = PosterSize.LARGE,
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+
+                // Popular section - Medium cards
+                item(key = "popular") {
+                    ContentSection(
+                        content = popularMovies,
+                        sectionName = stringResource(id = R.string.popular),
+                        posterSize = PosterSize.MEDIUM,
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+
+                // Top Rated section - Medium cards with ratings
+                item(key = "top_rated") {
+                    ContentSection(
+                        content = topRatedMovies,
+                        sectionName = stringResource(id = R.string.top_rated),
+                        posterSize = PosterSize.MEDIUM,
+                        showRatings = true,
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
+
+                // Upcoming section - Small cards
+                item(key = "upcoming") {
+                    ContentSection(
+                        content = upcomingMovies,
+                        sectionName = stringResource(id = R.string.upcoming),
+                        posterSize = PosterSize.SMALL,
+                        appendItems = appendItems,
+                        onItemClick = onItemClick,
+                        onSeeAllClick = onSeeAllClick)
+                }
             }
-            item {
-                ContentSection(
-                    content = popularMovies,
-                    sectionName = stringResource(id = R.string.popular),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = topRatedMovies,
-                    sectionName = stringResource(id = R.string.top_rated),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-            item {
-                ContentSection(
-                    content = upcomingMovies,
-                    sectionName = stringResource(id = R.string.upcoming),
-                    appendItems = appendItems,
-                    onItemClick = onItemClick,
-                    onSeeAllClick = onSeeAllClick
-                )
-            }
-        }
-    }*/
+    }
 }
 
 @Composable
@@ -179,47 +178,100 @@ private fun ContentSection(
     sectionName: String,
     appendItems: (MovieListCategory) -> Unit,
     onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit
+    onSeeAllClick: (String) -> Unit,
+    posterSize: PosterSize = PosterSize.MEDIUM,
+    showRatings: Boolean = false
 ) {
+    // STABLE: Only recreated when category changes
+    val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
+    val stableSeeAllClick = remember(content.category) { { onSeeAllClick(content.category.name) } }
+
     LazyRowContentSection(
         pagingEnabled = true,
         isLoading = content.isLoading,
         endReached = content.endReached,
         itemsEmpty = content.items.isEmpty(),
-        rowContentPadding = PaddingValues(horizontal = horizontalPadding),
-        appendItems = { appendItems(content.category) },
+        rowContentPadding = PaddingValues(horizontal = Spacing.screenPadding),
+        appendItems = stableAppendItems,
         sectionHeaderContent = {
             ContentSectionHeader(
                 sectionName = sectionName,
-                onSeeAllClick = { onSeeAllClick(content.category.name) },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
-            )
+                onSeeAllClick = stableSeeAllClick,
+                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
         },
         rowContent = {
-            items(
-                items = content.items,
-                key = { it.id }
-            ) {
-                MediaItemCard(
-                    posterPath = it.imagePath,
-                    onItemClick = {
-                        onItemClick("${it.id},${MediaType.MOVIE}")
+            items(items = content.items, key = { it.id }, contentType = { "media_item" }) { item ->
+                val stableItemClick =
+                    remember(item.id) { { onItemClick("${item.id},${MediaType.MOVIE}") } }
+                val sharedElementKey =
+                    remember(item.id) {
+                        MediaSharedElementKey(
+                            mediaId = item.id.toLong(),
+                            mediaType = SharedMediaType.Movie,
+                            origin = SharedElementOrigin.MOVIES_FEED,
+                            elementType = SharedElementType.Image)
                     }
-                )
+                MediaItemCard(
+                    posterPath = item.imagePath,
+                    size = posterSize,
+                    rating = if (showRatings) item.rating else null,
+                    sharedElementKey = sharedElementKey,
+                    onItemClick = stableItemClick)
             }
 
             if (content.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(110.dp)
-                    ) {
+                item(contentType = "loading") {
+                    Box(modifier = Modifier.fillMaxHeight().width(Dimens.loadingIndicatorWidth)) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
             }
         },
-        modifier = Modifier.height(160.dp)
-    )
+        modifier = Modifier.height(posterSize.height))
 }
+
+// region Previews
+
+private val previewItems =
+    listOf(
+        ContentItem(1, "/poster1.jpg", "Dune: Part Two", "/backdrop1.jpg", 8.5, "2024-03-01"),
+        ContentItem(2, "/poster2.jpg", "Oppenheimer", "/backdrop2.jpg", 8.3, "2023-07-21"),
+        ContentItem(3, "/poster3.jpg", "The Batman", "/backdrop3.jpg", 7.8, "2022-03-04"),
+        ContentItem(4, "/poster4.jpg", "Avatar: The Way of Water", "/backdrop4.jpg", 7.6, "2022"),
+        ContentItem(5, "/poster5.jpg", "Top Gun: Maverick", "/backdrop5.jpg", 8.2, "2022-05-27"))
+
+private fun previewContentUiState(category: MovieListCategory) =
+    ContentUiState(
+        items = previewItems, isLoading = false, endReached = false, page = 1, category = category)
+
+@Preview(showBackground = true)
+@Composable
+private fun FeedScreenPreview() {
+    FeedScreen(
+        nowPlayingMovies = previewContentUiState(MovieListCategory.NOW_PLAYING),
+        popularMovies = previewContentUiState(MovieListCategory.POPULAR),
+        topRatedMovies = previewContentUiState(MovieListCategory.TOP_RATED),
+        upcomingMovies = previewContentUiState(MovieListCategory.UPCOMING),
+        errorMessage = null,
+        appendItems = {},
+        onItemClick = {},
+        onSeeAllClick = {},
+        onErrorShown = {})
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeedScreenLoadingPreview() {
+    FeedScreen(
+        nowPlayingMovies = ContentUiState(MovieListCategory.NOW_PLAYING),
+        popularMovies = ContentUiState(MovieListCategory.POPULAR),
+        topRatedMovies = ContentUiState(MovieListCategory.TOP_RATED),
+        upcomingMovies = ContentUiState(MovieListCategory.UPCOMING),
+        errorMessage = null,
+        appendItems = {},
+        onItemClick = {},
+        onSeeAllClick = {},
+        onErrorShown = {})
+}
+
+// endregion

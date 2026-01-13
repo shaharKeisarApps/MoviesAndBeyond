@@ -10,21 +10,16 @@ import org.junit.Rule
 import org.junit.Test
 
 class TmdbImageTest {
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val testContext = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
     fun textDisplayed_whenImageUrlIsEmpty() {
-        composeTestRule.setContent {
-            TmdbImage(width = 500, imageUrl = "")
-        }
+        composeTestRule.setContent { TmdbImage(width = 500, imageUrl = "") }
 
         composeTestRule
-            .onNodeWithText(
-                testContext.resources.getText(R.string.no_image_available).toString()
-            )
+            .onNodeWithText(testContext.resources.getText(R.string.no_image_available).toString())
             .assertIsDisplayed()
     }
 }

@@ -17,14 +17,16 @@ import com.keisardev.moviesandbeyond.core.network.model.library.WatchlistRequest
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler
+import java.io.IOException
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
-import java.io.IOException
-import javax.inject.Inject
 
-internal class LibraryRepositoryImpl @Inject constructor(
+internal class LibraryRepositoryImpl
+@Inject
+constructor(
     private val tmdbApi: TmdbApi,
     private val favoriteContentDao: FavoriteContentDao,
     private val watchlistContentDao: WatchlistContentDao,
@@ -32,61 +34,48 @@ internal class LibraryRepositoryImpl @Inject constructor(
     private val syncScheduler: SyncScheduler
 ) : LibraryRepository {
     override val favoriteMovies: Flow<List<LibraryItem>> =
-        favoriteContentDao.getFavoriteMovies()
-            .map { it.map(FavoriteContentEntity::asLibraryItem) }
+        favoriteContentDao.getFavoriteMovies().map { it.map(FavoriteContentEntity::asLibraryItem) }
 
     override val favoriteTvShows: Flow<List<LibraryItem>> =
-        favoriteContentDao.getFavoriteTvShows()
-            .map { it.map(FavoriteContentEntity::asLibraryItem) }
+        favoriteContentDao.getFavoriteTvShows().map { it.map(FavoriteContentEntity::asLibraryItem) }
 
     override val moviesWatchlist: Flow<List<LibraryItem>> =
-        watchlistContentDao.getMoviesWatchlist()
-            .map { it.map(WatchlistContentEntity::asLibraryItem) }
+        watchlistContentDao.getMoviesWatchlist().map {
+            it.map(WatchlistContentEntity::asLibraryItem)
+        }
 
     override val tvShowsWatchlist: Flow<List<LibraryItem>> =
-        watchlistContentDao.getTvShowsWatchlist()
-            .map { it.map(WatchlistContentEntity::asLibraryItem) }
+        watchlistContentDao.getTvShowsWatchlist().map {
+            it.map(WatchlistContentEntity::asLibraryItem)
+        }
 
-    override suspend fun itemInFavoritesExists(
-        mediaId: Int,
-        mediaType: MediaType
-    ): Boolean {
+    override suspend fun itemInFavoritesExists(mediaId: Int, mediaType: MediaType): Boolean {
         return favoriteContentDao.checkFavoriteItemExists(
-            mediaId = mediaId,
-            mediaType = mediaType.name.lowercase()
-        )
+            mediaId = mediaId, mediaType = mediaType.name.lowercase())
     }
 
-    override suspend fun itemInWatchlistExists(
-        mediaId: Int,
-        mediaType: MediaType
-    ): Boolean {
+    override suspend fun itemInWatchlistExists(mediaId: Int, mediaType: MediaType): Boolean {
         return watchlistContentDao.checkWatchlistItemExists(
-            mediaId = mediaId,
-            mediaType = mediaType.name.lowercase()
-        )
+            mediaId = mediaId, mediaType = mediaType.name.lowercase())
     }
 
     override suspend fun addOrRemoveFavorite(libraryItem: LibraryItem) {
         try {
-            val itemExists = favoriteContentDao.checkFavoriteItemExists(
-                mediaId = libraryItem.id,
-                mediaType = libraryItem.mediaType
-            )
+            val itemExists =
+                favoriteContentDao.checkFavoriteItemExists(
+                    mediaId = libraryItem.id, mediaType = libraryItem.mediaType)
             if (itemExists) {
                 favoriteContentDao.deleteFavoriteItem(
-                    mediaId = libraryItem.id,
-                    mediaType = libraryItem.mediaType
-                )
+                    mediaId = libraryItem.id, mediaType = libraryItem.mediaType)
             } else {
                 favoriteContentDao.insertFavoriteItem(libraryItem.asFavoriteContentEntity())
             }
 
-            val libraryTask = LibraryTask.favoriteItemTask(
-                mediaId = libraryItem.id,
-                mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                itemExists = !itemExists
-            )
+            val libraryTask =
+                LibraryTask.favoriteItemTask(
+                    mediaId = libraryItem.id,
+                    mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
+                    itemExists = !itemExists)
             syncScheduler.scheduleLibraryTaskWork(libraryTask)
         } catch (e: IOException) {
             throw e
@@ -95,24 +84,21 @@ internal class LibraryRepositoryImpl @Inject constructor(
 
     override suspend fun addOrRemoveFromWatchlist(libraryItem: LibraryItem) {
         try {
-            val itemExists = watchlistContentDao.checkWatchlistItemExists(
-                mediaId = libraryItem.id,
-                mediaType = libraryItem.mediaType
-            )
+            val itemExists =
+                watchlistContentDao.checkWatchlistItemExists(
+                    mediaId = libraryItem.id, mediaType = libraryItem.mediaType)
             if (itemExists) {
                 watchlistContentDao.deleteWatchlistItem(
-                    mediaId = libraryItem.id,
-                    mediaType = libraryItem.mediaType
-                )
+                    mediaId = libraryItem.id, mediaType = libraryItem.mediaType)
             } else {
                 watchlistContentDao.insertWatchlistItem(libraryItem.asWatchlistContentEntity())
             }
 
-            val libraryTask = LibraryTask.watchlistItemTask(
-                mediaId = libraryItem.id,
-                mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                itemExists = !itemExists
-            )
+            val libraryTask =
+                LibraryTask.watchlistItemTask(
+                    mediaId = libraryItem.id,
+                    mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
+                    itemExists = !itemExists)
             syncScheduler.scheduleLibraryTaskWork(libraryTask)
         } catch (e: IOException) {
             throw e
@@ -129,20 +115,20 @@ internal class LibraryRepositoryImpl @Inject constructor(
         return try {
             when (libraryItemType) {
                 LibraryItemType.FAVORITE -> {
-                    val favoriteRequest = FavoriteRequest(
-                        mediaType = mediaType.name.lowercase(),
-                        mediaId = id,
-                        favorite = itemExistsLocally
-                    )
+                    val favoriteRequest =
+                        FavoriteRequest(
+                            mediaType = mediaType.name.lowercase(),
+                            mediaId = id,
+                            favorite = itemExistsLocally)
                     tmdbApi.addOrRemoveFavorite(accountId, favoriteRequest)
                 }
 
                 LibraryItemType.WATCHLIST -> {
-                    val watchlistRequest = WatchlistRequest(
-                        mediaType = mediaType.name.lowercase(),
-                        mediaId = id,
-                        watchlist = itemExistsLocally
-                    )
+                    val watchlistRequest =
+                        WatchlistRequest(
+                            mediaType = mediaType.name.lowercase(),
+                            mediaId = id,
+                            watchlist = itemExistsLocally)
                     tmdbApi.addOrRemoveFromWatchlist(accountId, watchlistRequest)
                 }
             }
@@ -155,8 +141,8 @@ internal class LibraryRepositoryImpl @Inject constructor(
     }
 
     /**
-     * This function syncs favorites from server by inserting items into database and removes
-     * items which are stale (i.e. not present on server) and for which no work is scheduled.
+     * This function syncs favorites from server by inserting items into database and removes items
+     * which are stale (i.e. not present on server) and for which no work is scheduled.
      */
     override suspend fun syncFavorites(): Boolean {
         val accountId = accountDetailsDao.getAccountDetails()?.id ?: return false
@@ -168,12 +154,14 @@ internal class LibraryRepositoryImpl @Inject constructor(
 
                 var favoriteItemsPage = 1
                 do {
-                    val result = tmdbApi.getLibraryItems(
-                        accountId = accountId,
-                        itemType = favoriteItemTypeString,
-                        mediaType = mediaTypeString,
-                        page = favoriteItemsPage++
-                    ).results
+                    val result =
+                        tmdbApi
+                            .getLibraryItems(
+                                accountId = accountId,
+                                itemType = favoriteItemTypeString,
+                                mediaType = mediaTypeString,
+                                page = favoriteItemsPage++)
+                            .results
 
                     favoriteItemsNetworkResults.addAll(result)
                 } while (result.isNotEmpty())
@@ -181,20 +169,20 @@ internal class LibraryRepositoryImpl @Inject constructor(
                 favoriteItemsNetworkResults
             },
             fetchStaleItemsFromLocalSource = { mediaType, networkResultsPair ->
-                val favoriteItems = when (mediaType) {
-                    MediaType.MOVIE -> favoriteContentDao.getFavoriteMovies().first()
-                    MediaType.TV -> favoriteContentDao.getFavoriteTvShows().first()
-                    else -> emptyList() // Unreachable
-                }
+                val favoriteItems =
+                    when (mediaType) {
+                        MediaType.MOVIE -> favoriteContentDao.getFavoriteMovies().first()
+                        MediaType.TV -> favoriteContentDao.getFavoriteTvShows().first()
+                        else -> emptyList() // Unreachable
+                    }
 
                 favoriteItems
                     .filter {
-                        Pair(it.mediaId, it.mediaType) !in networkResultsPair
-                                && syncScheduler.isWorkNotScheduled(
-                            mediaId = it.mediaId,
-                            mediaType = mediaType,
-                            itemType = LibraryItemType.FAVORITE
-                        )
+                        Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
+                            syncScheduler.isWorkNotScheduled(
+                                mediaId = it.mediaId,
+                                mediaType = mediaType,
+                                itemType = LibraryItemType.FAVORITE)
                     }
                     .map { Pair(it.mediaId, it.mediaType) }
             },
@@ -204,40 +192,34 @@ internal class LibraryRepositoryImpl @Inject constructor(
                         syncScheduler.isWorkNotScheduled(
                             mediaId = it.id,
                             mediaType = mediaType,
-                            itemType = LibraryItemType.FAVORITE
-                        )
-                    }.map {
+                            itemType = LibraryItemType.FAVORITE)
+                    }
+                    .map {
                         val contentItem = it.asModel()
-                        val item = favoriteContentDao.getFavoriteItem(
-                            mediaId = contentItem.id,
-                            mediaType = mediaTypeString
-                        )?.asLibraryItem()
+                        val item =
+                            favoriteContentDao
+                                .getFavoriteItem(
+                                    mediaId = contentItem.id, mediaType = mediaTypeString)
+                                ?.asLibraryItem()
 
-                        item?.copy(
-                            imagePath = contentItem.imagePath,
-                            name = contentItem.name
-                        ) ?: LibraryItem(
-                            id = contentItem.id,
-                            mediaType = mediaTypeString,
-                            imagePath = contentItem.imagePath,
-                            name = contentItem.name
-                        )
+                        item?.copy(imagePath = contentItem.imagePath, name = contentItem.name)
+                            ?: LibraryItem(
+                                id = contentItem.id,
+                                mediaType = mediaTypeString,
+                                imagePath = contentItem.imagePath,
+                                name = contentItem.name)
                     }
             },
             updateLocalSource = { libraryItems, staleItems ->
                 favoriteContentDao.syncFavoriteItems(
-                    upsertItems = libraryItems.map { item ->
-                        item.asFavoriteContentEntity()
-                    },
-                    deleteItems = staleItems
-                )
-            }
-        )
+                    upsertItems = libraryItems.map { item -> item.asFavoriteContentEntity() },
+                    deleteItems = staleItems)
+            })
     }
 
     /**
-     * This function syncs watchlist from server by inserting items into database and removes
-     * items which are stale (i.e. not present on server) and for which no work is scheduled.
+     * This function syncs watchlist from server by inserting items into database and removes items
+     * which are stale (i.e. not present on server) and for which no work is scheduled.
      */
     override suspend fun syncWatchlist(): Boolean {
         val accountId = accountDetailsDao.getAccountDetails()?.id ?: return false
@@ -249,12 +231,14 @@ internal class LibraryRepositoryImpl @Inject constructor(
 
                 var watchlistItemsPage = 1
                 do {
-                    val result = tmdbApi.getLibraryItems(
-                        accountId = accountId,
-                        itemType = watchlistItemTypeString,
-                        mediaType = mediaTypeString,
-                        page = watchlistItemsPage++
-                    ).results
+                    val result =
+                        tmdbApi
+                            .getLibraryItems(
+                                accountId = accountId,
+                                itemType = watchlistItemTypeString,
+                                mediaType = mediaTypeString,
+                                page = watchlistItemsPage++)
+                            .results
 
                     watchlistItemsNetworkResults.addAll(result)
                 } while (result.isNotEmpty())
@@ -262,20 +246,20 @@ internal class LibraryRepositoryImpl @Inject constructor(
                 watchlistItemsNetworkResults
             },
             fetchStaleItemsFromLocalSource = { mediaType, networkResultsPair ->
-                val watchlistItems = when (mediaType) {
-                    MediaType.MOVIE -> watchlistContentDao.getMoviesWatchlist().first()
-                    MediaType.TV -> watchlistContentDao.getTvShowsWatchlist().first()
-                    else -> emptyList() // Unreachable
-                }
+                val watchlistItems =
+                    when (mediaType) {
+                        MediaType.MOVIE -> watchlistContentDao.getMoviesWatchlist().first()
+                        MediaType.TV -> watchlistContentDao.getTvShowsWatchlist().first()
+                        else -> emptyList() // Unreachable
+                    }
 
                 watchlistItems
                     .filter {
-                        Pair(it.mediaId, it.mediaType) !in networkResultsPair
-                                && syncScheduler.isWorkNotScheduled(
-                            mediaId = it.mediaId,
-                            mediaType = mediaType,
-                            itemType = LibraryItemType.WATCHLIST
-                        )
+                        Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
+                            syncScheduler.isWorkNotScheduled(
+                                mediaId = it.mediaId,
+                                mediaType = mediaType,
+                                itemType = LibraryItemType.WATCHLIST)
                     }
                     .map { Pair(it.mediaId, it.mediaType) }
             },
@@ -285,34 +269,28 @@ internal class LibraryRepositoryImpl @Inject constructor(
                         syncScheduler.isWorkNotScheduled(
                             mediaId = it.id,
                             mediaType = mediaType,
-                            itemType = LibraryItemType.WATCHLIST
-                        )
-                    }.map {
+                            itemType = LibraryItemType.WATCHLIST)
+                    }
+                    .map {
                         val contentItem = it.asModel()
-                        val item = watchlistContentDao.getWatchlistItem(
-                            mediaId = contentItem.id,
-                            mediaType = mediaTypeString
-                        )?.asLibraryItem()
+                        val item =
+                            watchlistContentDao
+                                .getWatchlistItem(
+                                    mediaId = contentItem.id, mediaType = mediaTypeString)
+                                ?.asLibraryItem()
 
-                        item?.copy(
-                            imagePath = contentItem.imagePath,
-                            name = contentItem.name
-                        ) ?: LibraryItem(
-                            id = contentItem.id,
-                            mediaType = mediaTypeString,
-                            imagePath = contentItem.imagePath,
-                            name = contentItem.name
-                        )
+                        item?.copy(imagePath = contentItem.imagePath, name = contentItem.name)
+                            ?: LibraryItem(
+                                id = contentItem.id,
+                                mediaType = mediaTypeString,
+                                imagePath = contentItem.imagePath,
+                                name = contentItem.name)
                     }
             },
             updateLocalSource = { libraryItems, staleItems ->
                 watchlistContentDao.syncWatchlistItems(
-                    upsertItems = libraryItems.map { item ->
-                        item.asWatchlistContentEntity()
-                    },
-                    deleteItems = staleItems
-                )
-            }
-        )
+                    upsertItems = libraryItems.map { item -> item.asWatchlistContentEntity() },
+                    deleteItems = staleItems)
+            })
     }
 }

@@ -15,28 +15,12 @@ import java.util.Locale
 private val starColor = Color(0xFFF2D349)
 
 @Composable
-fun Rating(
-    rating: Double,
-    count: Int
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Row(
-            modifier = Modifier.weight(1f, fill = false)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Star,
-                contentDescription = null,
-                tint = starColor
-            )
-            Text(
-                text = "${String.format(Locale.getDefault(),"%.1f", rating)}/5"
-            )
+fun Rating(rating: Double, count: Int) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(modifier = Modifier.weight(1f, fill = false)) {
+            Icon(imageVector = Icons.Rounded.Star, contentDescription = null, tint = starColor)
+            Text(text = "${String.format(Locale.getDefault(),"%.1f", rating)}/5")
         }
-        Text(
-            text = "($count)",
-            color = Color.Gray
-        )
+        Text(text = "($count)", color = Color.Gray)
     }
 }

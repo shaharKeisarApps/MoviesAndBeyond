@@ -19,27 +19,20 @@ fun NavGraphBuilder.youScreen(
     navigateToAuth: () -> Unit,
     navigateToDetails: (String) -> Unit,
 ) {
-    navigation(
-        route = youNavigationGraphRoute,
-        startDestination = youNavigationRoute
-    ) {
+    navigation(route = youNavigationGraphRoute, startDestination = youNavigationRoute) {
         composable(route = youNavigationRoute) {
             YouRoute(
                 navigateToAuth = navigateToAuth,
-                navigateToLibraryItem = navController::navigateToLibraryItem
-            )
+                navigateToLibraryItem = navController::navigateToLibraryItem)
         }
         composable(
             route = "$libraryItemsNavigationRoute/{$libraryItemTypeNavigationArgument}",
-            arguments = listOf(
-                navArgument(libraryItemTypeNavigationArgument) { type = NavType.StringType }
-            )
-        ) {
-            LibraryItemsRoute(
-                onBackClick = navController::navigateUp,
-                navigateToDetails = navigateToDetails
-            )
-        }
+            arguments =
+                listOf(
+                    navArgument(libraryItemTypeNavigationArgument) { type = NavType.StringType })) {
+                LibraryItemsRoute(
+                    onBackClick = navController::navigateUp, navigateToDetails = navigateToDetails)
+            }
     }
 }
 

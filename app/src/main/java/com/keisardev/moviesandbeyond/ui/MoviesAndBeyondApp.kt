@@ -1,5 +1,7 @@
 package com.keisardev.moviesandbeyond.ui
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawing
@@ -9,123 +11,117 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
-import com.keisardev.moviesandbeyond.feature.movies.navigateToMovies
-import com.keisardev.moviesandbeyond.feature.search.navigateToSearch
-import com.keisardev.moviesandbeyond.feature.tv.navigateToTvShows
-import com.keisardev.moviesandbeyond.feature.you.navigateToYou
+import com.keisardev.moviesandbeyond.core.ui.LocalSharedTransitionScope
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
-import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNavigation
+import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNav3
+import com.keisardev.moviesandbeyond.ui.navigation.NavigationState
+import com.keisardev.moviesandbeyond.ui.navigation.TopLevelRoute
 import dev.chrisbanes.haze.ExperimentalHazeApi
-import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.materials.CupertinoMaterials
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
-
 @OptIn(
-    ExperimentalHazeApi::class, ExperimentalHazeMaterialsApi::class,
-    ExperimentalMaterial3Api::class
-)
+    ExperimentalHazeApi::class,
+    ExperimentalHazeMaterialsApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalSharedTransitionApi::class)
 @Composable
-fun MoviesAndBeyondApp(
-    hideOnboarding: Boolean,
-    navController: NavHostController = rememberNavController()
-) {
-    val hazeState = remember { HazeState() }
-    val inputScale: HazeInputScale = HazeInputScale.Auto
-    val style = CupertinoMaterials.ultraThin()
+fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
+    // Wrap entire app with SharedTransitionLayout for shared element transitions
+    SharedTransitionLayout {
+        // Provide SharedTransitionScope to all child composables
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            val hazeState = remember { HazeState() }
+            val style = CupertinoMaterials.ultraThin()
 
-    val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-    val showBottomBar = bottomBarDestinations.any { destination ->
-        currentDestination?.route?.contains(destination.name, true) == true
-    }
+            // Navigation 3: Use NavigationState instead of NavController
+            val navigationState = remember { NavigationState(hideOnboarding) }
 
-    HazeScaffold(
-        hazeState = hazeState,
-        bottomBar = {
-            if (showBottomBar)
-            MoviesAndBeyondNavigationBar(
-                destinations = bottomBarDestinations,
-                currentDestination = currentDestination,
-                onNavigateToDestination = { destination ->
-                    navController.navigateToBottomBarDestination(destination)
+            val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
+
+            // Determine if bottom bar should be shown based on current navigation state
+            val showBottomBar =
+                navigationState.hasCompletedOnboarding &&
+                    isTopLevelDestination(navigationState.topLevelBackStack.topLevelKey)
+
+            HazeScaffold(
+                hazeState = hazeState,
+                bottomBar = {
+                    if (showBottomBar) {
+                        MoviesAndBeyondNavigationBar(
+                            destinations = bottomBarDestinations,
+                            selectedDestination =
+                                topLevelRouteToDestination(
+                                    navigationState.topLevelBackStack.topLevelKey),
+                            onNavigateToDestination = { destination ->
+                                navigationState.topLevelBackStack.switchToTopLevel(
+                                    destinationToTopLevelRoute(destination))
+                            },
+                            modifier =
+                                Modifier.hazeEffect(state = hazeState, style = style)
+                                    .fillMaxWidth())
+                    }
                 },
-                modifier = Modifier
-                    .hazeEffect(state = hazeState, style = style)
-                    .fillMaxWidth()
-            )
-        },
-        contentWindowInsets = WindowInsets.safeDrawing
-    ) { padding ->
-        MoviesAndBeyondNavigation(
-            hideOnboarding = hideOnboarding,
-            navController = navController,
-            paddingValues = padding
-        )
+                contentWindowInsets = WindowInsets.safeDrawing) { padding ->
+                    MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+                }
+        }
     }
 }
 
 @Composable
 fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
-    currentDestination: NavDestination?,
+    selectedDestination: MoviesAndBeyondDestination?,
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(modifier = modifier, containerColor = Color.Transparent) {
         destinations.forEach { destination ->
-            val selected = currentDestination.isDestinationInHierarchy(destination)
+            val selected = destination == selectedDestination
             NavigationBarItem(
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
                 icon = {
                     Icon(
                         imageVector = if (selected) destination.selectedIcon else destination.icon,
-                        contentDescription = null
-                    )
+                        contentDescription = null)
                 },
-                label = { Text(stringResource(id = destination.titleId)) }
-            )
+                label = { Text(stringResource(id = destination.titleId)) })
         }
     }
 }
 
-private fun NavDestination?.isDestinationInHierarchy(destination: MoviesAndBeyondDestination): Boolean {
-    return this?.hierarchy?.any {
-        it.route?.contains(destination.name, true) == true
-    } == true
+/** Convert a TopLevelRoute to a MoviesAndBeyondDestination enum. */
+private fun topLevelRouteToDestination(route: Any?): MoviesAndBeyondDestination? {
+    return when (route) {
+        is TopLevelRoute.Movies -> MoviesAndBeyondDestination.MOVIES
+        is TopLevelRoute.TvShows -> MoviesAndBeyondDestination.TV_SHOWS
+        is TopLevelRoute.Search -> MoviesAndBeyondDestination.SEARCH
+        is TopLevelRoute.You -> MoviesAndBeyondDestination.YOU
+        else -> null
+    }
 }
 
-private fun NavController.navigateToBottomBarDestination(destination: MoviesAndBeyondDestination) {
-    val navOptions = navOptions {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
+/** Convert a MoviesAndBeyondDestination enum to a TopLevelRoute. */
+private fun destinationToTopLevelRoute(destination: MoviesAndBeyondDestination): TopLevelRoute {
+    return when (destination) {
+        MoviesAndBeyondDestination.MOVIES -> TopLevelRoute.Movies
+        MoviesAndBeyondDestination.TV_SHOWS -> TopLevelRoute.TvShows
+        MoviesAndBeyondDestination.SEARCH -> TopLevelRoute.Search
+        MoviesAndBeyondDestination.YOU -> TopLevelRoute.You
     }
+}
 
-    when (destination) {
-        MoviesAndBeyondDestination.MOVIES -> navigateToMovies(navOptions)
-        MoviesAndBeyondDestination.TV_SHOWS -> navigateToTvShows(navOptions)
-        MoviesAndBeyondDestination.SEARCH -> navigateToSearch(navOptions)
-        MoviesAndBeyondDestination.YOU -> navigateToYou(navOptions)
-    }
+/** Check if the current route is a top-level destination (for showing bottom bar). */
+private fun isTopLevelDestination(route: Any?): Boolean {
+    return route is TopLevelRoute
 }

@@ -16,41 +16,33 @@ fun NavGraphBuilder.tvShowsScreen(
     navController: NavController,
     navigateToDetails: (String) -> Unit
 ) {
-    navigation(
-        route = tvShowsNavigationRoute,
-        startDestination = TvShowsScreenRoutes.FEED
-    ) {
+    navigation(route = tvShowsNavigationRoute, startDestination = TvShowsScreenRoutes.FEED) {
         composable(route = TvShowsScreenRoutes.FEED) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(tvShowsNavigationRoute)
-            }
+            val parentEntry =
+                remember(backStackEntry) { navController.getBackStackEntry(tvShowsNavigationRoute) }
             val viewModel = hiltViewModel<TvShowsViewModel>(parentEntry)
             FeedRoute(
                 navigateToDetails = navigateToDetails,
-                navigateToItems = {
-                    navController.navigate("${TvShowsScreenRoutes.ITEMS}/$it")
-                },
+                navigateToItems = { navController.navigate("${TvShowsScreenRoutes.ITEMS}/$it") },
                 viewModel = viewModel,
             )
         }
 
         composable(
             route = "${TvShowsScreenRoutes.ITEMS}/{category}",
-            arguments = listOf(
-                navArgument("category") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(tvShowsNavigationRoute)
+            arguments = listOf(navArgument("category") { type = NavType.StringType })) {
+                backStackEntry ->
+                val parentEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(tvShowsNavigationRoute)
+                    }
+                val viewModel = hiltViewModel<TvShowsViewModel>(parentEntry)
+                ItemsRoute(
+                    categoryName = backStackEntry.arguments?.getString("category")!!,
+                    onItemClick = navigateToDetails,
+                    onBackClick = navController::navigateUp,
+                    viewModel = viewModel)
             }
-            val viewModel = hiltViewModel<TvShowsViewModel>(parentEntry)
-            ItemsRoute(
-                categoryName = backStackEntry.arguments?.getString("category")!!,
-                onItemClick = navigateToDetails,
-                onBackClick = navController::navigateUp,
-                viewModel = viewModel
-            )
-        }
     }
 }
 

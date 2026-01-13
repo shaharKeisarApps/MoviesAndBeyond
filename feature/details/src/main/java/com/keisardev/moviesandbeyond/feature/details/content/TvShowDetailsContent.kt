@@ -42,25 +42,21 @@ internal fun TvShowDetailsContent(
         onWatchlistClick = { onWatchlistClick(tvDetails.asLibraryItem()) },
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
-        onRecommendationClick = { id ->
-            onRecommendationClick("${id},${MediaType.TV}")
-        },
-        onBackdropCollapse = onBackdropCollapse
-    ) {
-        TvDetailsSection(
-            originalLanguage = tvDetails.originalLanguage,
-            firstAirDate = tvDetails.firstAirDate,
-            lastAirDate = tvDetails.lastAirDate,
-            inProduction = tvDetails.inProduction,
-            status = tvDetails.status,
-            nextAirDate = tvDetails.nextEpisodeToAir?.airDate,
-            numberOfEpisodes = tvDetails.numberOfEpisodes,
-            numberOfSeasons = tvDetails.numberOfSeasons,
-            networks = tvDetails.networks,
-            productionCompanies = tvDetails.productionCompanies,
-            productionCountries = tvDetails.productionCountries
-        )
-    }
+        onRecommendationClick = { id -> onRecommendationClick("${id},${MediaType.TV}") },
+        onBackdropCollapse = onBackdropCollapse) {
+            TvDetailsSection(
+                originalLanguage = tvDetails.originalLanguage,
+                firstAirDate = tvDetails.firstAirDate,
+                lastAirDate = tvDetails.lastAirDate,
+                inProduction = tvDetails.inProduction,
+                status = tvDetails.status,
+                nextAirDate = tvDetails.nextEpisodeToAir?.airDate,
+                numberOfEpisodes = tvDetails.numberOfEpisodes,
+                numberOfSeasons = tvDetails.numberOfSeasons,
+                networks = tvDetails.networks,
+                productionCompanies = tvDetails.productionCompanies,
+                productionCountries = tvDetails.productionCountries)
+        }
 }
 
 @Composable
@@ -79,63 +75,41 @@ private fun TvDetailsSection(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.padding(bottom = 6.dp)
-    ) {
-        DetailItem(
-            fieldName = stringResource(id = R.string.original_language),
-            value = originalLanguage
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.first_air_date),
-            value = firstAirDate
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.last_air_date),
-            value = lastAirDate
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.in_production),
-            value = inProduction
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.status),
-            value = status
-        )
-
-        nextAirDate?.let {
+        modifier = Modifier.padding(bottom = 6.dp)) {
             DetailItem(
-                fieldName = stringResource(id = R.string.next_air_date),
-                value = it
-            )
+                fieldName = stringResource(id = R.string.original_language),
+                value = originalLanguage)
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.first_air_date), value = firstAirDate)
+
+            DetailItem(fieldName = stringResource(id = R.string.last_air_date), value = lastAirDate)
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.in_production), value = inProduction)
+
+            DetailItem(fieldName = stringResource(id = R.string.status), value = status)
+
+            nextAirDate?.let {
+                DetailItem(fieldName = stringResource(id = R.string.next_air_date), value = it)
+            }
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.number_episodes),
+                value = "$numberOfEpisodes")
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.number_seasons),
+                value = "$numberOfSeasons")
+
+            DetailItem(fieldName = stringResource(id = R.string.networks), value = networks)
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.production_companies),
+                value = productionCompanies)
+
+            DetailItem(
+                fieldName = stringResource(id = R.string.production_countries),
+                value = productionCountries)
         }
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.number_episodes),
-            value = "$numberOfEpisodes"
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.number_seasons),
-            value = "$numberOfSeasons"
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.networks),
-            value = networks
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.production_companies),
-            value = productionCompanies
-        )
-
-        DetailItem(
-            fieldName = stringResource(id = R.string.production_countries),
-            value = productionCountries
-        )
-    }
 }

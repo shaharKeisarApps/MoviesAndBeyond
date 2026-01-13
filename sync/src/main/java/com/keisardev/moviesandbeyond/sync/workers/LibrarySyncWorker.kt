@@ -17,7 +17,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 
 @HiltWorker
-class LibrarySyncWorker @AssistedInject constructor(
+class LibrarySyncWorker
+@AssistedInject
+constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val libraryRepository: LibraryRepository,
@@ -28,7 +30,6 @@ class LibrarySyncWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result = coroutineScope {
-
         val userLoggedIn = authRepository.isLoggedIn.first()
 
         return@coroutineScope if (userLoggedIn) {

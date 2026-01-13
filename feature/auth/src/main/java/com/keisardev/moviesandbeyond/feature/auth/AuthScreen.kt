@@ -59,10 +59,7 @@ import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun AuthRoute(
-    onBackClick: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
-) {
+fun AuthRoute(onBackClick: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AuthScreen(
@@ -73,8 +70,7 @@ internal fun AuthRoute(
         onContinueWithoutSignInClick = viewModel::setHideOnboarding,
         onUsernameChange = viewModel::onUsernameChange,
         onPasswordChange = viewModel::onPasswordChange,
-        onErrorShown = viewModel::onErrorShown
-    )
+        onErrorShown = viewModel::onErrorShown)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,182 +100,160 @@ internal fun AuthScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBarWithBackButton(onBackClick = onBackClick)
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(horizontal = 12.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            val focusManager = LocalFocusManager.current
-            var passwordVisible by remember { mutableStateOf(false) }
+        topBar = { TopAppBarWithBackButton(onBackClick = onBackClick) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(paddingValues)
+                        .padding(horizontal = 12.dp)
+                        .verticalScroll(rememberScrollState())) {
+                    val focusManager = LocalFocusManager.current
+                    var passwordVisible by remember { mutableStateOf(false) }
 
-            Text(
-                text = stringResource(id = R.string.sign_in),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
+                    Text(
+                        text = stringResource(id = R.string.sign_in),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold)
 
-            Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(10.dp))
 
-            OutlinedTextField(
-                value = uiState.username,
-                onValueChange = onUsernameChange,
-                placeholder = { Text(stringResource(id = R.string.username)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
+                    OutlinedTextField(
+                        value = uiState.username,
+                        onValueChange = onUsernameChange,
+                        placeholder = { Text(stringResource(id = R.string.username)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.fillMaxWidth())
 
-            Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(10.dp))
 
-            OutlinedTextField(
-                value = uiState.password,
-                onValueChange = onPasswordChange,
-                placeholder = { Text(stringResource(id = R.string.password)) },
-                singleLine = true,
-                visualTransformation = if (passwordVisible) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
-                trailingIcon = {
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible }
-                    ) {
-                        if (passwordVisible) {
-                            Icon(
-                                imageVector = Icons.Default.VisibilityOff,
-                                contentDescription = stringResource(id = R.string.hide_password),
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Visibility,
-                                contentDescription = stringResource(id = R.string.show_password),
-                            )
+                    OutlinedTextField(
+                        value = uiState.password,
+                        onValueChange = onPasswordChange,
+                        placeholder = { Text(stringResource(id = R.string.password)) },
+                        singleLine = true,
+                        visualTransformation =
+                            if (passwordVisible) {
+                                VisualTransformation.None
+                            } else {
+                                PasswordVisualTransformation()
+                            },
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                if (passwordVisible) {
+                                    Icon(
+                                        imageVector = Icons.Default.VisibilityOff,
+                                        contentDescription =
+                                            stringResource(id = R.string.hide_password),
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Visibility,
+                                        contentDescription =
+                                            stringResource(id = R.string.show_password),
+                                    )
+                                }
+                            }
+                        },
+                        keyboardOptions =
+                            KeyboardOptions(
+                                imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.fillMaxWidth())
+
+                    Spacer(Modifier.height(20.dp))
+
+                    if (uiState.isLoading) {
+                        val authIndicatorDescription =
+                            stringResource(id = R.string.auth_circular_progress_indicator)
+                        CircularProgressIndicator(
+                            modifier =
+                                Modifier.semantics {
+                                    contentDescription = authIndicatorDescription
+                                })
+                    } else {
+                        Button(
+                            onClick = {
+                                onLogInClick()
+                                focusManager.clearFocus()
+                            },
+                            modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                                val signInText = stringResource(id = R.string.sign_in)
+                                Text(
+                                    text = signInText,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier =
+                                        Modifier.semantics { contentDescription = signInText })
+                            }
+                    }
+
+                    hideOnboarding?.let {
+                        if (!it) {
+                            Spacer(Modifier.height(10.dp))
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()) {
+                                    HorizontalDivider(
+                                        thickness = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.weight(1f))
+                                    Text(text = stringResource(id = R.string.or))
+                                    HorizontalDivider(
+                                        thickness = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.weight(1f))
+                                }
+
+                            Spacer(Modifier.height(10.dp))
+
+                            Button(
+                                onClick = onContinueWithoutSignInClick,
+                                modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                                    Text(
+                                        text =
+                                            stringResource(id = R.string.continue_without_sign_in),
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold)
+                                }
                         }
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Password
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            if (uiState.isLoading) {
-                val authIndicatorDescription = stringResource(
-                    id = R.string.auth_circular_progress_indicator
-                )
-                CircularProgressIndicator(
-                    modifier = Modifier.semantics {
-                        contentDescription = authIndicatorDescription
-                    }
-                )
-            } else {
-                Button(
-                    onClick = {
-                        onLogInClick()
-                        focusManager.clearFocus()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                ) {
-                    val signInText = stringResource(id = R.string.sign_in)
-                    Text(
-                        text = signInText,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.semantics { contentDescription = signInText }
-                    )
-                }
-            }
-
-            hideOnboarding?.let {
-                if (!it) {
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(text = stringResource(id = R.string.or))
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
 
                     Spacer(Modifier.height(10.dp))
 
-                    Button(
-                        onClick = onContinueWithoutSignInClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.continue_without_sign_in),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    val uriHandler = LocalUriHandler.current
+                    val signUpAnnotatedClickableText = buildAnnotatedString {
+                        append(stringResource(id = R.string.no_account))
+                        append(" ")
+                        pushStringAnnotation(
+                            tag = "URL", annotation = "https://www.themoviedb.org/signup")
+                        withStyle(
+                            style =
+                                SpanStyle(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold)) {
+                                append(stringResource(id = R.string.sign_up))
+                            }
+                        pop()
                     }
-                }
-            }
 
-            Spacer(Modifier.height(10.dp))
-
-            val uriHandler = LocalUriHandler.current
-            val signUpAnnotatedClickableText = buildAnnotatedString {
-                append(stringResource(id = R.string.no_account))
-                append(" ")
-                pushStringAnnotation(
-                    tag = "URL", annotation = "https://www.themoviedb.org/signup"
-                )
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(stringResource(id = R.string.sign_up))
+                    AnnotatedClickableText(
+                        attributionString = signUpAnnotatedClickableText,
+                        onClick = { offset ->
+                            signUpAnnotatedClickableText
+                                .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                                .firstOrNull()
+                                ?.let { uriHandler.openUri(it.item) }
+                        })
                 }
-                pop()
-            }
-
-            AnnotatedClickableText(
-                attributionString = signUpAnnotatedClickableText,
-                onClick = { offset ->
-                    signUpAnnotatedClickableText.getStringAnnotations(
-                        tag = "URL",
-                        start = offset,
-                        end = offset
-                    ).firstOrNull()?.let { uriHandler.openUri(it.item) }
-                }
-            )
         }
-    }
 }
 
 @Preview(showBackground = true)
@@ -293,6 +267,5 @@ private fun AuthScreenPreview() {
         onContinueWithoutSignInClick = {},
         onUsernameChange = {},
         onPasswordChange = {},
-        onErrorShown = {}
-    )
+        onErrorShown = {})
 }

@@ -1,11 +1,5 @@
-plugins {
-    id("moviesandbeyond.android.library")
-}
+plugins { id("moviesandbeyond.android.library") }
 
-android {
-    namespace = "com.keisardev.moviesandbeyond.core.model"
-}
+android { namespace = "com.keisardev.moviesandbeyond.core.model" }
 
-dependencies {
-
-}
+dependencies {}

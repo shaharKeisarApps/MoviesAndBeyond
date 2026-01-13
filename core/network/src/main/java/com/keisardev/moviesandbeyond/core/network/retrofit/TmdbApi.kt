@@ -59,9 +59,7 @@ interface TmdbApi {
     ): NetworkTvDetails
 
     @GET("person/{person_id}")
-    suspend fun getPersonDetails(
-        @Path("person_id") id: Int
-    ): NetworkPersonDetails
+    suspend fun getPersonDetails(@Path("person_id") id: Int): NetworkPersonDetails
 
     @GET("account/{account_id}/{item_type}/{media_type}")
     suspend fun getLibraryItems(
@@ -85,34 +83,23 @@ interface TmdbApi {
         @Body watchlistRequest: WatchlistRequest
     ): Response<Unit>
 
-    @GET("authentication/token/new")
-    suspend fun createRequestToken(): RequestTokenResponse
+    @GET("authentication/token/new") suspend fun createRequestToken(): RequestTokenResponse
 
     @Headers("content-type: application/json")
     @POST("authentication/token/validate_with_login")
-    suspend fun validateWithLogin(
-        @Body loginRequest: LoginRequest
-    ): LoginResponse
+    suspend fun validateWithLogin(@Body loginRequest: LoginRequest): LoginResponse
 
     @Headers("content-type: application/json")
     @POST("authentication/session/new")
-    suspend fun createSession(
-        @Body sessionRequest: SessionRequest
-    ): SessionResponse
+    suspend fun createSession(@Body sessionRequest: SessionRequest): SessionResponse
 
     @GET("account")
-    suspend fun getAccountDetails(
-        @Query("session_id") sessionId: String
-    ): NetworkAccountDetails
+    suspend fun getAccountDetails(@Query("session_id") sessionId: String): NetworkAccountDetails
 
     @GET("account/{account_id}")
-    suspend fun getAccountDetailsWithId(
-       @Path("account_id") accountId: Int
-    ): NetworkAccountDetails
+    suspend fun getAccountDetailsWithId(@Path("account_id") accountId: Int): NetworkAccountDetails
 
     @Headers("content-type: application/json")
     @HTTP(method = "DELETE", path = "authentication/session", hasBody = true)
-    suspend fun deleteSession(
-        @Body deleteSessionRequest: DeleteSessionRequest
-    )
+    suspend fun deleteSession(@Body deleteSessionRequest: DeleteSessionRequest)
 }

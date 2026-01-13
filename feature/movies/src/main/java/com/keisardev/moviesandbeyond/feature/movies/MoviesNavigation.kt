@@ -16,14 +16,10 @@ fun NavGraphBuilder.moviesScreen(
     navController: NavController,
     navigateToDetails: (String) -> Unit,
 ) {
-    navigation(
-        route = moviesNavigationRoute,
-        startDestination = MoviesScreenRoutes.FEED
-    ) {
+    navigation(route = moviesNavigationRoute, startDestination = MoviesScreenRoutes.FEED) {
         composable(route = MoviesScreenRoutes.FEED) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(moviesNavigationRoute)
-            }
+            val parentEntry =
+                remember(backStackEntry) { navController.getBackStackEntry(moviesNavigationRoute) }
             val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
             FeedRoute(
                 navigateToDetails = navigateToDetails,
@@ -34,21 +30,19 @@ fun NavGraphBuilder.moviesScreen(
 
         composable(
             route = "${MoviesScreenRoutes.ITEMS}/{category}",
-            arguments = listOf(
-                navArgument("category") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(moviesNavigationRoute)
+            arguments = listOf(navArgument("category") { type = NavType.StringType })) {
+                backStackEntry ->
+                val parentEntry =
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(moviesNavigationRoute)
+                    }
+                val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
+                ItemsRoute(
+                    categoryName = backStackEntry.arguments?.getString("category")!!,
+                    onItemClick = navigateToDetails,
+                    onBackClick = navController::navigateUp,
+                    viewModel = viewModel)
             }
-            val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
-            ItemsRoute(
-                categoryName = backStackEntry.arguments?.getString("category")!!,
-                onItemClick = navigateToDetails,
-                onBackClick = navController::navigateUp,
-                viewModel = viewModel
-            )
-        }
     }
 }
 

@@ -3,7 +3,11 @@ package com.keisardev.moviesandbeyond.core.local.di
 import android.content.Context
 import androidx.room.Room
 import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase
+import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase.Companion.MIGRATION_1_2
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedContentDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedMovieDetailsDao
+import com.keisardev.moviesandbeyond.core.local.database.dao.CachedTvDetailsDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.FavoriteContentDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import dagger.Module
@@ -21,44 +25,45 @@ internal object DatabaseModule {
     fun provideMoviesAndBeyondDatabase(
         @ApplicationContext context: Context
     ): MoviesAndBeyondDatabase {
-        return Room
-            .databaseBuilder(context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
-            /*.addMigrations(
-                MIGRATION_1_2,
-                MIGRATION_2_3,
-                MIGRATION_3_4,
-                MIGRATION_4_5,
-                MIGRATION_6_7,
-                MIGRATION_7_8,
-                MIGRATION_8_9,
-                MIGRATION_9_10,
-                MIGRATION_10_11,
-                MIGRATION_11_12
-            )*/
+        return Room.databaseBuilder(
+                context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 
     @Singleton
     @Provides
-    fun provideFavoriteContentDao(
-        db: MoviesAndBeyondDatabase
-    ): FavoriteContentDao {
+    fun provideFavoriteContentDao(db: MoviesAndBeyondDatabase): FavoriteContentDao {
         return db.favoriteContentDao()
     }
 
     @Singleton
     @Provides
-    fun provideWatchlistContentDao(
-        db: MoviesAndBeyondDatabase
-    ): WatchlistContentDao {
+    fun provideWatchlistContentDao(db: MoviesAndBeyondDatabase): WatchlistContentDao {
         return db.watchlistContentDao()
     }
 
     @Singleton
     @Provides
-    fun provideAccountDetailsDao(
-        db: MoviesAndBeyondDatabase
-    ): AccountDetailsDao {
+    fun provideAccountDetailsDao(db: MoviesAndBeyondDatabase): AccountDetailsDao {
         return db.accountDetailsDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedContentDao(db: MoviesAndBeyondDatabase): CachedContentDao {
+        return db.cachedContentDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedMovieDetailsDao(db: MoviesAndBeyondDatabase): CachedMovieDetailsDao {
+        return db.cachedMovieDetailsDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCachedTvDetailsDao(db: MoviesAndBeyondDatabase): CachedTvDetailsDao {
+        return db.cachedTvDetailsDao()
     }
 }

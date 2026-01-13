@@ -26,17 +26,12 @@ fun TopAppBarWithBackButton(
     TopAppBar(
         title = title,
         navigationIcon = {
-            IconButton(
-                colors = iconButtonColors,
-                onClick = onBackClick
-            ) {
+            IconButton(colors = iconButtonColors, onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
-                )
+                    contentDescription = stringResource(id = R.string.back))
             }
         },
         colors = topAppBarColors,
-        modifier = modifier
-    )
+        modifier = modifier)
 }

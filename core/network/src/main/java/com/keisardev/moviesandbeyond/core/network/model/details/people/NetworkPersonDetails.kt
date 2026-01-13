@@ -30,17 +30,17 @@ data class NetworkPersonDetails(
         }
     }
 
-    fun asModel() = PersonDetails(
-        adult = adult,
-        alsoKnownAs = if (alsoKnownAs.isEmpty()) "Unknown" else alsoKnownAs.joinToString(", "),
-        biography = if (biography.isNullOrEmpty()) "Not available" else biography,
-        birthday = birthday?.let { formatDate(it) } ?: "Unknown",
-        deathday = deathday?.let { formatDate(it) },
-        gender = getGender(),
-        id = id,
-        knownForDepartment = knownForDepartment,
-        name = name,
-        placeOfBirth = placeOfBirth ?: "Unknown",
-        profilePath = profilePath ?: ""
-    )
+    fun asModel() =
+        PersonDetails(
+            adult = adult,
+            alsoKnownAs = if (alsoKnownAs.isEmpty()) "Unknown" else alsoKnownAs.joinToString(", "),
+            biography = if (biography.isNullOrEmpty()) "Not available" else biography,
+            birthday = birthday?.let { formatDate(it) } ?: "Unknown",
+            deathday = deathday?.let { formatDate(it) },
+            gender = getGender(),
+            id = id,
+            knownForDepartment = knownForDepartment,
+            name = name,
+            placeOfBirth = placeOfBirth ?: "Unknown",
+            profilePath = profilePath ?: "")
 }
