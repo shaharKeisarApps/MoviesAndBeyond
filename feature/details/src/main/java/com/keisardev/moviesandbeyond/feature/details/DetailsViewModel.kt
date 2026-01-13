@@ -10,17 +10,14 @@ import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
-import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,7 +30,6 @@ constructor(
     private val savedStateHandle: SavedStateHandle,
     private val detailsRepository: DetailsRepository,
     private val libraryRepository: LibraryRepository,
-    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val idDetailsString =
         savedStateHandle.getStateFlow(key = idNavigationArgument, initialValue = "")
@@ -83,42 +79,25 @@ constructor(
             .stateInWhileSubscribed(
                 scope = viewModelScope, initialValue = ContentDetailUiState.Loading)
 
+    /**
+     * Add or remove the item from local favorites. Works without login since favorites are stored
+     * locally in Room database.
+     */
     fun addOrRemoveFavorite(libraryItem: LibraryItem) {
         viewModelScope.launch {
-            try {
-                val isLoggedIn = authRepository.isLoggedIn.first()
-                if (isLoggedIn) {
-                    _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
-                    libraryRepository.addOrRemoveFavorite(libraryItem)
-                } else {
-                    _uiState.update { it.copy(showSignInSheet = true) }
-                }
-            } catch (e: IOException) {
-                _uiState.update {
-                    it.copy(
-                        markedFavorite = !(it.markedFavorite), errorMessage = "An error occurred")
-                }
-            }
+            _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
+            libraryRepository.addOrRemoveFavorite(libraryItem)
         }
     }
 
+    /**
+     * Add or remove the item from local watchlist. Works without login since watchlist is stored
+     * locally in Room database.
+     */
     fun addOrRemoveFromWatchlist(libraryItem: LibraryItem) {
         viewModelScope.launch {
-            try {
-                val isLoggedIn = authRepository.isLoggedIn.first()
-                if (isLoggedIn) {
-                    _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
-                    libraryRepository.addOrRemoveFromWatchlist(libraryItem)
-                } else {
-                    _uiState.update { it.copy(showSignInSheet = true) }
-                }
-            } catch (e: IOException) {
-                _uiState.update {
-                    it.copy(
-                        savedInWatchlist = !(it.savedInWatchlist),
-                        errorMessage = "An error occurred")
-                }
-            }
+            _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
+            libraryRepository.addOrRemoveFromWatchlist(libraryItem)
         }
     }
 
