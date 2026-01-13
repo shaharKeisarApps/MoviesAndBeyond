@@ -1,6 +1,14 @@
-plugins { id("moviesandbeyond.android.feature") }
+plugins {
+    id("moviesandbeyond.android.feature")
+    alias(libs.plugins.screenshot)
+}
 
-android { namespace = "com.keisardev.moviesandbeyond.feature.movies" }
+android {
+    namespace = "com.keisardev.moviesandbeyond.feature.movies"
+
+    @Suppress("UnstableApiUsage")
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+}
 
 dependencies {
     implementation(projects.data)
@@ -9,5 +17,7 @@ dependencies {
     api(libs.haze)
     api(libs.haze.materials)
     androidTestImplementation(projects.core.testing)
-    // Landscapist comes from core:ui via the feature plugin
+
+    // Screenshot testing
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }

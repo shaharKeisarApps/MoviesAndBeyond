@@ -35,6 +35,7 @@ room = "2.8.4"
 spotless = "8.1.0"
 detekt = "1.23.8"
 ktfmt = "0.51"
+screenshot = "0.0.1-alpha12"
 
 [libraries]
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -109,6 +110,8 @@ compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compos
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+screenshot-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+screenshot-validation-api = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "screenshot" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -122,6 +125,16 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
+
+# Convention plugins
+moviesandbeyond-android-application = { id = "moviesandbeyond.android.application", version = "unspecified" }
+moviesandbeyond-android-application-compose = { id = "moviesandbeyond.android.application.compose", version = "unspecified" }
+moviesandbeyond-android-library = { id = "moviesandbeyond.android.library", version = "unspecified" }
+moviesandbeyond-android-library-compose = { id = "moviesandbeyond.android.library.compose", version = "unspecified" }
+moviesandbeyond-android-hilt = { id = "moviesandbeyond.android.hilt", version = "unspecified" }
+moviesandbeyond-android-feature = { id = "moviesandbeyond.android.feature", version = "unspecified" }
+moviesandbeyond-android-screenshot-test = { id = "moviesandbeyond.android.screenshot.test", version = "unspecified" }
 
 [bundles]
 

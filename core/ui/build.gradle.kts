@@ -1,12 +1,16 @@
 plugins {
     id("moviesandbeyond.android.library")
     id("moviesandbeyond.android.library.compose")
+    alias(libs.plugins.screenshot)
 }
 
 android {
     namespace = "com.keisardev.moviesandbeyond.core.ui"
 
     defaultConfig { testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+
+    @Suppress("UnstableApiUsage")
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -23,4 +27,7 @@ dependencies {
     api(libs.haze.materials)
 
     androidTestImplementation(projects.core.testing)
+
+    // Screenshot testing
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }

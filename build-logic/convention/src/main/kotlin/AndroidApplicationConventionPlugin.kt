@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
+import com.keisardev.moviesandbeyond.ProjectConfig
 import com.keisardev.moviesandbeyond.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,7 +12,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
+                defaultConfig.targetSdk = ProjectConfig.TARGET_SDK
             }
         }
     }
