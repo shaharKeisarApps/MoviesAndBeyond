@@ -54,7 +54,18 @@ import kotlinx.coroutines.flow.transformLatest
 @OptIn(ExperimentalCoroutinesApi::class)
 object WhileSubscribedOrRetained : SharingStarted {
 
-    private val handler = Handler(Looper.getMainLooper())
+    private val handler by lazy { Handler(Looper.getMainLooper()) }
+
+    /** Check if running in a unit test environment where Android framework is not available. */
+    private val isInTestEnvironment: Boolean by lazy {
+        try {
+            // This will fail in unit tests where Android framework is not mocked
+            Looper.getMainLooper()
+            false
+        } catch (_: RuntimeException) {
+            true
+        }
+    }
 
     override fun command(subscriptionCount: StateFlow<Int>): Flow<SharingCommand> =
         subscriptionCount
@@ -62,13 +73,15 @@ object WhileSubscribedOrRetained : SharingStarted {
                 if (count > 0) {
                     emit(SharingCommand.START)
                 } else {
-                    val posted = CompletableDeferred<Unit>()
-                    // Wait for frame + handler queue to clear before stopping
-                    // This gives the UI time to re-subscribe during configuration changes
-                    Choreographer.getInstance().postFrameCallback {
-                        handler.postAtFrontOfQueue { handler.post { posted.complete(Unit) } }
+                    if (!isInTestEnvironment) {
+                        val posted = CompletableDeferred<Unit>()
+                        // Wait for frame + handler queue to clear before stopping
+                        // This gives the UI time to re-subscribe during configuration changes
+                        Choreographer.getInstance().postFrameCallback {
+                            handler.postAtFrontOfQueue { handler.post { posted.complete(Unit) } }
+                        }
+                        posted.await()
                     }
-                    posted.await()
                     emit(SharingCommand.STOP)
                 }
             }
