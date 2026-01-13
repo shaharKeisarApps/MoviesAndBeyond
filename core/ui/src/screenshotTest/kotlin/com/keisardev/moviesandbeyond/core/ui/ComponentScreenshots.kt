@@ -60,13 +60,11 @@ fun RatingBadgePoor() {
 @Composable
 fun RatingBadgeSizes() {
     MaterialTheme {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(8.dp)) {
-                RatingBadge(rating = 8.5, size = RatingBadgeSize.SMALL)
-                RatingBadge(rating = 8.5, size = RatingBadgeSize.MEDIUM)
-                RatingBadge(rating = 8.5, size = RatingBadgeSize.LARGE)
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp)) {
+            RatingBadge(rating = 8.5, size = RatingBadgeSize.SMALL)
+            RatingBadge(rating = 8.5, size = RatingBadgeSize.MEDIUM)
+            RatingBadge(rating = 8.5, size = RatingBadgeSize.LARGE)
+        }
     }
 }
 
@@ -83,8 +81,7 @@ fun CompactRatingBadgePreview() {
 fun StarRatingVariants() {
     MaterialTheme {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(8.dp)) {
+            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp)) {
                 StarRating(rating = 10.0) // 5 stars
                 StarRating(rating = 7.0) // 3.5 stars
                 StarRating(rating = 4.0) // 2 stars
@@ -201,9 +198,7 @@ fun PersonCardWithImage() {
 @Preview(showBackground = true, name = "PersonCard - No Image")
 @Composable
 fun PersonCardNoImage() {
-    MaterialTheme {
-        PersonCard(imagePath = null, name = "Christian Bale", role = "Bruce Wayne")
-    }
+    MaterialTheme { PersonCard(imagePath = null, name = "Christian Bale", role = "Bruce Wayne") }
 }
 
 // ============================================================================

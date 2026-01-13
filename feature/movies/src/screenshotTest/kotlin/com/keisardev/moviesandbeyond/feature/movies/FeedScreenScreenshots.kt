@@ -61,11 +61,7 @@ private val previewItems =
 
 private fun createPreviewContentState(category: MovieListCategory) =
     ContentUiState(
-        items = previewItems,
-        isLoading = false,
-        endReached = false,
-        page = 1,
-        category = category)
+        items = previewItems, isLoading = false, endReached = false, page = 1, category = category)
 
 @PreviewTest
 @Preview(showBackground = true, name = "FeedScreen - Loading State")
