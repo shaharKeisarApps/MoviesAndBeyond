@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import com.keisardev.moviesandbeyond.core.local.proto.DarkMode
 import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import com.keisardev.moviesandbeyond.core.local.proto.copy
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.UserData
 import javax.inject.Inject
@@ -26,7 +27,8 @@ constructor(private val userPreferences: DataStore<UserPreferences>) {
                         DarkMode.DARK_MODE_DARK -> SelectedDarkMode.DARK
                         DarkMode.DARK_MODE_LIGHT -> SelectedDarkMode.LIGHT
                     },
-                hideOnboarding = it.hideOnboarding)
+                hideOnboarding = it.hideOnboarding,
+                seedColor = SeedColor.fromName(it.seedColor))
         }
 
     suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
@@ -52,5 +54,9 @@ constructor(private val userPreferences: DataStore<UserPreferences>) {
 
     suspend fun setHideOnboarding(hideOnboarding: Boolean) {
         userPreferences.updateData { it.copy { this.hideOnboarding = hideOnboarding } }
+    }
+
+    suspend fun setSeedColorPreference(seedColor: SeedColor) {
+        userPreferences.updateData { it.copy { this.seedColor = seedColor.name } }
     }
 }

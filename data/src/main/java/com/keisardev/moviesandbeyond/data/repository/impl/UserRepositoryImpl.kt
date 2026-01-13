@@ -3,6 +3,7 @@ package com.keisardev.moviesandbeyond.data.repository.impl
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.model.user.UserData
@@ -36,6 +37,10 @@ constructor(
 
     override suspend fun setDarkModePreference(selectedDarkMode: SelectedDarkMode) {
         userPreferencesDataStore.setDarkModePreference(selectedDarkMode)
+    }
+
+    override suspend fun setSeedColorPreference(seedColor: SeedColor) {
+        userPreferencesDataStore.setSeedColorPreference(seedColor)
     }
 
     override suspend fun updateAccountDetails(accountId: Int): NetworkResponse<Unit> {

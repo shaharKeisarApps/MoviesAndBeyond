@@ -10,6 +10,8 @@
     <string name="settings_dialog_dark_default">System default</string>
     <string name="settings_dialog_dark_yes">Dark</string>
     <string name="settings_dialog_dark_no">Light</string>
+    <string name="settings_dialog_seed_color">Theme Color</string>
+    <string name="seed_color_selected">Selected</string>
     <string name="log_in">Log In</string>
     <string name="log_in_description">Log in to view your profile and manage your collections</string>
     <string name="log_out">Log Out</string>

@@ -1,6 +1,7 @@
 package com.keisardev.moviesandbeyond.feature.you
 
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
@@ -58,7 +59,8 @@ class YouViewModelTest {
             UserSettings(
                 useDynamicColor = testUserData.useDynamicColor,
                 includeAdultResults = testUserData.includeAdultResults,
-                darkMode = testUserData.darkMode),
+                darkMode = testUserData.darkMode,
+                seedColor = testUserData.seedColor),
             viewModel.userSettings.value)
 
         collectJob.cancel()

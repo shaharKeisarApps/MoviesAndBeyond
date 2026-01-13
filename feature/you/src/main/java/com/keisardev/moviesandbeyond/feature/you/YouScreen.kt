@@ -2,10 +2,13 @@ package com.keisardev.moviesandbeyond.feature.you
 
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +16,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.AlertDialog
@@ -47,6 +54,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -56,6 +65,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.LIGHT
@@ -84,6 +94,7 @@ fun YouRoute(
         userSettings = userSettings,
         onChangeTheme = viewModel::setDynamicColorPreference,
         onChangeDarkMode = viewModel::setDarkModePreference,
+        onChangeSeedColor = viewModel::setSeedColorPreference,
         onChangeIncludeAdult = viewModel::setAdultResultPreference,
         onNavigateToAuth = navigateToAuth,
         onLibraryItemClick = navigateToLibraryItem,
@@ -101,6 +112,7 @@ internal fun YouScreen(
     userSettings: UserSettings?,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
     onNavigateToAuth: () -> Unit,
     onLibraryItemClick: (String) -> Unit,
@@ -125,6 +137,7 @@ internal fun YouScreen(
             userSettings = userSettings,
             onChangeTheme = onChangeTheme,
             onChangeDarkMode = onChangeDarkMode,
+            onChangeSeedColor = onChangeSeedColor,
             onChangeIncludeAdult = onChangeIncludeAdult,
             onDismissRequest = { showSettingsDialog = !showSettingsDialog })
     }
@@ -337,6 +350,7 @@ private fun SettingsDialog(
     userSettings: UserSettings?,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -358,6 +372,7 @@ private fun SettingsDialog(
                             settings = userSettings,
                             onChangeTheme = onChangeTheme,
                             onChangeDarkMode = onChangeDarkMode,
+                            onChangeSeedColor = onChangeSeedColor,
                             onChangeIncludeAdult = onChangeIncludeAdult)
                     }
             },
@@ -378,6 +393,7 @@ private fun SettingsPanel(
     settings: UserSettings,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
 ) {
     if (supportsDynamicColorTheme()) {
@@ -393,6 +409,16 @@ private fun SettingsPanel(
                 onClick = { onChangeTheme(true) })
         }
     }
+
+    // Show seed color picker when dynamic color is disabled or not supported
+    if (!settings.useDynamicColor || !supportsDynamicColorTheme()) {
+        SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_seed_color))
+        SeedColorPicker(
+            selectedColor = settings.seedColor,
+            onColorSelected = onChangeSeedColor,
+            modifier = Modifier.padding(vertical = 8.dp))
+    }
+
     SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_dark_mode))
     Column(Modifier.selectableGroup()) {
         SettingsDialogChooserRow(
@@ -412,6 +438,63 @@ private fun SettingsPanel(
         SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
         Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
     }
+}
+
+/**
+ * A composable that displays a horizontal row of seed color options for theme customization.
+ *
+ * @param selectedColor The currently selected seed color
+ * @param onColorSelected Callback invoked when a color is selected
+ * @param modifier Modifier to be applied to the LazyRow
+ */
+@Composable
+fun SeedColorPicker(
+    selectedColor: SeedColor,
+    onColorSelected: (SeedColor) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp)) {
+            items(SeedColor.entries) { seedColor ->
+                val isSelected = seedColor == selectedColor
+                Box(
+                    modifier =
+                        Modifier.size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color(seedColor.argb))
+                            .then(
+                                if (isSelected) {
+                                    Modifier.border(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = CircleShape)
+                                } else {
+                                    Modifier.border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outlineVariant,
+                                        shape = CircleShape)
+                                })
+                            .clickable { onColorSelected(seedColor) },
+                    contentAlignment = Alignment.Center) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription =
+                                    stringResource(id = R.string.seed_color_selected),
+                                tint = getContrastColor(Color(seedColor.argb)),
+                                modifier = Modifier.size(24.dp))
+                        }
+                    }
+            }
+        }
+}
+
+/** Returns a contrasting color (black or white) based on the luminance of the input color. */
+private fun getContrastColor(color: Color): Color {
+    val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
+    return if (luminance > 0.5) Color.Black else Color.White
 }
 
 @Composable
@@ -474,9 +557,14 @@ private fun YouScreenPreview() {
                 errorMessage = null),
         isLoggedIn = true,
         userSettings =
-            UserSettings(useDynamicColor = true, includeAdultResults = false, darkMode = SYSTEM),
+            UserSettings(
+                useDynamicColor = true,
+                includeAdultResults = false,
+                darkMode = SYSTEM,
+                seedColor = SeedColor.DEFAULT),
         onChangeTheme = {},
         onChangeDarkMode = {},
+        onChangeSeedColor = {},
         onChangeIncludeAdult = {},
         onNavigateToAuth = {},
         onLibraryItemClick = {},
@@ -491,8 +579,19 @@ private fun YouScreenPreview() {
 private fun SettingsDialogPreview() {
     SettingsDialog(
         userSettings =
-            UserSettings(useDynamicColor = true, includeAdultResults = true, darkMode = SYSTEM),
+            UserSettings(
+                useDynamicColor = false,
+                includeAdultResults = true,
+                darkMode = SYSTEM,
+                seedColor = SeedColor.BLUE),
         onChangeTheme = {},
         onChangeDarkMode = {},
+        onChangeSeedColor = {},
         onChangeIncludeAdult = {}) {}
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SeedColorPickerPreview() {
+    SeedColorPicker(selectedColor = SeedColor.BLUE, onColorSelected = {})
 }

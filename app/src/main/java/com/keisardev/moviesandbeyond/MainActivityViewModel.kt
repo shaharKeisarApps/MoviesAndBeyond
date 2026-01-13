@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
@@ -31,7 +32,8 @@ constructor(
                 Success(
                     useDynamicColor = it.useDynamicColor,
                     darkMode = it.darkMode,
-                    hideOnboarding = it.hideOnboarding)
+                    hideOnboarding = it.hideOnboarding,
+                    seedColor = it.seedColor)
             }
             .stateIn(
                 scope = viewModelScope,
@@ -59,6 +61,7 @@ sealed interface MainActivityUiState {
     data class Success(
         val useDynamicColor: Boolean,
         val darkMode: SelectedDarkMode,
-        val hideOnboarding: Boolean
+        val hideOnboarding: Boolean,
+        val seedColor: SeedColor
     ) : MainActivityUiState
 }
