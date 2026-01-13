@@ -4,6 +4,15 @@
   <img src="./images/tmdb-logo.svg" width="200" alt="TMDB Logo"/>
 </p>
 
+<p align="center">
+  <a href="https://github.com/keisardev/moviesandbeyond/releases/latest">
+    <img src="https://img.shields.io/github/v/release/keisardev/moviesandbeyond?include_prereleases&label=Download%20APK&logo=android&logoColor=white&style=for-the-badge" alt="Download APK"/>
+  </a>
+  <a href="https://github.com/keisardev/moviesandbeyond/actions/workflows/build.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/keisardev/moviesandbeyond/build.yml?branch=main&label=Build&logo=github&style=for-the-badge" alt="Build Status"/>
+  </a>
+</p>
+
 A modern Android application that provides comprehensive information about movies, TV shows, and people from The Movie Database (TMDB). Built with the latest Android development best practices, this app showcases clean architecture, multi-module design, and beautiful Material Design 3 UI.
 
 ## 📸 Screenshots
@@ -65,6 +74,76 @@ This project implements a **multi-module architecture** following official [Andr
 └── build-logic        # Custom Gradle convention plugins
 ```
 
+### Store5 Offline-First Architecture
+
+This app implements a robust **offline-first architecture** using [Store5](https://github.com/MobileNativeFoundation/Store) from Mobile Native Foundation. Store5 provides a unified caching layer that seamlessly handles network requests, local persistence, and memory caching.
+
+#### Data Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              UI Layer                                    │
+│                    (Compose + ViewModel)                                 │
+└──────────────────────────────┬──────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Repository Layer                                 │
+│              observeMovieItems() / observeTvShowItems()                 │
+└──────────────────────────────┬──────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Store5 Layer                                   │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                      Memory Cache                                │   │
+│  │                  (100 items, LRU eviction)                       │   │
+│  └──────────────────────────┬──────────────────────────────────────┘   │
+│                             │ miss                                      │
+│                             ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                   Source of Truth (Room)                         │   │
+│  │              CachedContentDao / CachedContentEntity              │   │
+│  └──────────────────────────┬──────────────────────────────────────┘   │
+│                             │ miss                                      │
+│                             ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                      Fetcher (Network)                           │   │
+│  │                  TMDB API via Retrofit                           │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Caching Strategy
+
+| Cache Layer | Purpose | Configuration |
+|-------------|---------|---------------|
+| **Memory Cache** | Instant access for hot data | LRU with 100 items max |
+| **Source of Truth (Room)** | Persistent offline storage | Survives app restarts |
+| **Fetcher (Network)** | Fresh data from TMDB API | Only on cache miss or refresh |
+
+**How it works:**
+
+1. **Read Request**: When the UI requests data, Store5 first checks memory cache, then Room database, and finally fetches from network if needed.
+
+2. **Automatic Persistence**: Network responses are automatically persisted to Room, ensuring offline availability.
+
+3. **Stream-based API**: Returns a `Flow<StoreReadResponse>` that emits loading states, cached data, and fresh data progressively.
+
+4. **Refresh Support**: Supports both cached reads (`StoreReadRequest.cached()`) and forced refresh (`StoreReadRequest.fresh()`).
+
+```kotlin
+// Example: Observing movie items with offline-first support
+viewModel.observeMovieItems(MovieListCategory.POPULAR, page = 1)
+    .collect { response ->
+        when (response) {
+            is StoreReadResponse.Loading -> showLoading()
+            is StoreReadResponse.Data -> showContent(response.value)
+            is StoreReadResponse.Error -> showError(response.error)
+        }
+    }
+```
+
 ## 🛠️ Tech Stack
 
 - **Language**: [Kotlin 2.3.0](https://kotlinlang.org/)
@@ -76,6 +155,7 @@ This project implements a **multi-module architecture** following official [Andr
 - **Local Storage**:
   - [Room](https://developer.android.com/training/data-storage/room) 2.8.4
   - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) 1.2.0 with Proto
+- **Offline-First Caching**: [Store5](https://github.com/MobileNativeFoundation/Store) for unified caching layer
 - **Image Loading**: [Coil](https://coil-kt.github.io/coil/) 2.7.0
 - **Background Processing**: [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) 2.11.0
 - **Navigation**: [Navigation Compose](https://developer.android.com/jetpack/compose/navigation) 2.9.6
