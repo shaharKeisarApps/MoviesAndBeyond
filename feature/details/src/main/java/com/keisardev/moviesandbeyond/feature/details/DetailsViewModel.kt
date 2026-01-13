@@ -9,7 +9,7 @@ import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
-import com.keisardev.moviesandbeyond.data.coroutines.WhileSubscribedOrRetained
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -81,10 +80,8 @@ constructor(
                         }
                     } ?: ContentDetailUiState.Empty
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileSubscribedOrRetained,
-                initialValue = ContentDetailUiState.Loading)
+            .stateInWhileSubscribed(
+                scope = viewModelScope, initialValue = ContentDetailUiState.Loading)
 
     fun addOrRemoveFavorite(libraryItem: LibraryItem) {
         viewModelScope.launch {

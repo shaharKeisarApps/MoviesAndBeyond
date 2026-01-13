@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Choreographer
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingCommand
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 
 /**
@@ -90,3 +92,24 @@ object WhileSubscribedOrRetained : SharingStarted {
 
     override fun toString(): String = "WhileSubscribedOrRetained"
 }
+
+/**
+ * Converts a [Flow] to a [StateFlow] using [WhileSubscribedOrRetained] sharing strategy.
+ *
+ * This is a convenience extension that wraps [stateIn] with the recommended sharing strategy for
+ * ViewModels, ensuring proper behavior during configuration changes.
+ *
+ * @param scope The [CoroutineScope] in which sharing is started (typically viewModelScope)
+ * @param initialValue The initial value of the StateFlow before any emissions
+ * @return A [StateFlow] that shares emissions using WhileSubscribedOrRetained strategy
+ */
+@JvmSynthetic
+fun <T> Flow<T>.stateInWhileSubscribed(
+    scope: CoroutineScope,
+    initialValue: T,
+): StateFlow<T> =
+    stateIn(
+        scope = scope,
+        started = WhileSubscribedOrRetained,
+        initialValue = initialValue,
+    )
