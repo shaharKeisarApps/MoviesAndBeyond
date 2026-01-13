@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
-import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestDetailsRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestLibraryRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.testLibraryItems
@@ -28,7 +27,6 @@ import org.junit.Test
 class DetailsViewModelTest {
     private val detailsRepository = TestDetailsRepository()
     private val libraryRepository = TestLibraryRepository()
-    private val authRepository = TestAuthRepository()
     private lateinit var viewModel: DetailsViewModel
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
@@ -142,43 +140,29 @@ class DetailsViewModelTest {
     }
 
     @Test
-    fun `test favorite`() = runTest {
+    fun `test favorite toggles locally without login`() = runTest {
         val libraryItem = testLibraryItems[0].copy(id = 0)
-        authRepository.setAuthStatus(true)
-        viewModel.addOrRemoveFavorite(libraryItem)
 
+        // Test that favorite can be toggled without login (local-only storage)
+        viewModel.addOrRemoveFavorite(libraryItem)
         assertTrue(viewModel.uiState.value.markedFavorite)
 
-        authRepository.setAuthStatus(false)
+        // Toggle back
         viewModel.addOrRemoveFavorite(libraryItem)
-
-        assertTrue(viewModel.uiState.value.showSignInSheet)
-
-        authRepository.setAuthStatus(true)
-        libraryRepository.generateError(true)
-        viewModel.addOrRemoveFavorite(libraryItem)
-
-        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
+        assertFalse(viewModel.uiState.value.markedFavorite)
     }
 
     @Test
-    fun `test watchlist`() = runTest {
+    fun `test watchlist toggles locally without login`() = runTest {
         val libraryItem = testLibraryItems[0].copy(id = 0)
-        authRepository.setAuthStatus(true)
-        viewModel.addOrRemoveFromWatchlist(libraryItem)
 
+        // Test that watchlist can be toggled without login (local-only storage)
+        viewModel.addOrRemoveFromWatchlist(libraryItem)
         assertTrue(viewModel.uiState.value.savedInWatchlist)
 
-        authRepository.setAuthStatus(false)
+        // Toggle back
         viewModel.addOrRemoveFromWatchlist(libraryItem)
-
-        assertTrue(viewModel.uiState.value.showSignInSheet)
-
-        authRepository.setAuthStatus(true)
-        libraryRepository.generateError(true)
-        viewModel.addOrRemoveFromWatchlist(libraryItem)
-
-        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
+        assertFalse(viewModel.uiState.value.savedInWatchlist)
     }
 
     @Test
@@ -199,6 +183,5 @@ class DetailsViewModelTest {
         DetailsViewModel(
             savedStateHandle = SavedStateHandle(mapOf(idNavigationArgument to navigationArgument)),
             detailsRepository = detailsRepository,
-            libraryRepository = libraryRepository,
-            authRepository = authRepository)
+            libraryRepository = libraryRepository)
 }

@@ -506,7 +506,10 @@ private fun CastItemCard(
         }
 }
 
-/** Library action buttons with improved styling. */
+/**
+ * Library action buttons with delightful animations for favorites and watchlist. Features bounce
+ * animation, color transitions, and haptic feedback when toggling items.
+ */
 @Composable
 private fun LibraryActions(
     isFavorite: Boolean,
@@ -520,7 +523,7 @@ private fun LibraryActions(
                 .height(IntrinsicSize.Max)
                 .padding(top = Spacing.sm, bottom = Spacing.xs),
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            // Favorite button
+            // Favorite button with bounce animation and haptic feedback
             LibraryActionButton(
                 name =
                     if (isFavorite) {
@@ -529,16 +532,13 @@ private fun LibraryActions(
                         stringResource(id = R.string.add_to_favorites)
                     },
                 icon = Icons.Rounded.Favorite,
-                iconTint =
-                    if (isFavorite) {
-                        Color.Red
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    },
+                isActive = isFavorite,
+                activeIconTint = Color.Red,
+                inactiveIconTint = MaterialTheme.colorScheme.onPrimary,
                 onClick = onFavoriteClick,
                 modifier = Modifier.fillMaxHeight().weight(1f))
 
-            // Watchlist button
+            // Watchlist button with bounce animation and haptic feedback
             LibraryActionButton(
                 name =
                     if (isAddedToWatchList) {
@@ -552,6 +552,9 @@ private fun LibraryActions(
                     } else {
                         Icons.Outlined.BookmarkBorder
                     },
+                isActive = isAddedToWatchList,
+                activeIconTint = MaterialTheme.colorScheme.primary,
+                inactiveIconTint = MaterialTheme.colorScheme.onSurfaceVariant,
                 colors =
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
