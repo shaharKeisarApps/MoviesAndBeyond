@@ -1,3 +1,31 @@
+# MoviesAndBeyond Project Progress
+
+## Recent Updates (January 2026)
+
+### Branch Reorganization
+- ✅ Merged `adding-readme-detekt-spotlessis-disabled` into `main`
+- ✅ Fixed Splash Screen to use `installSplashScreen()` BEFORE `super.onCreate()` (TIVI pattern)
+- ✅ Added Benchmarks module with startup benchmark and baseline profile support
+- ✅ Build passes successfully
+
+### Key Improvements in Main Branch
+- **Splash Screen**: Follows Android 12+ guidelines (installSplashScreen before super.onCreate)
+- **Landscapist**: Migrated from Coil to Landscapist for KMP-ready image loading
+- **Screenshot Tests**: Non-blocking CI integration
+- **Build-Logic**: ProjectConfig centralization, type-safe convention plugins
+- **Navigation**: Animations and predictive back support
+- **StateFlow**: WhileSubscribedOrRetained pattern across all ViewModels
+- **UI Design System**: Consistent spacing, typography, and components
+
+### Feature Branch: `feature/floating-navigation-bar`
+Contains UI improvements ready for future PR:
+- Dynamic Theme with seed color picker
+- HSV Color Picker for custom theme colors
+- Local-only mode toggle
+- TIVI-style FloatingNavigationBar
+
+---
+
 # Offline-First Architecture Implementation Progress
 
 ## Status: COMPLETED (with test updates pending)
