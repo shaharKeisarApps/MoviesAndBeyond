@@ -9,8 +9,10 @@ message UserPreferences {
   bool useDynamicColor = 1;
   DarkMode darkMode = 2;
   bool includeAdultResults = 3;
+  bool useLocalOnly = 5;
   bool hideOnboarding = 8;
   string seedColor = 9;
+  int64 customColorArgb = 10;
 
-  // Next available number = 10
+  // Next available number = 11
 }

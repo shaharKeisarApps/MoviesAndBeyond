@@ -25,4 +25,8 @@ interface UserRepository {
     ): com.keisardev.moviesandbeyond.core.model.NetworkResponse<Unit>
 
     suspend fun setHideOnboarding(hideOnboarding: Boolean)
+
+    suspend fun setUseLocalOnly(useLocalOnly: Boolean)
+
+    suspend fun setCustomColorArgb(colorArgb: Long)
 }
