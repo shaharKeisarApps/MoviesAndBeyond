@@ -4,13 +4,14 @@
 
 | # | Task | Branch | Worktree | Status | PR | CI | Merged | Cleaned |
 |---|------|--------|----------|--------|----|----|--------|---------|
-| 1 | Type-Safe Plugins | feature/type-safe-plugins | ../movies-worktree-plugins | 🟢 | #62 | ✅ | 🟢 | 🟢 |
-| 2 | Dynamic Theme | feature/dynamic-theme | ../movies-worktree-theme | 🟢 | #61 | ✅ | 🟢 | 🟢 |
-| 3 | README + CI | feature/readme-ci | ../movies-worktree-readme | 🟢 | #57 | ✅ | 🟢 | 🟢 |
-| 4 | Splash + Icon | feature/splash-icon | ../movies-worktree-splash | 🟢 | #58 | ✅ | 🟢 | 🟢 |
-| 5 | Local User | feature/local-user | ../movies-worktree-localuser | 🟢 | #59 | ✅ | 🟢 | 🟢 |
-| 6 | Benchmarks | feature/benchmarks | ../movies-worktree-benchmarks | 🟢 | #60 | ✅ | 🟢 | 🟢 |
-| 7 | Metro DI | feature/metro-di | ../movies-worktree-metro | ⬜ | - | - | ⬜ | ⬜ |
+| 1 | Type-Safe Plugins | feature/type-safe-plugins | - | 🟡 | #62 | ⚠️ | 🟢 | 🟢 |
+| 2 | Dynamic Theme | feature/dynamic-theme | - | 🟡 | #61 | ⚠️ | 🟢 | 🟢 |
+| 3 | README + CI | feature/readme-ci | - | 🟡 | #57 | ⚠️ | 🟢 | 🟢 |
+| 4 | Splash + Icon | feature/splash-icon | - | 🟡 | #58 | ⚠️ | 🟢 | 🟢 |
+| 5 | Local User | feature/local-user | - | 🟡 | #59 | ⚠️ | 🟢 | 🟢 |
+| 6 | Benchmarks | feature/benchmarks | - | 🟡 | #60 | ⚠️ | 🟢 | 🟢 |
+| 7 | Metro DI | feature/metro-di | - | ⬜ | - | - | ⬜ | ⬜ |
+| 8 | TIVI-style BottomBar | feature/tivi-bottombar | - | ⬜ | - | - | ⬜ | ⬜ |
 
 **Legend**: ⬜ Pending | 🟡 In Progress | 🟢 Done | ❌ Failed
 
@@ -210,3 +211,48 @@
 - M3 Expressive press animations on all cards
 - Spring physics for bouncy interactions
 - Benchmark module with startup tests
+
+---
+
+## Required Improvements
+
+### Task 2 Enhancement: Full Color Picker
+**Status**: 🟡 In Progress
+**Reference**: NoteNest app color picker implementation
+
+**Requirements**:
+- Add `colorpicker-compose` by Skydoves (v1.1.2)
+- Replace preset seed color grid with HSV color picker
+- Allow custom color selection via `HsvColorPicker`
+- Save custom color to DataStore preferences
+- Keep preset colors as quick-select options
+
+### Task 5 Enhancement: Local-Only Mode Toggle
+**Status**: 🟡 In Progress
+
+**Requirements**:
+- Add toggle in Settings/You screen for "Local Only Mode"
+- Default: OFF (use TMDB remote API)
+- When ON: All favorites/watchlist operations use local Room database only
+- Persist preference in DataStore
+- Update repository layer to respect this toggle
+
+### Task 8: TIVI-style BottomBar
+**Status**: ⬜ Pending
+**Reference**: https://github.com/chrisbanes/tivi
+
+**Requirements**:
+- Implement FloatingNavigationBar with gradient border
+- Add spring-based scale animation on selected items
+- Use Haze effect integration (already have haze library)
+- Transparent container with surfaceVariant border gradient
+- Shape: MaterialTheme.shapes.extraLarge
+- Height: 80dp with horizontal padding
+
+### Screenshot Test Validation
+**Status**: ⬜ Pending
+
+**Requirements**:
+- Generate screenshot tests for all screens
+- Validate UI quality through visual regression
+- Review generated screenshots before marking tasks complete
