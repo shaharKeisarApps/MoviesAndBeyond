@@ -47,3 +47,5 @@ include(":feature:tv")
 include(":feature:you")
 
 include(":sync")
+
+include(":benchmarks")
