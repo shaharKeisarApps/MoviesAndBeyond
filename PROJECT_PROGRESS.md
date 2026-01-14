@@ -68,23 +68,133 @@ main (stable)
 
 ## Pull Requests & Merges
 
-### Merged PRs (in chronological order)
+### Merged PRs with Test Plans
 
-| PR | Title | Branch | Status | Date |
-|----|-------|--------|--------|------|
-| #56 | Adding README and CLAUDE.md | `adding-readme-detekt-spotlessis-disabled` | ✅ Merged | Dec 2025 |
-| #57 | Docs: README update and APK release CI | `feature/readme-ci` | ✅ Merged | Jan 13, 2026 |
-| #58 | UI: New app icon and splash screen | `feature/splash-icon` | ✅ Merged | Jan 13, 2026 |
-| #59 | Feature: Local favorites and watchlist | `feature/local-user` | ✅ Merged | Jan 13, 2026 |
-| #60 | Performance: Benchmarks and baseline profiles | `feature/benchmarks` | ✅ Merged | Jan 13, 2026 |
-| #61 | Theme: Dynamic colors and seed color picker | `feature/dynamic-theme` | ✅ Merged | Jan 13, 2026 |
-| #62 | Build: Type-safe convention plugins | `feature/type-safe-plugins` | ✅ Merged | Jan 13, 2026 |
+#### PR #57: Docs: README update and APK release CI ✅
+**Branch**: `feature/readme-ci` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Add Store5 offline-first architecture documentation with ASCII data flow diagram
+- Document the three-tier caching strategy (memory cache, Room source of truth, network fetcher)
+- Add download APK badge linking to latest GitHub release
+- Create `release.yml` workflow for automatic APK releases on main merge
+
+**Test Plan Completion**:
+- [x] Verify README renders correctly on GitHub
+- [x] Verify badges display correctly
+- [x] Trigger release workflow by merging to main
+- [x] Confirm APK is published to GitHub releases
+
+---
+
+#### PR #58: UI: New app icon and splash screen ✅
+**Branch**: `feature/splash-icon` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Update app icon using new design assets for all density buckets (mdpi to xxxhdpi)
+- Implement Android 12+ Splash Screen API with proper theme configuration
+- Add monochrome icon support for themed icons
+
+**Test Plan Completion**:
+- [x] Verify app icon displays correctly on home screen
+- [x] Verify round icon displays correctly on devices that use round icons
+- [x] Verify splash screen appears on app launch
+- [x] Test on Android 12+ devices for native splash screen support
+- [x] Test on older Android versions for backward compatibility
+
+---
+
+#### PR #59: Feature: Local favorites and watchlist ✅
+**Branch**: `feature/local-user` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Implement local-only favorites/watchlist storage using Room database
+- Add delightful bounce animation (scale 1.0 -> 1.3 -> 1.0) with color transitions
+- Add haptic feedback (HapticFeedbackConstants.CONFIRM) when toggling
+
+**Test Plan Completion**:
+- [x] Verify favorites can be added/removed locally without login
+- [x] Verify watchlist can be added/removed locally without login
+- [x] Verify bounce animation plays on favorite toggle
+- [x] Verify haptic feedback triggers on toggle
+- [x] Verify favorite/watchlist state persists across app restarts
+- [x] Run unit tests: `./gradlew :feature:details:testDebugUnitTest`
+
+---
+
+#### PR #60: Performance: Benchmarks and baseline profiles ✅
+**Branch**: `feature/benchmarks` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Add `:benchmarks` module with macrobenchmark tests for measuring app startup
+- Configure startup benchmarks for cold, warm, and hot startup scenarios
+- Add baseline profile support with profileinstaller dependency
+
+**Test Plan Completion**:
+- [x] Run `./gradlew :benchmarks:compileBenchmarkKotlin` to verify compilation
+- [x] Run `./gradlew :app:assembleBenchmark` to build benchmark variant
+- [x] Run benchmarks on physical device for accurate measurements
+
+---
+
+#### PR #61: Theme: Dynamic colors and seed color picker ✅
+**Branch**: `feature/dynamic-theme` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Enable Material You dynamic theming on Android 12+ as the default option
+- Add seed color picker with 8 preset colors for customization
+- Support older Android versions with seed color fallback
+
+**Test Plan Completion**:
+- [x] Test on Android 12+ device - verify dynamic color is used by default
+- [x] Disable dynamic color in settings and verify seed color picker appears
+- [x] Select different seed colors and verify theme changes immediately
+- [x] Test on Android 11 or lower - verify seed color picker shows
+- [x] Verify preference persists across app restarts
+- [x] Verify dark/light mode works correctly with both dynamic and seed colors
+
+---
+
+#### PR #62: Build: Type-safe convention plugins ✅
+**Branch**: `feature/type-safe-plugins` | **Merged**: Jan 13, 2026
+
+**Summary**:
+- Migrate from string-based plugin IDs to type-safe alias consumption
+- All module build.gradle.kts files now use `alias(libs.plugins.moviesandbeyond.android.xxx)`
+
+**Before → After**:
+```kotlin
+// Before
+plugins { id("moviesandbeyond.android.application") }
+
+// After
+plugins { alias(libs.plugins.moviesandbeyond.android.application) }
+```
+
+**Test Plan Completion**:
+- [x] Run `./gradlew clean assemble` - build succeeds
+- [x] Run `./gradlew spotlessCheck detekt test` - all checks pass
+- [x] Verify all modules compile correctly with new plugin syntax
+
+---
 
 ### Open PRs
 
-| PR | Title | Branch | Status |
-|----|-------|--------|--------|
-| #63 | UI: TIVI-style FloatingNavigationBar | `feature/floating-navigation-bar` | 🟡 Open |
+#### PR #63: UI: TIVI-style FloatingNavigationBar 🟡
+**Branch**: `feature/floating-navigation-bar` | **Status**: Open
+
+**Summary**:
+- Create `FloatingNavigationBar` component with transparent background and gradient border
+- Add `AnimatedNavigationItem` with spring scale animation (1.0 -> 1.1 when selected)
+- Integrate with existing HazeScaffold for blur support
+
+**Test Plan** (Pending):
+- [ ] Build the app with `./gradlew :app:assembleDebug`
+- [ ] Launch the app and verify floating navigation bar appearance
+- [ ] Verify gradient border is visible
+- [ ] Tap navigation items and verify spring scale animation
+- [ ] Verify Crossfade icon transition between selected/unselected
+- [ ] Verify blur effect (hazeEffect) is still applied correctly
 
 ---
 
