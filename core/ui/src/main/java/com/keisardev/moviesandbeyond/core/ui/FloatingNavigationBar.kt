@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,26 +11,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 
 /**
- * A TIVI-style floating navigation bar with a transparent background and gradient border.
+ * A TIVI-style floating navigation bar with proper Surface, elevation, and gradient border.
  *
  * This navigation bar provides a modern floating appearance with:
- * - Transparent background
+ * - Surface with NavigationBar elevation and colors
  * - Gradient border from surfaceVariant to surfaceVariant @ 0.3 alpha
  * - ExtraLarge rounded shape
  * - 80dp height
+ * - Accessible selectableGroup modifier
  *
  * @param modifier The modifier to be applied to the navigation bar
  * @param content The navigation items to display in the bar
@@ -40,13 +42,11 @@ import androidx.compose.ui.unit.dp
 fun FloatingNavigationBar(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     val colorScheme = MaterialTheme.colorScheme
 
-    Row(
+    Surface(
         modifier =
             modifier
                 .padding(horizontal = 8.dp)
                 .height(80.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(Color.Transparent)
                 .border(
                     width = 0.5.dp,
                     brush =
@@ -56,17 +56,24 @@ fun FloatingNavigationBar(modifier: Modifier = Modifier, content: @Composable Ro
                                     colorScheme.surfaceVariant,
                                     colorScheme.surfaceVariant.copy(alpha = 0.3f))),
                     shape = MaterialTheme.shapes.extraLarge),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        content = content)
+        shape = MaterialTheme.shapes.extraLarge,
+        color = NavigationBarDefaults.containerColor,
+        tonalElevation = NavigationBarDefaults.Elevation) {
+            Row(
+                modifier = Modifier.selectableGroup(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = content)
+        }
 }
 
 /**
  * An animated navigation item with spring scale animation for the floating navigation bar.
  *
  * This item provides:
- * - Spring scale animation (1.0 -> 1.1) when selected
+ * - Spring scale animation (0.95 -> 1.0) when selected (TIVI-style)
  * - Crossfade animation between selected and unselected icons
+ * - Proper NavigationBarItem colors for selected/unselected states
  *
  * @param selected Whether this item is currently selected
  * @param onClick Callback when the item is clicked
@@ -86,7 +93,7 @@ fun RowScope.AnimatedNavigationItem(
 ) {
     val scale by
         animateFloatAsState(
-            targetValue = if (selected) 1.1f else 1f,
+            targetValue = if (selected) 1f else 0.95f,
             animationSpec =
                 spring(
                     stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy),
@@ -112,5 +119,9 @@ fun RowScope.AnimatedNavigationItem(
                 }
         },
         label = label,
-        modifier = modifier)
+        modifier = modifier,
+        colors =
+            NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)))
 }

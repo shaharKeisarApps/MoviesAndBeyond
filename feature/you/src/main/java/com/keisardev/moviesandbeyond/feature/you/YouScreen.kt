@@ -44,7 +44,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -159,72 +158,72 @@ internal fun YouScreen(
             onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog })
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    IconButton(onClick = { showAttributionInfoDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Rounded.Info,
-                            contentDescription = stringResource(id = R.string.attribution_info))
-                    }
-
-                    userSettings?.let {
-                        IconButton(onClick = { showSettingsDialog = true }) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+        Box(
+            modifier =
+                Modifier.padding(paddingValues)
+                    .pullToRefresh(
+                        isRefreshing = uiState.isRefreshing,
+                        state = pullToRefreshState,
+                        onRefresh = onRefresh)) {
+                // Floating action buttons in top-right corner
+                Row(
+                    modifier =
+                        Modifier.align(Alignment.TopEnd)
+                            .padding(top = Spacing.md, end = Spacing.sm)) {
+                        IconButton(onClick = { showAttributionInfoDialog = true }) {
                             Icon(
-                                imageVector = Icons.Rounded.Settings,
-                                contentDescription =
-                                    stringResource(id = R.string.settings_dialog_title))
+                                imageVector = Icons.Rounded.Info,
+                                contentDescription = stringResource(id = R.string.attribution_info))
                         }
-                    }
-                })
-        }) { paddingValues ->
-            Box(
-                modifier =
-                    Modifier.padding(paddingValues)
-                        .pullToRefresh(
-                            isRefreshing = uiState.isRefreshing,
-                            state = pullToRefreshState,
-                            onRefresh = onRefresh)) {
-                    Column(Modifier.fillMaxSize()) {
-                        isLoggedIn?.let {
-                            if (isLoggedIn) {
-                                uiState.accountDetails?.let {
-                                    LoggedInView(
-                                        accountDetails = it,
-                                        isLoggingOut = uiState.isLoggingOut,
-                                        onLibraryItemClick = onLibraryItemClick,
-                                        onLogOutClick = onLogOutClick)
-                                }
-                                    ?: LoadAccountDetails(
-                                        isLoading = uiState.isLoading,
-                                        onReloadAccountDetailsClick = onReloadAccountDetailsClick)
-                            } else {
-                                LoggedOutView(onNavigateToAuth = onNavigateToAuth)
+
+                        userSettings?.let {
+                            IconButton(onClick = { showSettingsDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Settings,
+                                    contentDescription =
+                                        stringResource(id = R.string.settings_dialog_title))
                             }
                         }
                     }
 
-                    /*  PullToRefreshContainer(
-                        state = pullToRefreshState,
-                        modifier = Modifier.align(Alignment.TopCenter),
-                    )
-
-                    if (pullToRefreshState.isRefreshing) {
-                        LaunchedEffect(true) { onRefresh() }
-                    }
-
-                    LaunchedEffect(uiState.isRefreshing) {
-                        if (uiState.isRefreshing) {
-                            pullToRefreshState.startRefresh()
+                Column(Modifier.fillMaxSize()) {
+                    isLoggedIn?.let {
+                        if (isLoggedIn) {
+                            uiState.accountDetails?.let {
+                                LoggedInView(
+                                    accountDetails = it,
+                                    isLoggingOut = uiState.isLoggingOut,
+                                    onLibraryItemClick = onLibraryItemClick,
+                                    onLogOutClick = onLogOutClick)
+                            }
+                                ?: LoadAccountDetails(
+                                    isLoading = uiState.isLoading,
+                                    onReloadAccountDetailsClick = onReloadAccountDetailsClick)
                         } else {
-                            pullToRefreshState.endRefresh()
+                            LoggedOutView(onNavigateToAuth = onNavigateToAuth)
                         }
-                    }*/
+                    }
                 }
-        }
+
+                /*  PullToRefreshContainer(
+                    state = pullToRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+
+                if (pullToRefreshState.isRefreshing) {
+                    LaunchedEffect(true) { onRefresh() }
+                }
+
+                LaunchedEffect(uiState.isRefreshing) {
+                    if (uiState.isRefreshing) {
+                        pullToRefreshState.startRefresh()
+                    } else {
+                        pullToRefreshState.endRefresh()
+                    }
+                }*/
+            }
+    }
 }
 
 @Composable
