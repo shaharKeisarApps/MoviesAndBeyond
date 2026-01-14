@@ -79,11 +79,11 @@ main (stable)
 - Add download APK badge linking to latest GitHub release
 - Create `release.yml` workflow for automatic APK releases on main merge
 
-**Test Plan Completion**:
-- [x] Verify README renders correctly on GitHub
-- [x] Verify badges display correctly
-- [x] Trigger release workflow by merging to main
-- [x] Confirm APK is published to GitHub releases
+**Test Plan**:
+- [ ] Verify README renders correctly on GitHub
+- [ ] Verify badges display correctly (may show "no releases" initially)
+- [ ] Trigger release workflow by merging to main
+- [ ] Confirm APK is published to GitHub releases
 
 ---
 
@@ -95,12 +95,12 @@ main (stable)
 - Implement Android 12+ Splash Screen API with proper theme configuration
 - Add monochrome icon support for themed icons
 
-**Test Plan Completion**:
-- [x] Verify app icon displays correctly on home screen
-- [x] Verify round icon displays correctly on devices that use round icons
-- [x] Verify splash screen appears on app launch
-- [x] Test on Android 12+ devices for native splash screen support
-- [x] Test on older Android versions for backward compatibility
+**Test Plan**:
+- [ ] Verify app icon displays correctly on home screen
+- [ ] Verify round icon displays correctly on devices that use round icons
+- [ ] Verify splash screen appears on app launch
+- [ ] Test on Android 12+ devices for native splash screen support
+- [ ] Test on older Android versions for backward compatibility
 
 ---
 
@@ -112,13 +112,13 @@ main (stable)
 - Add delightful bounce animation (scale 1.0 -> 1.3 -> 1.0) with color transitions
 - Add haptic feedback (HapticFeedbackConstants.CONFIRM) when toggling
 
-**Test Plan Completion**:
-- [x] Verify favorites can be added/removed locally without login
-- [x] Verify watchlist can be added/removed locally without login
-- [x] Verify bounce animation plays on favorite toggle
-- [x] Verify haptic feedback triggers on toggle
-- [x] Verify favorite/watchlist state persists across app restarts
-- [x] Run unit tests: `./gradlew :feature:details:testDebugUnitTest`
+**Test Plan**:
+- [ ] Verify favorites can be added/removed locally without login
+- [ ] Verify watchlist can be added/removed locally without login
+- [ ] Verify bounce animation plays on favorite toggle
+- [ ] Verify haptic feedback triggers on toggle
+- [ ] Verify favorite/watchlist state persists across app restarts
+- [ ] Run unit tests: `./gradlew :feature:details:testDebugUnitTest`
 
 ---
 
@@ -130,10 +130,10 @@ main (stable)
 - Configure startup benchmarks for cold, warm, and hot startup scenarios
 - Add baseline profile support with profileinstaller dependency
 
-**Test Plan Completion**:
-- [x] Run `./gradlew :benchmarks:compileBenchmarkKotlin` to verify compilation
-- [x] Run `./gradlew :app:assembleBenchmark` to build benchmark variant
-- [x] Run benchmarks on physical device for accurate measurements
+**Test Plan**:
+- [ ] Run `./gradlew :benchmarks:compileBenchmarkKotlin` to verify compilation
+- [ ] Run `./gradlew :app:assembleBenchmark` to build benchmark variant
+- [ ] Run benchmarks on a physical device for accurate measurements
 
 ---
 
@@ -145,13 +145,13 @@ main (stable)
 - Add seed color picker with 8 preset colors for customization
 - Support older Android versions with seed color fallback
 
-**Test Plan Completion**:
-- [x] Test on Android 12+ device - verify dynamic color is used by default
-- [x] Disable dynamic color in settings and verify seed color picker appears
-- [x] Select different seed colors and verify theme changes immediately
-- [x] Test on Android 11 or lower - verify seed color picker shows
-- [x] Verify preference persists across app restarts
-- [x] Verify dark/light mode works correctly with both dynamic and seed colors
+**Test Plan**:
+- [ ] Test on Android 12+ device - verify dynamic color is used by default
+- [ ] Disable dynamic color in settings and verify seed color picker appears
+- [ ] Select different seed colors and verify theme changes immediately
+- [ ] Test on Android 11 or lower - verify seed color picker shows and dynamic option is hidden
+- [ ] Verify preference persists across app restarts
+- [ ] Verify dark/light mode works correctly with both dynamic and seed colors
 
 ---
 
@@ -171,7 +171,7 @@ plugins { id("moviesandbeyond.android.application") }
 plugins { alias(libs.plugins.moviesandbeyond.android.application) }
 ```
 
-**Test Plan Completion**:
+**Test Plan** ✅ (All Completed):
 - [x] Run `./gradlew clean assemble` - build succeeds
 - [x] Run `./gradlew spotlessCheck detekt test` - all checks pass
 - [x] Verify all modules compile correctly with new plugin syntax
