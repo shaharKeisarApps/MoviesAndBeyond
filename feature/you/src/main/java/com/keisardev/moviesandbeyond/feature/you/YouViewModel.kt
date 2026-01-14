@@ -46,7 +46,9 @@ constructor(
                     useDynamicColor = it.useDynamicColor,
                     includeAdultResults = it.includeAdultResults,
                     darkMode = it.darkMode,
-                    seedColor = it.seedColor)
+                    seedColor = it.seedColor,
+                    useLocalOnly = it.useLocalOnly,
+                    customColorArgb = it.customColorArgb)
             }
             .stateIn(
                 scope = viewModelScope,
@@ -67,6 +69,14 @@ constructor(
 
     fun setSeedColorPreference(seedColor: SeedColor) {
         viewModelScope.launch { userRepository.setSeedColorPreference(seedColor) }
+    }
+
+    fun toggleUseLocalOnly(useLocalOnly: Boolean) {
+        viewModelScope.launch { userRepository.setUseLocalOnly(useLocalOnly) }
+    }
+
+    fun setCustomColorArgb(colorArgb: Long) {
+        viewModelScope.launch { userRepository.setCustomColorArgb(colorArgb) }
     }
 
     fun getAccountDetails() {
@@ -138,4 +148,6 @@ data class UserSettings(
     val includeAdultResults: Boolean,
     val darkMode: SelectedDarkMode,
     val seedColor: SeedColor,
+    val useLocalOnly: Boolean,
+    val customColorArgb: Long,
 )

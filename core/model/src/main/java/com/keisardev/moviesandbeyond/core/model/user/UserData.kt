@@ -8,5 +8,7 @@ data class UserData(
     val includeAdultResults: Boolean,
     val darkMode: SelectedDarkMode,
     val hideOnboarding: Boolean,
-    val seedColor: SeedColor
+    val seedColor: SeedColor,
+    val useLocalOnly: Boolean = false,
+    val customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB
 )

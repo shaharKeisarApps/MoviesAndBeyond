@@ -5,6 +5,7 @@ import com.keisardev.moviesandbeyond.core.local.proto.DarkMode
 import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import com.keisardev.moviesandbeyond.core.local.proto.copy
 import com.keisardev.moviesandbeyond.core.model.SeedColor
+import com.keisardev.moviesandbeyond.core.model.SeedColor.Companion.DEFAULT_CUSTOM_COLOR_ARGB
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.UserData
 import javax.inject.Inject
@@ -28,7 +29,10 @@ constructor(private val userPreferences: DataStore<UserPreferences>) {
                         DarkMode.DARK_MODE_LIGHT -> SelectedDarkMode.LIGHT
                     },
                 hideOnboarding = it.hideOnboarding,
-                seedColor = SeedColor.fromName(it.seedColor))
+                seedColor = SeedColor.fromName(it.seedColor),
+                useLocalOnly = it.useLocalOnly,
+                customColorArgb =
+                    if (it.customColorArgb != 0L) it.customColorArgb else DEFAULT_CUSTOM_COLOR_ARGB)
         }
 
     suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
@@ -58,5 +62,13 @@ constructor(private val userPreferences: DataStore<UserPreferences>) {
 
     suspend fun setSeedColorPreference(seedColor: SeedColor) {
         userPreferences.updateData { it.copy { this.seedColor = seedColor.name } }
+    }
+
+    suspend fun setUseLocalOnlyPreference(useLocalOnly: Boolean) {
+        userPreferences.updateData { it.copy { this.useLocalOnly = useLocalOnly } }
+    }
+
+    suspend fun setCustomColorArgb(colorArgb: Long) {
+        userPreferences.updateData { it.copy { this.customColorArgb = colorArgb } }
     }
 }

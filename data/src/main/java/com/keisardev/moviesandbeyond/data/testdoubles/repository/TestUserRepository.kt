@@ -16,7 +16,9 @@ val testUserData =
         includeAdultResults = false,
         darkMode = SelectedDarkMode.SYSTEM,
         hideOnboarding = false,
-        seedColor = SeedColor.DEFAULT)
+        seedColor = SeedColor.DEFAULT,
+        useLocalOnly = false,
+        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB)
 
 val testAccountDetails =
     AccountDetails(
@@ -64,6 +66,14 @@ class TestUserRepository : UserRepository {
 
     override suspend fun setHideOnboarding(hideOnboarding: Boolean) {
         _userData.update { it.copy(hideOnboarding = hideOnboarding) }
+    }
+
+    override suspend fun setUseLocalOnly(useLocalOnly: Boolean) {
+        _userData.update { it.copy(useLocalOnly = useLocalOnly) }
+    }
+
+    override suspend fun setCustomColorArgb(colorArgb: Long) {
+        _userData.update { it.copy(customColorArgb = colorArgb) }
     }
 
     fun generateError(value: Boolean) {

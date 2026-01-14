@@ -60,4 +60,12 @@ constructor(
     override suspend fun setHideOnboarding(hideOnboarding: Boolean) {
         userPreferencesDataStore.setHideOnboarding(hideOnboarding)
     }
+
+    override suspend fun setUseLocalOnly(useLocalOnly: Boolean) {
+        userPreferencesDataStore.setUseLocalOnlyPreference(useLocalOnly)
+    }
+
+    override suspend fun setCustomColorArgb(colorArgb: Long) {
+        userPreferencesDataStore.setCustomColorArgb(colorArgb)
+    }
 }

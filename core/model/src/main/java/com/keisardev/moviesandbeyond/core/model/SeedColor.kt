@@ -9,9 +9,12 @@ enum class SeedColor(val argb: Long) {
     RED(0xFFD32F2F),
     TEAL(0xFF00796B),
     PINK(0xFFE91E63),
-    AMBER(0xFFFFA000);
+    AMBER(0xFFFFA000),
+    CUSTOM(0); // Custom color - actual value stored separately in customColorArgb
 
     companion object {
         fun fromName(name: String): SeedColor = entries.find { it.name == name } ?: DEFAULT
+
+        const val DEFAULT_CUSTOM_COLOR_ARGB: Long = 0xFF6750A4
     }
 }

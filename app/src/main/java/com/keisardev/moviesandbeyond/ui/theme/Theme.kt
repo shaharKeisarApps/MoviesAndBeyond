@@ -10,7 +10,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.materialkolor.dynamiccolor.MaterialDynamicColors
@@ -151,7 +150,8 @@ private fun generateColorSchemeFromSeed(seedColor: SeedColor, isDark: Boolean): 
             surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
             surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
             surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
-            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerHighest =
+                Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
         )
     } else {
         lightColorScheme(
@@ -189,7 +189,8 @@ private fun generateColorSchemeFromSeed(seedColor: SeedColor, isDark: Boolean): 
             surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
             surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
             surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
-            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerHighest =
+                Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
         )
     }
 }
