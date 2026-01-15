@@ -1,8 +1,6 @@
 package com.keisardev.moviesandbeyond.core.local.database.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
@@ -22,7 +20,7 @@ interface WatchlistContentDao {
     @Query("SELECT * FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType")
     suspend fun getWatchlistItem(mediaId: Int, mediaType: String): WatchlistContentEntity?
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Upsert
     suspend fun insertWatchlistItem(watchlistContentEntity: WatchlistContentEntity)
 
     @Query(
