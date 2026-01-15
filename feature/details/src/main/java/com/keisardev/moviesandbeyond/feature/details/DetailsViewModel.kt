@@ -89,7 +89,7 @@ constructor(
                 val isLoggedIn = authRepository.isLoggedIn.first()
                 if (isLoggedIn) {
                     _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
-                    libraryRepository.addOrRemoveFavorite(libraryItem)
+                    libraryRepository.addOrRemoveFavorite(libraryItem, isLoggedIn)
                 } else {
                     _uiState.update { it.copy(showSignInSheet = true) }
                 }
@@ -108,7 +108,7 @@ constructor(
                 val isLoggedIn = authRepository.isLoggedIn.first()
                 if (isLoggedIn) {
                     _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
-                    libraryRepository.addOrRemoveFromWatchlist(libraryItem)
+                    libraryRepository.addOrRemoveFromWatchlist(libraryItem, isLoggedIn)
                 } else {
                     _uiState.update { it.copy(showSignInSheet = true) }
                 }

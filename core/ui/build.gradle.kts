@@ -26,6 +26,9 @@ dependencies {
     api(libs.haze)
     api(libs.haze.materials)
 
+    // Color picker for theme customization
+    api(libs.colorpicker.compose)
+
     androidTestImplementation(projects.core.testing)
 
     // Screenshot testing

@@ -178,23 +178,42 @@ plugins { alias(libs.plugins.moviesandbeyond.android.application) }
 
 ---
 
-### Open PRs
+### Recently Merged (via Cherry-Pick)
 
-#### PR #63: UI: TIVI-style FloatingNavigationBar 🟡
-**Branch**: `feature/floating-navigation-bar` | **Status**: Open
+#### PR #63: UI: TIVI-style FloatingNavigationBar ✅
+**Branch**: `feature/floating-navigation-bar` | **Status**: Cherry-picked to main
 
 **Summary**:
-- Create `FloatingNavigationBar` component with transparent background and gradient border
-- Add `AnimatedNavigationItem` with spring scale animation (1.0 -> 1.1 when selected)
-- Integrate with existing HazeScaffold for blur support
+- Create `FloatingNavigationBar` component with Surface, elevation, and gradient border (TIVI-style)
+- Add `AnimatedNavigationItem` with spring scale animation (0.95 -> 1.0 when selected)
+- Crossfade animation between selected/unselected icons
+- HSV Color Picker dialog for custom theme color selection
 
-**Test Plan** (Pending):
-- [ ] Build the app with `./gradlew :app:assembleDebug`
+**Test Plan**:
+- [x] Build the app with `./gradlew :app:assembleDebug`
+- [x] All quality gates pass (spotless, detekt, test)
 - [ ] Launch the app and verify floating navigation bar appearance
 - [ ] Verify gradient border is visible
 - [ ] Tap navigation items and verify spring scale animation
 - [ ] Verify Crossfade icon transition between selected/unselected
-- [ ] Verify blur effect (hazeEffect) is still applied correctly
+- [ ] Verify HSV color picker works in Settings
+
+---
+
+### Bug Fixes (Latest)
+
+#### Fix: Favorites/Watchlist Not Persisting
+**Status**: ✅ Fixed
+
+**Issue**: Marking movies/series as favorite or adding to watchlist didn't persist changes.
+
+**Root Cause**: `DetailsViewModel.kt` wasn't passing the `isLoggedIn` parameter to repository methods.
+
+**Fix**: Updated `addOrRemoveFavorite()` and `addOrRemoveFromWatchlist()` to pass authentication state:
+```kotlin
+libraryRepository.addOrRemoveFavorite(libraryItem, isLoggedIn)
+libraryRepository.addOrRemoveFromWatchlist(libraryItem, isLoggedIn)
+```
 
 ---
 
@@ -385,17 +404,18 @@ benchmarks/
 - Optimized caching with LRU strategy
 - Created reusable image components (`TmdbImage`, `TmdbListImage`, `PersonImage`)
 
-### Task 8: TIVI-style FloatingNavigationBar 🟡
+### Task 8: TIVI-style FloatingNavigationBar ✅
 
 **Objective**: Modern bottom navigation with animations
 
-**Status**: In feature branch (`feature/floating-navigation-bar`)
+**Status**: Cherry-picked to main (from `feature/floating-navigation-bar`)
 
 **Changes**:
-- Custom `FloatingNavigationBar` component
-- Spring animations for selection
-- Scale effects on item selection
+- Custom `FloatingNavigationBar` component with Surface, elevation, gradient border
+- `AnimatedNavigationItem` with spring scale animation (0.95 -> 1.0)
+- Crossfade animation between selected/unselected icons
 - Proper accessibility with `selectableGroup()`
+- HSV Color Picker dialog for custom theme color selection
 
 ---
 

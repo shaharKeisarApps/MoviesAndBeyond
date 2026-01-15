@@ -2,10 +2,13 @@ package com.keisardev.moviesandbeyond.feature.you
 
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +16,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.AlertDialog
@@ -35,11 +43,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +56,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -56,6 +67,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.LIGHT
@@ -84,7 +98,10 @@ fun YouRoute(
         userSettings = userSettings,
         onChangeTheme = viewModel::setDynamicColorPreference,
         onChangeDarkMode = viewModel::setDarkModePreference,
+        onChangeSeedColor = viewModel::setSeedColorPreference,
+        onChangeCustomColorArgb = viewModel::setCustomColorArgb,
         onChangeIncludeAdult = viewModel::setAdultResultPreference,
+        onChangeUseLocalOnly = viewModel::toggleUseLocalOnly,
         onNavigateToAuth = navigateToAuth,
         onLibraryItemClick = navigateToLibraryItem,
         onReloadAccountDetailsClick = viewModel::getAccountDetails,
@@ -101,7 +118,10 @@ internal fun YouScreen(
     userSettings: UserSettings?,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
+    onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
+    onChangeUseLocalOnly: (Boolean) -> Unit,
     onNavigateToAuth: () -> Unit,
     onLibraryItemClick: (String) -> Unit,
     onReloadAccountDetailsClick: () -> Unit,
@@ -125,7 +145,10 @@ internal fun YouScreen(
             userSettings = userSettings,
             onChangeTheme = onChangeTheme,
             onChangeDarkMode = onChangeDarkMode,
+            onChangeSeedColor = onChangeSeedColor,
+            onChangeCustomColorArgb = onChangeCustomColorArgb,
             onChangeIncludeAdult = onChangeIncludeAdult,
+            onChangeUseLocalOnly = onChangeUseLocalOnly,
             onDismissRequest = { showSettingsDialog = !showSettingsDialog })
     }
 
@@ -135,72 +158,72 @@ internal fun YouScreen(
             onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog })
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    IconButton(onClick = { showAttributionInfoDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Rounded.Info,
-                            contentDescription = stringResource(id = R.string.attribution_info))
-                    }
-
-                    userSettings?.let {
-                        IconButton(onClick = { showSettingsDialog = true }) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+        Box(
+            modifier =
+                Modifier.padding(paddingValues)
+                    .pullToRefresh(
+                        isRefreshing = uiState.isRefreshing,
+                        state = pullToRefreshState,
+                        onRefresh = onRefresh)) {
+                // Floating action buttons in top-right corner
+                Row(
+                    modifier =
+                        Modifier.align(Alignment.TopEnd)
+                            .padding(top = Spacing.md, end = Spacing.sm)) {
+                        IconButton(onClick = { showAttributionInfoDialog = true }) {
                             Icon(
-                                imageVector = Icons.Rounded.Settings,
-                                contentDescription =
-                                    stringResource(id = R.string.settings_dialog_title))
+                                imageVector = Icons.Rounded.Info,
+                                contentDescription = stringResource(id = R.string.attribution_info))
                         }
-                    }
-                })
-        }) { paddingValues ->
-            Box(
-                modifier =
-                    Modifier.padding(paddingValues)
-                        .pullToRefresh(
-                            isRefreshing = uiState.isRefreshing,
-                            state = pullToRefreshState,
-                            onRefresh = onRefresh)) {
-                    Column(Modifier.fillMaxSize()) {
-                        isLoggedIn?.let {
-                            if (isLoggedIn) {
-                                uiState.accountDetails?.let {
-                                    LoggedInView(
-                                        accountDetails = it,
-                                        isLoggingOut = uiState.isLoggingOut,
-                                        onLibraryItemClick = onLibraryItemClick,
-                                        onLogOutClick = onLogOutClick)
-                                }
-                                    ?: LoadAccountDetails(
-                                        isLoading = uiState.isLoading,
-                                        onReloadAccountDetailsClick = onReloadAccountDetailsClick)
-                            } else {
-                                LoggedOutView(onNavigateToAuth = onNavigateToAuth)
+
+                        userSettings?.let {
+                            IconButton(onClick = { showSettingsDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Settings,
+                                    contentDescription =
+                                        stringResource(id = R.string.settings_dialog_title))
                             }
                         }
                     }
 
-                    /*  PullToRefreshContainer(
-                        state = pullToRefreshState,
-                        modifier = Modifier.align(Alignment.TopCenter),
-                    )
-
-                    if (pullToRefreshState.isRefreshing) {
-                        LaunchedEffect(true) { onRefresh() }
-                    }
-
-                    LaunchedEffect(uiState.isRefreshing) {
-                        if (uiState.isRefreshing) {
-                            pullToRefreshState.startRefresh()
+                Column(Modifier.fillMaxSize()) {
+                    isLoggedIn?.let {
+                        if (isLoggedIn) {
+                            uiState.accountDetails?.let {
+                                LoggedInView(
+                                    accountDetails = it,
+                                    isLoggingOut = uiState.isLoggingOut,
+                                    onLibraryItemClick = onLibraryItemClick,
+                                    onLogOutClick = onLogOutClick)
+                            }
+                                ?: LoadAccountDetails(
+                                    isLoading = uiState.isLoading,
+                                    onReloadAccountDetailsClick = onReloadAccountDetailsClick)
                         } else {
-                            pullToRefreshState.endRefresh()
+                            LoggedOutView(onNavigateToAuth = onNavigateToAuth)
                         }
-                    }*/
+                    }
                 }
-        }
+
+                /*  PullToRefreshContainer(
+                    state = pullToRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+
+                if (pullToRefreshState.isRefreshing) {
+                    LaunchedEffect(true) { onRefresh() }
+                }
+
+                LaunchedEffect(uiState.isRefreshing) {
+                    if (uiState.isRefreshing) {
+                        pullToRefreshState.startRefresh()
+                    } else {
+                        pullToRefreshState.endRefresh()
+                    }
+                }*/
+            }
+    }
 }
 
 @Composable
@@ -337,7 +360,10 @@ private fun SettingsDialog(
     userSettings: UserSettings?,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
+    onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
+    onChangeUseLocalOnly: (Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     userSettings?.let {
@@ -358,7 +384,10 @@ private fun SettingsDialog(
                             settings = userSettings,
                             onChangeTheme = onChangeTheme,
                             onChangeDarkMode = onChangeDarkMode,
-                            onChangeIncludeAdult = onChangeIncludeAdult)
+                            onChangeSeedColor = onChangeSeedColor,
+                            onChangeCustomColorArgb = onChangeCustomColorArgb,
+                            onChangeIncludeAdult = onChangeIncludeAdult,
+                            onChangeUseLocalOnly = onChangeUseLocalOnly)
                     }
             },
             confirmButton = {
@@ -378,7 +407,10 @@ private fun SettingsPanel(
     settings: UserSettings,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    onChangeSeedColor: (SeedColor) -> Unit,
+    onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
+    onChangeUseLocalOnly: (Boolean) -> Unit,
 ) {
     if (supportsDynamicColorTheme()) {
         SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_theme))
@@ -393,6 +425,18 @@ private fun SettingsPanel(
                 onClick = { onChangeTheme(true) })
         }
     }
+
+    // Show seed color picker when dynamic color is disabled or not supported
+    if (!settings.useDynamicColor || !supportsDynamicColorTheme()) {
+        SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_seed_color))
+        SeedColorPicker(
+            selectedColor = settings.seedColor,
+            customColorArgb = settings.customColorArgb,
+            onColorSelected = onChangeSeedColor,
+            onCustomColorChanged = onChangeCustomColorArgb,
+            modifier = Modifier.padding(vertical = 8.dp))
+    }
+
     SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_dark_mode))
     Column(Modifier.selectableGroup()) {
         SettingsDialogChooserRow(
@@ -412,6 +456,183 @@ private fun SettingsPanel(
         SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
         Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
     }
+    Column {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    SettingsDialogSectionTitle(
+                        text = stringResource(id = R.string.settings_dialog_local_only))
+                    Text(
+                        text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+            }
+    }
+}
+
+/**
+ * A composable that displays a horizontal row of seed color options for theme customization,
+ * including preset colors and a custom color option with HSV picker.
+ *
+ * @param selectedColor The currently selected seed color
+ * @param customColorArgb The custom color ARGB value
+ * @param onColorSelected Callback invoked when a preset color is selected
+ * @param onCustomColorChanged Callback invoked when the custom color is changed
+ * @param modifier Modifier to be applied to the LazyRow
+ */
+@Composable
+fun SeedColorPicker(
+    selectedColor: SeedColor,
+    customColorArgb: Long,
+    onColorSelected: (SeedColor) -> Unit,
+    onCustomColorChanged: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showColorPickerDialog by remember { mutableStateOf(false) }
+
+    if (showColorPickerDialog) {
+        CustomColorPickerDialog(
+            initialColor = customColorArgb,
+            onColorConfirmed = { newColor ->
+                onCustomColorChanged(newColor)
+                onColorSelected(SeedColor.CUSTOM)
+                showColorPickerDialog = false
+            },
+            onDismiss = { showColorPickerDialog = false })
+    }
+
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp)) {
+            // Preset colors (excluding CUSTOM)
+            items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
+                val isSelected = seedColor == selectedColor
+                Box(
+                    modifier =
+                        Modifier.size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color(seedColor.argb))
+                            .then(
+                                if (isSelected) {
+                                    Modifier.border(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = CircleShape)
+                                } else {
+                                    Modifier.border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outlineVariant,
+                                        shape = CircleShape)
+                                })
+                            .clickable { onColorSelected(seedColor) },
+                    contentAlignment = Alignment.Center) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription =
+                                    stringResource(id = R.string.seed_color_selected),
+                                tint = getContrastColor(Color(seedColor.argb)),
+                                modifier = Modifier.size(24.dp))
+                        }
+                    }
+            }
+
+            // Custom color option
+            item {
+                val isCustomSelected = selectedColor == SeedColor.CUSTOM
+                Box(
+                    modifier =
+                        Modifier.size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color(customColorArgb))
+                            .then(
+                                if (isCustomSelected) {
+                                    Modifier.border(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = CircleShape)
+                                } else {
+                                    Modifier.border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outlineVariant,
+                                        shape = CircleShape)
+                                })
+                            .clickable { showColorPickerDialog = true },
+                    contentAlignment = Alignment.Center) {
+                        if (isCustomSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription =
+                                    stringResource(id = R.string.seed_color_selected),
+                                tint = getContrastColor(Color(customColorArgb)),
+                                modifier = Modifier.size(24.dp))
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription =
+                                    stringResource(id = R.string.custom_color_picker),
+                                tint = getContrastColor(Color(customColorArgb)),
+                                modifier = Modifier.size(24.dp))
+                        }
+                    }
+            }
+        }
+}
+
+@Composable
+private fun CustomColorPickerDialog(
+    initialColor: Long,
+    onColorConfirmed: (Long) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colorPickerController = rememberColorPickerController()
+    var selectedColorArgb by remember { mutableLongStateOf(initialColor) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.custom_color_picker)) },
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    HsvColorPicker(
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        controller = colorPickerController,
+                        onColorChanged = { colorEnvelope ->
+                            selectedColorArgb = colorEnvelope.color.value.toLong()
+                        })
+
+                    // Color preview
+                    Box(
+                        modifier =
+                            Modifier.size(64.dp)
+                                .clip(CircleShape)
+                                .background(Color(selectedColorArgb))
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.outline,
+                                    shape = CircleShape))
+                }
+        },
+        confirmButton = {
+            TextButton(onClick = { onColorConfirmed(selectedColorArgb) }) {
+                Text(stringResource(id = R.string.submit))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(id = R.string.cancel)) }
+        })
+}
+
+/** Returns a contrasting color (black or white) based on the luminance of the input color. */
+private fun getContrastColor(color: Color): Color {
+    val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
+    return if (luminance > 0.5) Color.Black else Color.White
 }
 
 @Composable
@@ -474,10 +695,19 @@ private fun YouScreenPreview() {
                 errorMessage = null),
         isLoggedIn = true,
         userSettings =
-            UserSettings(useDynamicColor = true, includeAdultResults = false, darkMode = SYSTEM),
+            UserSettings(
+                useDynamicColor = true,
+                includeAdultResults = false,
+                darkMode = SYSTEM,
+                seedColor = SeedColor.DEFAULT,
+                useLocalOnly = false,
+                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
         onChangeTheme = {},
         onChangeDarkMode = {},
+        onChangeSeedColor = {},
+        onChangeCustomColorArgb = {},
         onChangeIncludeAdult = {},
+        onChangeUseLocalOnly = {},
         onNavigateToAuth = {},
         onLibraryItemClick = {},
         onReloadAccountDetailsClick = {},
@@ -491,8 +721,27 @@ private fun YouScreenPreview() {
 private fun SettingsDialogPreview() {
     SettingsDialog(
         userSettings =
-            UserSettings(useDynamicColor = true, includeAdultResults = true, darkMode = SYSTEM),
+            UserSettings(
+                useDynamicColor = false,
+                includeAdultResults = true,
+                darkMode = SYSTEM,
+                seedColor = SeedColor.BLUE,
+                useLocalOnly = false,
+                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
         onChangeTheme = {},
         onChangeDarkMode = {},
-        onChangeIncludeAdult = {}) {}
+        onChangeSeedColor = {},
+        onChangeCustomColorArgb = {},
+        onChangeIncludeAdult = {},
+        onChangeUseLocalOnly = {}) {}
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SeedColorPickerPreview() {
+    SeedColorPicker(
+        selectedColor = SeedColor.BLUE,
+        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+        onColorSelected = {},
+        onCustomColorChanged = {})
 }

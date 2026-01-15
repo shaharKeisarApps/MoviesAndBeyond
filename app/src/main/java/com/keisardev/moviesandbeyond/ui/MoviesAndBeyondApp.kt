@@ -7,15 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import com.keisardev.moviesandbeyond.core.ui.AnimatedNavigationItem
+import com.keisardev.moviesandbeyond.core.ui.FloatingNavigationBar
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
 import com.keisardev.moviesandbeyond.core.ui.LocalSharedTransitionScope
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
@@ -77,6 +76,14 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
     }
 }
 
+/**
+ * A TIVI-style floating navigation bar with animated navigation items.
+ *
+ * Features:
+ * - Transparent background with gradient border
+ * - Spring scale animation on selected items
+ * - Crossfade icon transitions between selected/unselected states
+ */
 @Composable
 fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
@@ -84,16 +91,17 @@ fun MoviesAndBeyondNavigationBar(
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(modifier = modifier, containerColor = Color.Transparent) {
+    FloatingNavigationBar(modifier = modifier) {
         destinations.forEach { destination ->
             val selected = destination == selectedDestination
-            NavigationBarItem(
+            AnimatedNavigationItem(
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
-                icon = {
-                    Icon(
-                        imageVector = if (selected) destination.selectedIcon else destination.icon,
-                        contentDescription = null)
+                selectedIcon = {
+                    Icon(imageVector = destination.selectedIcon, contentDescription = null)
+                },
+                unselectedIcon = {
+                    Icon(imageVector = destination.icon, contentDescription = null)
                 },
                 label = { Text(stringResource(id = destination.titleId)) })
         }

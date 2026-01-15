@@ -1,6 +1,7 @@
 package com.keisardev.moviesandbeyond.data.testdoubles.repository
 
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.model.user.UserData
@@ -14,7 +15,10 @@ val testUserData =
         useDynamicColor = false,
         includeAdultResults = false,
         darkMode = SelectedDarkMode.SYSTEM,
-        hideOnboarding = false)
+        hideOnboarding = false,
+        seedColor = SeedColor.DEFAULT,
+        useLocalOnly = false,
+        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB)
 
 val testAccountDetails =
     AccountDetails(
@@ -48,6 +52,10 @@ class TestUserRepository : UserRepository {
         _userData.update { it.copy(darkMode = selectedDarkMode) }
     }
 
+    override suspend fun setSeedColorPreference(seedColor: SeedColor) {
+        _userData.update { it.copy(seedColor = seedColor) }
+    }
+
     override suspend fun updateAccountDetails(accountId: Int): NetworkResponse<Unit> {
         return if (generateError) {
             NetworkResponse.Error()
@@ -58,6 +66,14 @@ class TestUserRepository : UserRepository {
 
     override suspend fun setHideOnboarding(hideOnboarding: Boolean) {
         _userData.update { it.copy(hideOnboarding = hideOnboarding) }
+    }
+
+    override suspend fun setUseLocalOnly(useLocalOnly: Boolean) {
+        _userData.update { it.copy(useLocalOnly = useLocalOnly) }
+    }
+
+    override suspend fun setCustomColorArgb(colorArgb: Long) {
+        _userData.update { it.copy(customColorArgb = colorArgb) }
     }
 
     fun generateError(value: Boolean) {

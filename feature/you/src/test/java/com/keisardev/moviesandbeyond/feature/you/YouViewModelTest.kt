@@ -58,7 +58,10 @@ class YouViewModelTest {
             UserSettings(
                 useDynamicColor = testUserData.useDynamicColor,
                 includeAdultResults = testUserData.includeAdultResults,
-                darkMode = testUserData.darkMode),
+                darkMode = testUserData.darkMode,
+                seedColor = testUserData.seedColor,
+                useLocalOnly = testUserData.useLocalOnly,
+                customColorArgb = testUserData.customColorArgb),
             viewModel.userSettings.value)
 
         collectJob.cancel()

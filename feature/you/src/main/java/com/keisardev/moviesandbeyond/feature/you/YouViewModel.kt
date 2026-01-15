@@ -3,6 +3,7 @@ package com.keisardev.moviesandbeyond.feature.you
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
@@ -40,7 +41,10 @@ constructor(
                 UserSettings(
                     useDynamicColor = it.useDynamicColor,
                     includeAdultResults = it.includeAdultResults,
-                    darkMode = it.darkMode)
+                    darkMode = it.darkMode,
+                    seedColor = it.seedColor,
+                    useLocalOnly = it.useLocalOnly,
+                    customColorArgb = it.customColorArgb)
             }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
@@ -54,6 +58,18 @@ constructor(
 
     fun setDarkModePreference(selectedDarkMode: SelectedDarkMode) {
         viewModelScope.launch { userRepository.setDarkModePreference(selectedDarkMode) }
+    }
+
+    fun setSeedColorPreference(seedColor: SeedColor) {
+        viewModelScope.launch { userRepository.setSeedColorPreference(seedColor) }
+    }
+
+    fun toggleUseLocalOnly(useLocalOnly: Boolean) {
+        viewModelScope.launch { userRepository.setUseLocalOnly(useLocalOnly) }
+    }
+
+    fun setCustomColorArgb(colorArgb: Long) {
+        viewModelScope.launch { userRepository.setCustomColorArgb(colorArgb) }
     }
 
     fun getAccountDetails() {
@@ -124,4 +140,7 @@ data class UserSettings(
     val useDynamicColor: Boolean,
     val includeAdultResults: Boolean,
     val darkMode: SelectedDarkMode,
+    val seedColor: SeedColor,
+    val useLocalOnly: Boolean,
+    val customColorArgb: Long,
 )
