@@ -5,16 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -33,10 +32,9 @@ constructor(
                     darkMode = it.darkMode,
                     hideOnboarding = it.hideOnboarding)
             }
-            .stateIn(
+            .stateInWhileSubscribed(
                 scope = viewModelScope,
                 initialValue = Loading,
-                started = SharingStarted.WhileSubscribed(5000L),
             )
 
     init {

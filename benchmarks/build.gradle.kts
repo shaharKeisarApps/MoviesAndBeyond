@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidTest)
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -40,3 +41,8 @@ dependencies {
 }
 
 androidComponents { beforeVariants(selector().all()) { it.enable = it.buildType == "benchmark" } }
+
+baselineProfile {
+    // Use connected device for profile generation (faster for local dev)
+    useConnectedDevices = true
+}

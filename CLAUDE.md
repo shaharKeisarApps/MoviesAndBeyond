@@ -240,3 +240,99 @@ Repositories follow interface-implementation separation:
 - Implementation in `data/repository/impl/`
 - Test doubles in `data/testdoubles/repository/`
 - Binding in `data/di/RepositoryModule.kt`
+
+---
+
+## Claude Code Orchestration
+
+This project uses an advanced Claude Code setup with skills, subagents, hooks, and task orchestration.
+
+### Directory Structure
+```
+.claude/
+├── agents/                     # Subagent definitions
+│   ├── code-reviewer.md        # Code quality review
+│   ├── test-plan-validator.md  # PR test plan validation
+│   ├── bug-fixer.md            # Bug investigation and fixing
+│   ├── refactor-expert.md      # Code refactoring
+│   └── release-manager.md      # Release preparation
+├── hooks/                      # Automation hooks
+│   └── pre-pr-merge.sh         # Test plan validation before merge
+├── skills/                     # Domain expertise skills
+│   ├── compose-expert/         # Jetpack Compose patterns
+│   ├── coroutines-expert/      # Kotlin coroutines
+│   ├── gradle-expert/          # Gradle/build configuration
+│   ├── testing-expert/         # Testing patterns
+│   ├── store5-expert/          # Store5 caching
+│   └── ...                     # See full list below
+├── specs/                      # Feature and task specifications
+│   ├── features/               # Feature specifications
+│   └── tasks/                  # Task definitions and gates
+├── settings.json               # Hooks and workflow configuration
+└── ORCHESTRATION.md            # Full orchestration documentation
+```
+
+### Available Skills (17 total)
+
+| Skill | Domain |
+|-------|--------|
+| `circuit-expert` | Circuit UI framework |
+| `metro-expert` | Metro dependency injection |
+| `compose-expert` | Jetpack Compose patterns |
+| `coroutines-expert` | Kotlin coroutines & Flow |
+| `gradle-expert` | Build configuration |
+| `testing-expert` | Unit and integration testing |
+| `quality-expert` | Code quality (Detekt, Spotless) |
+| `store5-expert` | Store5 caching patterns |
+| `ktor-expert` | Ktor HTTP client |
+| `usecase-expert` | Use case/interactor patterns |
+| `git-expert` | Git workflows |
+| `cicd-expert` | CI/CD with GitHub Actions |
+| `technical-researcher` | Technical research |
+| `navigation3` | Navigation 3 patterns |
+| `material3-expressive` | Material 3 expressive |
+| `landscapist` | Image loading |
+| `shared-elements` | Shared element transitions |
+
+### Subagent Usage
+
+| Subagent | Trigger | Purpose |
+|----------|---------|---------|
+| `code-reviewer` | "review code", "check PR" | Pre-commit code review |
+| `test-plan-validator` | "verify test plan", "ready to merge" | PR test plan validation |
+| `bug-fixer` | "bug in", "crash", "doesn't work" | Bug investigation |
+| `refactor-expert` | "refactor", "migrate to" | Safe code transformations |
+| `release-manager` | "prepare release", "version bump" | Release preparation |
+
+### Task Orchestrator Integration
+
+The project uses Task Orchestrator MCP plugin for feature development:
+
+```
+1. Create plan file: .claude/specs/features/[feature-name].md
+2. Run: coordinate_feature_development with my [feature-name].md plan file
+3. Execute: Ask "What's next?" for automatic task routing
+```
+
+See `.claude/ORCHESTRATION.md` for full workflow documentation.
+
+### Quality Gates
+
+All tasks must pass through 6 quality gates before completion:
+1. **Implementation Complete**: Code compiles
+2. **Code Quality**: spotlessCheck, detekt, lint pass
+3. **Testing Complete**: Unit tests pass
+4. **Code Review**: code-reviewer subagent approved
+5. **Integration Verified**: Full build passes
+6. **PR Ready**: Test plan 100% checked
+
+See `.claude/specs/tasks/task-completion-gates.md` for details.
+
+### PR Test Plan Enforcement
+
+Before merging any PR, verify test plan is complete:
+```bash
+.claude/hooks/pre-pr-merge.sh <PR_NUMBER>
+```
+
+All test plan items must be checked `[x]` before merge is allowed

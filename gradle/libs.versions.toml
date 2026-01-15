@@ -140,6 +140,7 @@ screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot"
 
 
 benchmark = { id = "androidx.benchmark", version.ref = "benchmark-macro" }
+baselineprofile = { id = "androidx.baselineprofile", version.ref = "benchmark-macro" }
 
 
 # Convention plugins

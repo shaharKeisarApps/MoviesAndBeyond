@@ -490,13 +490,80 @@ e4c57fc Add full CI pipeline with code quality and screenshot tests
 
 ---
 
+## Session Updates (January 15, 2026)
+
+### Critical Finding: PRs #57-61 Missing from Main
+
+**Issue**: PRs #57-61 show as "MERGED" in GitHub but their commits are NOT in main's history. A force push or history rewrite occurred after merge.
+
+| PR | Status | Current State |
+|----|--------|--------------|
+| #57 | ❌ Missing | Re-added: release.yml + README badges |
+| #58 | ❌ Missing | Re-added: splash screen themes |
+| #59 | ✅ Present | Re-implemented with SyncStatus for dual-user |
+| #60 | ✅ Present | Benchmark module exists |
+| #61 | ✅ Present | Dynamic colors in Theme.kt |
+
+### Tasks Completed This Session
+
+1. **Local Favorites Dual-User Support** ✅
+   - Created `SyncStatus` enum (LOCAL_ONLY, SYNCED, PENDING_PUSH, PENDING_DELETE)
+   - Updated FavoriteContentEntity/WatchlistContentEntity with sync columns
+   - Created MIGRATION_2_3 for database schema update
+   - Updated LibraryRepositoryImpl with guest/authenticated dual-mode logic
+
+2. **Baseline Profiles Integration** ✅
+   - Added baselineprofile plugin to version catalog
+   - Created BaselineProfileGenerator.kt
+   - Updated CI workflow with baseline profile job
+
+3. **Orchestration Configuration** ✅
+   - Added "Parallel-First Implementation Strategy" to ORCHESTRATION.md v1.2
+   - Updated settings.json hooks for parallel enforcement
+   - Added layer-based specialist routing
+
+4. **Bridge Skills Enhanced** ✅
+   - compose-viewmodel-bridge: WhileSubscribedOrRetained patterns + validation scripts
+   - store5-room-bridge: StoreReadResponse handling + offline-first patterns
+
+5. **ViewModel Anti-Patterns Fixed** ✅
+   - Fixed 3 ViewModels using `WhileSubscribed(5000L)` anti-pattern:
+     - MainActivityViewModel.kt
+     - YouViewModel.kt
+     - LibraryItemsViewModel.kt
+
+6. **Missing PR Features Re-Added** ✅
+   - PR #57: Created `.github/workflows/release.yml` + README badges
+   - PR #58: Configured splash screen themes (light/dark)
+
+7. **Quality Gates Passed** ✅
+   - spotlessCheck: PASSED
+   - detekt: PASSED
+   - test: PASSED
+   - assembleDebug: PASSED
+
+### Parallel Execution Demonstrated
+
+```
+Phase 2 Parallel Launch:
+├── Task(general-purpose): Verify PR test plans
+├── Task(general-purpose): Upgrade bridge skills
+└── Task(Explore): Analyze existing patterns
+```
+
+All three agents completed concurrently with findings aggregated.
+
+---
+
 ## Next Steps
 
 1. **Merge PR #63**: TIVI-style FloatingNavigationBar when ready
 2. **Unit Test Coverage**: Increase coverage for new features
 3. **Performance Optimization**: Run benchmarks and optimize startup
 4. **KMP Migration**: Leverage Landscapist for future iOS support
+5. **Verify All Test Plans**: Manual device testing for UI features
 
 ---
 
 *This document was generated with Claude Code orchestration capabilities.*
+*Last updated: January 15, 2026*

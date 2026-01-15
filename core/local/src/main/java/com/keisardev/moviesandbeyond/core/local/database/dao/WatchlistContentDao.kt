@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContentEntity
+import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -43,4 +44,27 @@ interface WatchlistContentDao {
         upsertWatchlistItems(upsertItems)
         deleteItems.forEach { deleteWatchlistItem(mediaId = it.first, mediaType = it.second) }
     }
+
+    // Sync status queries for offline-first support
+
+    @Query("SELECT * FROM watchlist_content WHERE sync_status = :status")
+    suspend fun getItemsBySyncStatus(status: SyncStatus): List<WatchlistContentEntity>
+
+    @Query("SELECT * FROM watchlist_content WHERE sync_status IN ('LOCAL_ONLY', 'PENDING_PUSH')")
+    suspend fun getPendingSyncItems(): List<WatchlistContentEntity>
+
+    @Query("SELECT * FROM watchlist_content WHERE sync_status = 'PENDING_DELETE'")
+    suspend fun getPendingDeleteItems(): List<WatchlistContentEntity>
+
+    @Query(
+        "UPDATE watchlist_content SET sync_status = :status WHERE media_id = :mediaId AND media_type = :mediaType")
+    suspend fun updateSyncStatus(mediaId: Int, mediaType: String, status: SyncStatus)
+
+    @Query("UPDATE watchlist_content SET sync_status = 'SYNCED' WHERE media_id IN (:mediaIds)")
+    suspend fun markAsSynced(mediaIds: List<Int>)
+
+    @Query(
+        "UPDATE watchlist_content SET sync_status = 'PENDING_DELETE' " +
+            "WHERE media_id = :mediaId AND media_type = :mediaType")
+    suspend fun markForDeletion(mediaId: Int, mediaType: String)
 }

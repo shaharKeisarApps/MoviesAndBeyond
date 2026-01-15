@@ -28,7 +28,7 @@ import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContent
             CachedContentEntity::class,
             CachedMovieDetailsEntity::class,
             CachedTvDetailsEntity::class],
-    version = 2,
+    version = 3,
     /*autoMigrations = [
         AutoMigration(from = 5, to = 6, spec = MoviesAndBeyondDatabase.Companion.Migration5to6::class)
     ],
@@ -48,6 +48,42 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
     abstract fun cachedTvDetailsDao(): CachedTvDetailsDao
 
     companion object {
+        /**
+         * Migration from version 2 to 3: Add sync_status and added_at columns to favorite_content
+         * and watchlist_content tables for offline-first dual-user support.
+         */
+        val MIGRATION_2_3 =
+            object : Migration(2, 3) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Add sync_status column to favorite_content (default SYNCED for existing rows)
+                    db.execSQL(
+                        """
+                        ALTER TABLE favorite_content ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'SYNCED'
+                        """
+                            .trimIndent())
+                    // Add added_at column to favorite_content
+                    db.execSQL(
+                        """
+                        ALTER TABLE favorite_content ADD COLUMN added_at INTEGER NOT NULL DEFAULT 0
+                        """
+                            .trimIndent())
+
+                    // Add sync_status column to watchlist_content (default SYNCED for existing
+                    // rows)
+                    db.execSQL(
+                        """
+                        ALTER TABLE watchlist_content ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'SYNCED'
+                        """
+                            .trimIndent())
+                    // Add added_at column to watchlist_content
+                    db.execSQL(
+                        """
+                        ALTER TABLE watchlist_content ADD COLUMN added_at INTEGER NOT NULL DEFAULT 0
+                        """
+                            .trimIndent())
+                }
+            }
+
         /** Migration from version 1 to 2: Add Store5 cache tables for offline-first support. */
         val MIGRATION_1_2 =
             object : Migration(1, 2) {
@@ -100,7 +136,7 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 }
             }
 
-        // Legacy migrations below (kept for reference, no longer used)
+        // Legacy migrations below (kept for reference, database was reset)
         @Deprecated("Legacy migration - database was reset to version 1")
         val LEGACY_MIGRATION_1_2 =
             object : Migration(1, 2) {
@@ -119,7 +155,8 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 }
             }
 
-        val MIGRATION_2_3 =
+        @Deprecated("Legacy migration - database was reset, superseded by new MIGRATION_2_3")
+        val LEGACY_MIGRATION_2_3 =
             object : Migration(2, 3) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
@@ -165,7 +202,9 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                     db.execSQL("ALTER TABLE temp_pc RENAME TO popular_content")
                 }
             }
-        val MIGRATION_3_4 =
+
+        @Deprecated("Legacy migration - database was reset")
+        val LEGACY_MIGRATION_3_4 =
             object : Migration(3, 4) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(

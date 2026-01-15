@@ -3,9 +3,13 @@
 
     <style name="Theme.MoviesAndBeyond" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <!-- Android 12+ Splash Screen Theme (Light Mode) -->
     <style name="Theme.MoviesAndBeyond.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/black</item>
+        <!-- Splash screen background color - matches launcher icon background -->
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <!-- Splash screen icon - uses adaptive icon foreground -->
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!-- Theme to apply after splash screen exits -->
         <item name="postSplashScreenTheme">@style/Theme.MoviesAndBeyond</item>
     </style>
 </resources>

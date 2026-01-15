@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
+import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
 
 @Entity(
     tableName = "watchlist_content",
@@ -14,11 +15,21 @@ data class WatchlistContentEntity(
     @ColumnInfo(name = "media_id") val mediaId: Int,
     @ColumnInfo(name = "media_type") val mediaType: String,
     @ColumnInfo(name = "image_path") val imagePath: String,
-    val name: String
+    val name: String,
+    @ColumnInfo(name = "sync_status", defaultValue = "SYNCED")
+    val syncStatus: SyncStatus = SyncStatus.SYNCED,
+    @ColumnInfo(name = "added_at", defaultValue = "0")
+    val addedAt: Long = System.currentTimeMillis()
 ) {
     fun asLibraryItem() =
         LibraryItem(id = mediaId, mediaType = mediaType, imagePath = imagePath, name = name)
 }
 
-fun LibraryItem.asWatchlistContentEntity() =
-    WatchlistContentEntity(mediaId = id, mediaType = mediaType, imagePath = imagePath, name = name)
+fun LibraryItem.asWatchlistContentEntity(syncStatus: SyncStatus = SyncStatus.SYNCED) =
+    WatchlistContentEntity(
+        mediaId = id,
+        mediaType = mediaType,
+        imagePath = imagePath,
+        name = name,
+        syncStatus = syncStatus,
+        addedAt = System.currentTimeMillis())

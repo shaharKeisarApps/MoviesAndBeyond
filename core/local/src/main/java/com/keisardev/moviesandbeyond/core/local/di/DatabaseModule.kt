@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase
 import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase.Companion.MIGRATION_1_2
+import com.keisardev.moviesandbeyond.core.local.database.MoviesAndBeyondDatabase.Companion.MIGRATION_2_3
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.CachedContentDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.CachedMovieDetailsDao
@@ -27,7 +28,7 @@ internal object DatabaseModule {
     ): MoviesAndBeyondDatabase {
         return Room.databaseBuilder(
                 context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 

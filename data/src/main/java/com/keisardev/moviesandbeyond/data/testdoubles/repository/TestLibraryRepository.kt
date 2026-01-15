@@ -3,7 +3,9 @@ package com.keisardev.moviesandbeyond.data.testdoubles.repository
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
+import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
+import com.keisardev.moviesandbeyond.data.repository.SyncResult
 import com.keisardev.moviesandbeyond.data.testdoubles.movieMediaType
 import com.keisardev.moviesandbeyond.data.testdoubles.testLibraryItems
 import com.keisardev.moviesandbeyond.data.testdoubles.tvMediaType
@@ -22,6 +24,9 @@ class TestLibraryRepository : LibraryRepository {
     private val _movies = MutableStateFlow(movieLibrary)
     private val _tvShows = MutableStateFlow(tvLibrary)
 
+    // Track sync status for test items
+    private val syncStatusMap = mutableMapOf<Pair<Int, String>, SyncStatus>()
+
     override val favoriteMovies: Flow<List<LibraryItem>> = _movies.asStateFlow()
 
     override val favoriteTvShows: Flow<List<LibraryItem>> = _tvShows.asStateFlow()
@@ -38,12 +43,16 @@ class TestLibraryRepository : LibraryRepository {
         return testLibraryItems.find { it.id == mediaId } != null
     }
 
-    override suspend fun addOrRemoveFavorite(libraryItem: LibraryItem) {
+    override suspend fun addOrRemoveFavorite(libraryItem: LibraryItem, isAuthenticated: Boolean) {
         return if (generateError) {
             throw IOException()
         } else {
             // For testing add
             if (libraryItem.id == 0) return
+
+            // Track sync status
+            val key = Pair(libraryItem.id, libraryItem.mediaType)
+            syncStatusMap[key] = if (isAuthenticated) SyncStatus.SYNCED else SyncStatus.LOCAL_ONLY
 
             // For testing delete
             // Since delete button is present on items list, list needs to be updated
@@ -57,12 +66,19 @@ class TestLibraryRepository : LibraryRepository {
         }
     }
 
-    override suspend fun addOrRemoveFromWatchlist(libraryItem: LibraryItem) {
+    override suspend fun addOrRemoveFromWatchlist(
+        libraryItem: LibraryItem,
+        isAuthenticated: Boolean
+    ) {
         return if (generateError) {
             throw IOException()
         } else {
             // For testing add
             if (libraryItem.id == 0) return
+
+            // Track sync status
+            val key = Pair(libraryItem.id, libraryItem.mediaType)
+            syncStatusMap[key] = if (isAuthenticated) SyncStatus.SYNCED else SyncStatus.LOCAL_ONLY
 
             // For testing delete
             // Since delete button is present on items list, list needs to be updated
@@ -74,6 +90,22 @@ class TestLibraryRepository : LibraryRepository {
                 else -> {}
             }
         }
+    }
+
+    override suspend fun syncLocalItemsWithTmdb(): SyncResult {
+        // Mark all LOCAL_ONLY items as SYNCED
+        syncStatusMap.entries
+            .filter { it.value == SyncStatus.LOCAL_ONLY }
+            .forEach { syncStatusMap[it.key] = SyncStatus.SYNCED }
+        return SyncResult(pushed = 0, pulled = 0, conflicts = 0, errors = emptyList())
+    }
+
+    override suspend fun getFavoriteSyncStatus(mediaId: Int, mediaType: MediaType): SyncStatus? {
+        return syncStatusMap[Pair(mediaId, mediaType.name.lowercase())]
+    }
+
+    override suspend fun getWatchlistSyncStatus(mediaId: Int, mediaType: MediaType): SyncStatus? {
+        return syncStatusMap[Pair(mediaId, mediaType.name.lowercase())]
     }
 
     override suspend fun executeLibraryTask(

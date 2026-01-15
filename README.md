@@ -1,5 +1,8 @@
 # Movies And Beyond
 
+[![Download APK](https://img.shields.io/github/v/release/shaharKeisarApps/MoviesAndBeyond?label=Download%20APK&logo=android&logoColor=white&color=green)](https://github.com/shaharKeisarApps/MoviesAndBeyond/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/shaharKeisarApps/MoviesAndBeyond/build.yml?branch=main&label=Build&logo=github)](https://github.com/shaharKeisarApps/MoviesAndBeyond/actions/workflows/build.yml)
+
 <p align="center">
   <img src="./images/tmdb-logo.svg" width="200" alt="TMDB Logo"/>
 </p>

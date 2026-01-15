@@ -5,18 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -33,10 +32,7 @@ constructor(
     val isLoggedIn =
         authRepository.isLoggedIn
             .onEach { isLoggedIn -> if (isLoggedIn) getAccountDetails() }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = null)
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
     val userSettings: StateFlow<UserSettings?> =
         userRepository.userData
@@ -46,10 +42,7 @@ constructor(
                     includeAdultResults = it.includeAdultResults,
                     darkMode = it.darkMode)
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = null)
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
     fun setDynamicColorPreference(useDynamicColor: Boolean) {
         viewModelScope.launch { userRepository.setDynamicColorPreference(useDynamicColor) }

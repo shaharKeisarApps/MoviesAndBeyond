@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
+import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,13 +13,11 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -38,10 +37,7 @@ constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: L
     val libraryItemType: StateFlow<LibraryItemType?> =
         libraryItemTypeString
             .map { if (it.isEmpty()) null else enumValueOf<LibraryItemType>(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = null)
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
     val movieItems: StateFlow<List<LibraryItem>> =
         libraryItemType
@@ -53,10 +49,7 @@ constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: L
                     }
                 } ?: flow {}
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = emptyList())
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
 
     val tvItems: StateFlow<List<LibraryItem>> =
         libraryItemType
@@ -68,10 +61,7 @@ constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: L
                     }
                 } ?: flow {}
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = emptyList())
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
 
     fun deleteItem(libraryItem: LibraryItem) {
         viewModelScope.launch {

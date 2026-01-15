@@ -3,6 +3,7 @@ plugins {
     id("moviesandbeyond.android.application.compose")
     id("moviesandbeyond.android.hilt")
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -74,6 +75,7 @@ dependencies {
 
     // Baseline profile support
     implementation(libs.profileinstaller)
+    baselineProfile(projects.benchmarks)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
