@@ -166,7 +166,27 @@ internal fun YouScreen(
                         isRefreshing = uiState.isRefreshing,
                         state = pullToRefreshState,
                         onRefresh = onRefresh)) {
-                // Floating action buttons in top-right corner
+                // Content FIRST (behind) - so buttons can be clickable on top
+                Column(Modifier.fillMaxSize()) {
+                    isLoggedIn?.let {
+                        if (isLoggedIn) {
+                            uiState.accountDetails?.let {
+                                LoggedInView(
+                                    accountDetails = it,
+                                    isLoggingOut = uiState.isLoggingOut,
+                                    onLibraryItemClick = onLibraryItemClick,
+                                    onLogOutClick = onLogOutClick)
+                            }
+                                ?: LoadAccountDetails(
+                                    isLoading = uiState.isLoading,
+                                    onReloadAccountDetailsClick = onReloadAccountDetailsClick)
+                        } else {
+                            LoggedOutView(onNavigateToAuth = onNavigateToAuth)
+                        }
+                    }
+                }
+
+                // Floating action buttons LAST (on top) - so they're clickable
                 Row(
                     modifier =
                         Modifier.align(Alignment.TopEnd)
@@ -186,25 +206,6 @@ internal fun YouScreen(
                             }
                         }
                     }
-
-                Column(Modifier.fillMaxSize()) {
-                    isLoggedIn?.let {
-                        if (isLoggedIn) {
-                            uiState.accountDetails?.let {
-                                LoggedInView(
-                                    accountDetails = it,
-                                    isLoggingOut = uiState.isLoggingOut,
-                                    onLibraryItemClick = onLibraryItemClick,
-                                    onLogOutClick = onLogOutClick)
-                            }
-                                ?: LoadAccountDetails(
-                                    isLoading = uiState.isLoading,
-                                    onReloadAccountDetailsClick = onReloadAccountDetailsClick)
-                        } else {
-                            LoggedOutView(onNavigateToAuth = onNavigateToAuth)
-                        }
-                    }
-                }
 
                 /*  PullToRefreshContainer(
                     state = pullToRefreshState,

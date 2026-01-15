@@ -20,8 +20,7 @@ interface WatchlistContentDao {
     @Query("SELECT * FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType")
     suspend fun getWatchlistItem(mediaId: Int, mediaType: String): WatchlistContentEntity?
 
-    @Upsert
-    suspend fun insertWatchlistItem(watchlistContentEntity: WatchlistContentEntity)
+    @Upsert suspend fun insertWatchlistItem(watchlistContentEntity: WatchlistContentEntity)
 
     @Query(
         "SELECT EXISTS(SELECT 1 FROM watchlist_content WHERE media_id = :mediaId AND media_type = :mediaType)")

@@ -23,13 +23,9 @@ import com.keisardev.moviesandbeyond.ui.navigation.NavigationState
 import com.keisardev.moviesandbeyond.ui.navigation.TopLevelRoute
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.materials.CupertinoMaterials
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
 @OptIn(
     ExperimentalHazeApi::class,
-    ExperimentalHazeMaterialsApi::class,
     ExperimentalMaterial3Api::class,
     ExperimentalSharedTransitionApi::class)
 @Composable
@@ -39,7 +35,6 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
         // Provide SharedTransitionScope to all child composables
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             val hazeState = remember { HazeState() }
-            val style = CupertinoMaterials.ultraThin()
 
             // Navigation 3: Use NavigationState instead of NavController
             val navigationState = remember { NavigationState(hideOnboarding) }
@@ -64,9 +59,7 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
                                 navigationState.topLevelBackStack.switchToTopLevel(
                                     destinationToTopLevelRoute(destination))
                             },
-                            modifier =
-                                Modifier.hazeEffect(state = hazeState, style = style)
-                                    .fillMaxWidth())
+                            modifier = Modifier.fillMaxWidth())
                     }
                 },
                 contentWindowInsets = WindowInsets.safeDrawing) { padding ->

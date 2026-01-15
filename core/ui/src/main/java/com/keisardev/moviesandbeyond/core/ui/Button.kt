@@ -59,7 +59,7 @@ fun LibraryActionButton(
             label = "button_scale")
 
     Button(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = colors,
         border = border,

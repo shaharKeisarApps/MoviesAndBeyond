@@ -20,8 +20,7 @@ interface FavoriteContentDao {
     @Query("SELECT * FROM favorite_content WHERE media_id = :mediaId AND media_type = :mediaType")
     suspend fun getFavoriteItem(mediaId: Int, mediaType: String): FavoriteContentEntity?
 
-    @Upsert
-    suspend fun insertFavoriteItem(favoriteContentEntity: FavoriteContentEntity)
+    @Upsert suspend fun insertFavoriteItem(favoriteContentEntity: FavoriteContentEntity)
 
     @Query(
         "SELECT EXISTS(SELECT 1 FROM favorite_content WHERE media_id = :mediaId AND media_type = :mediaType)")

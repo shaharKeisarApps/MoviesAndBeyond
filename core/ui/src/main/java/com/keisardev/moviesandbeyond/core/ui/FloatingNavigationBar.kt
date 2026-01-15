@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
  * - Surface with NavigationBar elevation and colors
  * - Gradient border from surfaceVariant to surfaceVariant @ 0.3 alpha
  * - ExtraLarge rounded shape
- * - 80dp height
+ * - 64dp height (TIVI-style)
  * - Accessible selectableGroup modifier
  *
  * @param modifier The modifier to be applied to the navigation bar
@@ -45,8 +45,8 @@ fun FloatingNavigationBar(modifier: Modifier = Modifier, content: @Composable Ro
     Surface(
         modifier =
             modifier
-                .padding(horizontal = 8.dp)
-                .height(80.dp)
+                .padding(horizontal = 16.dp)
+                .height(64.dp)
                 .border(
                     width = 0.5.dp,
                     brush =
