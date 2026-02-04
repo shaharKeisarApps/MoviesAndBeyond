@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.you
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
@@ -25,7 +26,8 @@ class YouViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val libraryRepository: com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(YouUiState())
     val uiState = _uiState.asStateFlow()
@@ -47,6 +49,23 @@ constructor(
                     customColorArgb = it.customColorArgb)
             }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
+
+    val libraryItemCounts: StateFlow<LibraryItemCounts> =
+        kotlinx.coroutines.flow
+            .combine(
+                libraryRepository.favoriteMovies,
+                libraryRepository.favoriteTvShows,
+                libraryRepository.moviesWatchlist,
+                libraryRepository.tvShowsWatchlist) {
+                    favoriteMovies,
+                    favoriteTvShows,
+                    moviesWatchlist,
+                    tvShowsWatchlist ->
+                    LibraryItemCounts(
+                        favoritesCount = favoriteMovies.size + favoriteTvShows.size,
+                        watchlistCount = moviesWatchlist.size + tvShowsWatchlist.size)
+                }
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = LibraryItemCounts(0, 0))
 
     fun setDynamicColorPreference(useDynamicColor: Boolean) {
         viewModelScope.launch { userRepository.setDynamicColorPreference(useDynamicColor) }
@@ -78,6 +97,17 @@ constructor(
             try {
                 val accountDetails = userRepository.getAccountDetails()
                 _uiState.update { it.copy(isLoading = false, accountDetails = accountDetails) }
+
+                // Trigger immediate sync of favorites and watchlist after login
+                // This ensures TMDB data appears without waiting for WorkManager
+                launch {
+                    try {
+                        libraryRepository.syncFavorites()
+                        libraryRepository.syncWatchlist()
+                    } catch (e: Exception) {
+                        // Silent failure - WorkManager will retry later
+                    }
+                }
             } catch (e: IOException) {
                 _uiState.update {
                     it.copy(isLoading = false, errorMessage = "Failed to load account details.")
@@ -111,7 +141,18 @@ constructor(
             val response =
                 userRepository.updateAccountDetails(accountId = _uiState.value.accountDetails!!.id)
             when (response) {
-                is NetworkResponse.Success -> {}
+                is NetworkResponse.Success -> {
+                    // Sync favorites and watchlist after refreshing account details
+                    // This ensures TMDB data is pulled when user refreshes
+                    launch {
+                        try {
+                            libraryRepository.syncFavorites()
+                            libraryRepository.syncWatchlist()
+                        } catch (e: Exception) {
+                            // Silent failure - sync will retry later via WorkManager
+                        }
+                    }
+                }
 
                 is NetworkResponse.Error -> {
                     val errorMessage = response.errorMessage
@@ -128,6 +169,7 @@ constructor(
     }
 }
 
+@Immutable
 data class YouUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -136,6 +178,7 @@ data class YouUiState(
     val errorMessage: String? = null
 )
 
+@Immutable
 data class UserSettings(
     val useDynamicColor: Boolean,
     val includeAdultResults: Boolean,
@@ -144,3 +187,5 @@ data class UserSettings(
     val useLocalOnly: Boolean,
     val customColorArgb: Long,
 )
+
+@Immutable data class LibraryItemCounts(val favoritesCount: Int, val watchlistCount: Int)

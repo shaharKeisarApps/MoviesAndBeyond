@@ -29,6 +29,10 @@ object Dimens {
     val posterLargeWidth = 140.dp
     val posterLargeHeight = 210.dp
 
+    /** XLarge poster card - 160.dp x 240.dp - hero/showcase */
+    val posterXLargeWidth = 160.dp
+    val posterXLargeHeight = 240.dp
+
     // Legacy aliases for compatibility
     val cardWidth = posterMediumWidth
     val cardHeight = posterMediumHeight
@@ -36,6 +40,18 @@ object Dimens {
     // ==========================================================================
     // BACKDROP CARDS (16:9 aspect ratio)
     // ==========================================================================
+
+    /** Small backdrop - 200x112dp - compact cards */
+    val backdropSmallWidth = 200.dp
+    val backdropSmallHeight = 112.dp
+
+    /** Medium backdrop - 280x158dp - standard cards */
+    val backdropMediumWidth = 280.dp
+    val backdropMediumHeight = 158.dp
+
+    /** Large backdrop - 360x202dp - featured cards */
+    val backdropLargeWidth = 360.dp
+    val backdropLargeHeight = 202.dp
 
     /** Backdrop card height for trending/featured sections */
     val backdropCardHeight = 180.dp
@@ -87,6 +103,19 @@ object Dimens {
 
     /** Person avatar diameter */
     val personAvatarSize = 64.dp
+
+    // ==========================================================================
+    // PROFILE SIZES (1:1 aspect ratio)
+    // ==========================================================================
+
+    /** Small profile - 48dp - inline mentions */
+    val profileSmallSize = 48.dp
+
+    /** Medium profile - 64dp - standard cards */
+    val profileMediumSize = 64.dp
+
+    /** Large profile - 96dp - featured/detail */
+    val profileLargeSize = 96.dp
 
     // ==========================================================================
     // LOADING
@@ -159,6 +188,15 @@ object Dimens {
 
     /** Number of columns for search results */
     const val searchGridColumns = 2
+
+    /** Minimum width for adaptive grid cells - poster medium width */
+    val gridCellMinWidth = posterMediumWidth
+
+    /** Grid item spacing - consistent spacing between grid items */
+    val gridItemSpacing = 12.dp
+
+    /** Grid content padding - padding around the grid */
+    val gridContentPadding = 16.dp
 }
 
 /** Poster card size variants for different contexts. */
@@ -170,7 +208,34 @@ enum class PosterSize(val width: Dp, val height: Dp) {
     MEDIUM(Dimens.posterMediumWidth, Dimens.posterMediumHeight),
 
     /** Large - 140x210dp - featured content, first items */
-    LARGE(Dimens.posterLargeWidth, Dimens.posterLargeHeight)
+    LARGE(Dimens.posterLargeWidth, Dimens.posterLargeHeight),
+
+    /** XLarge - 160x240dp - hero/showcase sections */
+    XLARGE(Dimens.posterXLargeWidth, Dimens.posterXLargeHeight)
+}
+
+/** Backdrop size variants for horizontal content cards. Uses 16:9 aspect ratio. */
+enum class BackdropSize(val width: Dp, val height: Dp) {
+    /** Small - 200x112dp - compact backdrop cards */
+    SMALL(Dimens.backdropSmallWidth, Dimens.backdropSmallHeight),
+
+    /** Medium - 280x158dp - standard backdrop cards */
+    MEDIUM(Dimens.backdropMediumWidth, Dimens.backdropMediumHeight),
+
+    /** Large - 360x202dp - featured backdrop cards */
+    LARGE(Dimens.backdropLargeWidth, Dimens.backdropLargeHeight)
+}
+
+/** Profile image size variants for person cards and avatars. */
+enum class ProfileSize(val size: Dp) {
+    /** Small - 48dp - inline mentions, compact lists */
+    SMALL(Dimens.profileSmallSize),
+
+    /** Medium - 64dp - standard person cards */
+    MEDIUM(Dimens.profileMediumSize),
+
+    /** Large - 96dp - featured cast, user profiles */
+    LARGE(Dimens.profileLargeSize)
 }
 
 /** Rating badge size variants. */

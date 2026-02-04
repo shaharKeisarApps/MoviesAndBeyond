@@ -29,9 +29,15 @@ fun NavGraphBuilder.youScreen(
             route = "$libraryItemsNavigationRoute/{$libraryItemTypeNavigationArgument}",
             arguments =
                 listOf(
-                    navArgument(libraryItemTypeNavigationArgument) { type = NavType.StringType })) {
+                    navArgument(libraryItemTypeNavigationArgument) {
+                        type = NavType.StringType
+                    })) { backStackEntry ->
+                val libraryItemType =
+                    backStackEntry.arguments?.getString(libraryItemTypeNavigationArgument)
                 LibraryItemsRoute(
-                    onBackClick = navController::navigateUp, navigateToDetails = navigateToDetails)
+                    onBackClick = navController::navigateUp,
+                    navigateToDetails = navigateToDetails,
+                    libraryItemType = libraryItemType)
             }
     }
 }

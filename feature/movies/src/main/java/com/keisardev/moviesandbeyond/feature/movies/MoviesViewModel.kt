@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.movies
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
@@ -223,6 +224,7 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
  * @param category The movie list category
  * @param isFromCache Whether the current data is from cache (stale data indicator)
  */
+@Immutable
 data class ContentUiState(
     val items: List<ContentItem>,
     val isLoading: Boolean,

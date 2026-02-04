@@ -94,14 +94,22 @@ object WhileSubscribedOrRetained : SharingStarted {
 }
 
 /**
- * Converts a [Flow] to a [StateFlow] using [WhileSubscribedOrRetained] sharing strategy.
+ * Converts a [Flow] to a [StateFlow] using [SharingStarted.WhileSubscribed] sharing strategy.
  *
  * This is a convenience extension that wraps [stateIn] with the recommended sharing strategy for
- * ViewModels, ensuring proper behavior during configuration changes.
+ * ViewModels, ensuring proper behavior during configuration changes and navigation.
+ *
+ * Uses WhileSubscribed(5000) to:
+ * - Keep the upstream flow active for 5 seconds after the last subscriber disappears
+ * - Allow configuration changes to re-subscribe without restarting the flow
+ * - Ensure navigation argument changes propagate to UI when screen becomes visible
+ *
+ * Note: Changed from WhileSubscribedOrRetained to fix bug where StateFlow would cache empty values
+ * when navigation arguments changed while screen was not visible.
  *
  * @param scope The [CoroutineScope] in which sharing is started (typically viewModelScope)
  * @param initialValue The initial value of the StateFlow before any emissions
- * @return A [StateFlow] that shares emissions using WhileSubscribedOrRetained strategy
+ * @return A [StateFlow] that shares emissions using WhileSubscribed(5000) strategy
  */
 @JvmSynthetic
 fun <T> Flow<T>.stateInWhileSubscribed(
@@ -110,6 +118,6 @@ fun <T> Flow<T>.stateInWhileSubscribed(
 ): StateFlow<T> =
     stateIn(
         scope = scope,
-        started = WhileSubscribedOrRetained,
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = initialValue,
     )

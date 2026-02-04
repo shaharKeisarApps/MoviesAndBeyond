@@ -18,3 +18,10 @@ local.properties
 
 # Detekt reports
 **/build/reports/detekt/
+
+# Claude Flow V3 runtime data (do not commit)
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+.claude-flow/metrics/
+.claude-flow/security/

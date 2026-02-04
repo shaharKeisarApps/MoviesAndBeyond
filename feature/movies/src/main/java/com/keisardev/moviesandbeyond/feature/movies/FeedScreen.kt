@@ -16,9 +16,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,7 +39,6 @@ import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
-import kotlinx.coroutines.launch
 
 @Composable
 fun FeedRoute(
@@ -82,11 +81,12 @@ internal fun FeedScreen(
     modifier: Modifier = Modifier
 ) {
     val snackbarState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
-    errorMessage?.let {
-        scope.launch { snackbarState.showSnackbar(it) }
-        onErrorShown()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            snackbarState.showSnackbar(message)
+            onErrorShown()
+        }
     }
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->

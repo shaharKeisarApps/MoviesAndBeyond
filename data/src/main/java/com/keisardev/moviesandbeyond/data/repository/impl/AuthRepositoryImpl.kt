@@ -68,8 +68,9 @@ constructor(
             sessionManager.deleteSessionId()
             accountDetailsDao.deleteAccountDetails(accountId)
 
-            favoriteContentDao.deleteAllFavoriteItems()
-            watchlistContentDao.deleteAllWatchlistItems()
+            // Only delete TMDB-synced items, preserve LOCAL_ONLY items for guest mode
+            favoriteContentDao.deleteSyncedFavoriteItems()
+            watchlistContentDao.deleteSyncedWatchlistItems()
 
             NetworkResponse.Success(Unit)
         } catch (e: IOException) {

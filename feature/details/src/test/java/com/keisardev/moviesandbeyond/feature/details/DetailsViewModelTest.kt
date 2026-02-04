@@ -149,10 +149,12 @@ class DetailsViewModelTest {
 
         assertTrue(viewModel.uiState.value.markedFavorite)
 
+        // Test guest mode - should save locally without showing sign-in sheet
         authRepository.setAuthStatus(false)
         viewModel.addOrRemoveFavorite(libraryItem)
 
-        assertTrue(viewModel.uiState.value.showSignInSheet)
+        assertFalse(viewModel.uiState.value.markedFavorite) // Toggled off
+        assertFalse(viewModel.uiState.value.showSignInSheet) // No sign-in sheet in guest mode
 
         authRepository.setAuthStatus(true)
         libraryRepository.generateError(true)
@@ -169,10 +171,12 @@ class DetailsViewModelTest {
 
         assertTrue(viewModel.uiState.value.savedInWatchlist)
 
+        // Test guest mode - should save locally without showing sign-in sheet
         authRepository.setAuthStatus(false)
         viewModel.addOrRemoveFromWatchlist(libraryItem)
 
-        assertTrue(viewModel.uiState.value.showSignInSheet)
+        assertFalse(viewModel.uiState.value.savedInWatchlist) // Toggled off
+        assertFalse(viewModel.uiState.value.showSignInSheet) // No sign-in sheet in guest mode
 
         authRepository.setAuthStatus(true)
         libraryRepository.generateError(true)

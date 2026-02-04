@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MoviesAndBeyond" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MoviesAndBeyond" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Enable true edge-to-edge display -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Make navigation bar contrast enforced on Android 10+ -->
+        <item name="android:enforceNavigationBarContrast">false</item>
+    </style>
 
     <!-- Android 12+ Splash Screen Theme (Light Mode) -->
     <style name="Theme.MoviesAndBeyond.Splash" parent="Theme.SplashScreen">

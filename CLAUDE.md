@@ -243,96 +243,198 @@ Repositories follow interface-implementation separation:
 
 ---
 
-## Claude Code Orchestration
+## Claude Flow V3 Orchestration
 
-This project uses an advanced Claude Code setup with skills, subagents, hooks, and task orchestration.
+This project uses **Claude Flow V3** for AI-powered development orchestration with 15-agent hierarchical mesh coordination.
+
+### Quick Start
+
+```bash
+# Initialize memory system
+npx @claude-flow/cli@latest memory init
+
+# Start background daemon
+npx @claude-flow/cli@latest daemon start
+
+# Check system health
+npx @claude-flow/cli@latest doctor
+
+# Spawn a specialized agent
+npx @claude-flow/cli@latest agent spawn -t android-architect
+```
 
 ### Directory Structure
 ```
 .claude/
-├── agents/                     # Subagent definitions
+├── agents/                     # 99 agent definitions (8 project-specific + 91 claude-flow)
 │   ├── code-reviewer.md        # Code quality review
 │   ├── test-plan-validator.md  # PR test plan validation
 │   ├── bug-fixer.md            # Bug investigation and fixing
+│   ├── data-layer-specialist.md # Repository, Room, Store5
+│   ├── presentation-layer-specialist.md # ViewModel, Compose UI
+│   ├── di-layer-specialist.md  # Hilt dependency injection
 │   ├── refactor-expert.md      # Code refactoring
 │   └── release-manager.md      # Release preparation
-├── hooks/                      # Automation hooks
-│   └── pre-pr-merge.sh         # Test plan validation before merge
-├── skills/                     # Domain expertise skills
-│   ├── compose-expert/         # Jetpack Compose patterns
-│   ├── coroutines-expert/      # Kotlin coroutines
-│   ├── gradle-expert/          # Gradle/build configuration
-│   ├── testing-expert/         # Testing patterns
-│   ├── store5-expert/          # Store5 caching
-│   └── ...                     # See full list below
-├── specs/                      # Feature and task specifications
-│   ├── features/               # Feature specifications
-│   └── tasks/                  # Task definitions and gates
+├── skills/                     # 46 domain expertise skills
+│   ├── Project-Specific (10):
+│   │   ├── compose-expert/     # Jetpack Compose patterns
+│   │   ├── coroutines-expert/  # Kotlin coroutines
+│   │   ├── gradle-expert/      # Gradle/build configuration
+│   │   ├── testing-expert/     # Testing patterns
+│   │   └── ...
+│   └── Claude Flow (36):
+│       ├── agentdb-*/          # AgentDB features
+│       ├── github-*/           # GitHub integration
+│       ├── sparc/              # SPARC methodology
+│       └── swarm-*/            # Swarm orchestration
+├── commands/                   # 10 CLI command helpers
+├── helpers/                    # Utility helpers
 ├── settings.json               # Hooks and workflow configuration
-└── ORCHESTRATION.md            # Full orchestration documentation
+└── specs/                      # Feature and task specifications
+    ├── features/               # Feature specifications
+    └── tasks/                  # Task definitions and gates
+
+.claude-flow/
+├── config.yaml                 # V3 runtime configuration
+├── data/                       # Persistent data
+├── logs/                       # Execution logs
+└── sessions/                   # Session history
 ```
 
-### Available Skills (17 total)
+### Available Skills (46 Total)
 
-| Skill | Domain |
-|-------|--------|
-| `circuit-expert` | Circuit UI framework |
-| `metro-expert` | Metro dependency injection |
-| `compose-expert` | Jetpack Compose patterns |
-| `coroutines-expert` | Kotlin coroutines & Flow |
-| `gradle-expert` | Build configuration |
-| `testing-expert` | Unit and integration testing |
-| `quality-expert` | Code quality (Detekt, Spotless) |
-| `store5-expert` | Store5 caching patterns |
-| `ktor-expert` | Ktor HTTP client |
-| `usecase-expert` | Use case/interactor patterns |
-| `git-expert` | Git workflows |
-| `cicd-expert` | CI/CD with GitHub Actions |
-| `technical-researcher` | Technical research |
-| `navigation3` | Navigation 3 patterns |
-| `material3-expressive` | Material 3 expressive |
-| `landscapist` | Image loading |
-| `shared-elements` | Shared element transitions |
+**Project-Specific Skills (10):**
+- `cicd-expert` - CI/CD with GitHub Actions
+- `compose-expert` - Jetpack Compose patterns
+- `compose-viewmodel-bridge` - ViewModel StateFlow to Compose UI
+- `coroutines-expert` - Kotlin coroutines & Flow
+- `git-expert` - Git workflows
+- `gradle-expert` - Gradle build configuration
+- `quality-expert` - Code quality (Detekt, Spotless)
+- `store5-expert` - Store5 caching patterns
+- `testing-expert` - Unit and integration testing
+- `usecase-expert` - Use case/interactor patterns
 
-### Subagent Usage
+**Claude Flow Skills (36):**
+Including AgentDB, GitHub integration, SPARC methodology, swarm coordination, hooks automation, and more.
 
-| Subagent | Trigger | Purpose |
-|----------|---------|---------|
-| `code-reviewer` | "review code", "check PR" | Pre-commit code review |
-| `test-plan-validator` | "verify test plan", "ready to merge" | PR test plan validation |
-| `bug-fixer` | "bug in", "crash", "doesn't work" | Bug investigation |
-| `refactor-expert` | "refactor", "migrate to" | Safe code transformations |
-| `release-manager` | "prepare release", "version bump" | Release preparation |
+Use `/skills` to see all available skills.
 
-### Task Orchestrator Integration
+### Available Agents (99 Total)
 
-The project uses Task Orchestrator MCP plugin for feature development:
+**Project-Specific Agents (8):**
+- `bug-fixer` - Bug investigation and fixing
+- `code-reviewer` - Code quality review
+- `data-layer-specialist` - Repository, Room, Store5, Retrofit
+- `di-layer-specialist` - Hilt dependency injection
+- `presentation-layer-specialist` - ViewModel, Compose UI, StateFlow
+- `refactor-expert` - Safe code transformations
+- `release-manager` - Release preparation
+- `test-plan-validator` - PR test plan validation
 
+**Claude Flow Agents (91):**
+Including core development, specialized, swarm coordination, GitHub, SPARC methodology, and more.
+
+### Quality Gates (5-Gate Android Validation)
+
+Based on KMP validation framework, all features must pass:
+
+#### Gate 1: Requirements Validation
+- Feature matches specification
+- All user stories addressed
+- Edge cases identified
+- Accessibility requirements met
+- Performance targets defined
+
+#### Gate 2: Code Quality Validation
+- Follows Android Architecture Guidelines
+- Uses Hilt correctly
+- Proper error handling
+- Null safety everywhere
+- Passes: `./gradlew spotlessCheck detekt lint`
+
+#### Gate 3: Test Coverage Validation
+- Unit tests for business logic
+- Integration tests for data layer
+- UI tests for screens
+- Coverage thresholds met
+- Passes: `./gradlew test connectedAndroidTest`
+
+#### Gate 4: Functional Validation
+- Feature works on real devices
+- No crashes or ANRs
+- Performance acceptable
+- User flows complete
+
+#### Gate 5: Production Readiness
+- Release build works
+- ProGuard/R8 rules correct
+- APK size acceptable
+- No regressions
+- Passes: `./gradlew assembleRelease`
+
+### Verification Commands
+
+```bash
+# Full verification suite
+./gradlew clean assembleDebug test check
+
+# Code quality only
+./gradlew spotlessApply spotlessCheck detekt lint
+
+# Test specific module
+./gradlew :feature:movies:testDebugUnitTest
+
+# Android validation pipeline
+./gradlew spotlessCheck detekt lint test assembleDebug connectedAndroidTest
 ```
-1. Create plan file: .claude/specs/features/[feature-name].md
-2. Run: coordinate_feature_development with my [feature-name].md plan file
-3. Execute: Ask "What's next?" for automatic task routing
+
+### Claude Flow Memory System
+
+Store and retrieve project knowledge:
+
+```bash
+# Store pattern
+npx @claude-flow/cli@latest memory store \
+  --key "pattern-hilt-repository" \
+  --value "Interface in data/repository/, impl in data/repository/impl/, bind in di/RepositoryModule.kt" \
+  --namespace android-patterns
+
+# Search semantically
+npx @claude-flow/cli@latest memory search --query "repository pattern"
+
+# List stored memories
+npx @claude-flow/cli@latest memory list --namespace android-patterns
 ```
 
-See `.claude/ORCHESTRATION.md` for full workflow documentation.
+### Swarm Orchestration
 
-### Quality Gates
+For complex multi-step tasks:
 
-All tasks must pass through 6 quality gates before completion:
-1. **Implementation Complete**: Code compiles
-2. **Code Quality**: spotlessCheck, detekt, lint pass
-3. **Testing Complete**: Unit tests pass
-4. **Code Review**: code-reviewer subagent approved
-5. **Integration Verified**: Full build passes
-6. **PR Ready**: Test plan 100% checked
+```bash
+# Initialize a swarm for Android development
+npx @claude-flow/cli@latest swarm init \
+  --topology hierarchical \
+  --max-agents 8 \
+  --strategy specialized
 
-See `.claude/specs/tasks/task-completion-gates.md` for details.
+# Or use SPARC methodology
+npx @claude-flow/cli@latest sparc:orchestrator
+```
 
 ### PR Test Plan Enforcement
 
-Before merging any PR, verify test plan is complete:
-```bash
-.claude/hooks/pre-pr-merge.sh <PR_NUMBER>
-```
+Before merging any PR:
+1. All test plan items must be checked `[x]`
+2. All 5 quality gates must pass
+3. CI/CD checks must be green
 
-All test plan items must be checked `[x]` before merge is allowed
+---
+
+**Configuration Files:**
+- Runtime: `.claude-flow/config.yaml`
+- MCP Integration: `.mcp.json`
+- Hooks: `.claude/settings.json`
+
+**Last Updated**: 2026-02-02
+**Version**: Claude Flow V3.1.0-alpha.3

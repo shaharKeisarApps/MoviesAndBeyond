@@ -3,10 +3,13 @@ package com.keisardev.moviesandbeyond.feature.details
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -212,6 +215,20 @@ internal fun DetailsScreen(
         }
 }
 
+/**
+ * Premium M3 top app bar for details screen with proper window insets handling.
+ *
+ * Features:
+ * - Edge-to-edge rendering with status bar padding
+ * - Transparent background overlays backdrop
+ * - Animated title appearance when backdrop collapses
+ * - Semi-transparent back button with proper contrast
+ * - Follows Material Design 3 guidelines for immersive experiences
+ *
+ * @param showTitle Whether to show the animated title (true when backdrop is collapsed)
+ * @param title The content title to display
+ * @param onBackClick Callback for back navigation
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () -> Unit) {
@@ -221,7 +238,9 @@ private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () 
         iconButtonColors =
             IconButtonDefaults.iconButtonColors(
                 containerColor = Color.Black.copy(alpha = 0.5f), contentColor = Color.White),
-        onBackClick = onBackClick)
+        onBackClick = onBackClick,
+        // Apply status bar insets so app bar doesn't overlap with system UI
+        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
 }
 
 @Composable
