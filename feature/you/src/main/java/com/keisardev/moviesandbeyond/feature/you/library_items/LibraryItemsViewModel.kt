@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -25,11 +27,24 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LibraryItemsViewModel
 @Inject
-constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: LibraryRepository) :
-    ViewModel() {
+constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val libraryRepository: LibraryRepository,
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
+
+    /**
+     * Set the library item type for Navigation 3. In Nav3, the type comes from the route key
+     * instead of URL path arguments.
+     */
+    fun setLibraryItemType(type: String) {
+        if (savedStateHandle.get<String>(libraryItemTypeNavigationArgument).isNullOrEmpty()) {
+            savedStateHandle[libraryItemTypeNavigationArgument] = type
+        }
+    }
 
     private val libraryItemTypeString =
         savedStateHandle.getStateFlow(key = libraryItemTypeNavigationArgument, initialValue = "")
@@ -47,7 +62,7 @@ constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: L
                         LibraryItemType.FAVORITE -> libraryRepository.favoriteMovies
                         LibraryItemType.WATCHLIST -> libraryRepository.moviesWatchlist
                     }
-                } ?: flow {}
+                } ?: flow { emit(emptyList()) }
             }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
 
@@ -59,22 +74,21 @@ constructor(savedStateHandle: SavedStateHandle, private val libraryRepository: L
                         LibraryItemType.FAVORITE -> libraryRepository.favoriteTvShows
                         LibraryItemType.WATCHLIST -> libraryRepository.tvShowsWatchlist
                     }
-                } ?: flow {}
+                } ?: flow { emit(emptyList()) }
             }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
 
     fun deleteItem(libraryItem: LibraryItem) {
         viewModelScope.launch {
             try {
+                val isAuthenticated = authRepository.isLoggedIn.first()
                 when (libraryItemType.value) {
                     LibraryItemType.FAVORITE -> {
-                        libraryRepository.addOrRemoveFavorite(libraryItem)
+                        libraryRepository.addOrRemoveFavorite(libraryItem, isAuthenticated)
                     }
-
                     LibraryItemType.WATCHLIST -> {
-                        libraryRepository.addOrRemoveFromWatchlist(libraryItem)
+                        libraryRepository.addOrRemoveFromWatchlist(libraryItem, isAuthenticated)
                     }
-
                     else -> Unit
                 }
             } catch (e: IOException) {

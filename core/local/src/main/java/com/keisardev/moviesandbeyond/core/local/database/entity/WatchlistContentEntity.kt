@@ -28,7 +28,7 @@ data class WatchlistContentEntity(
 fun LibraryItem.asWatchlistContentEntity(syncStatus: SyncStatus = SyncStatus.SYNCED) =
     WatchlistContentEntity(
         mediaId = id,
-        mediaType = mediaType,
+        mediaType = mediaType.lowercase(), // Ensure lowercase for DAO query compatibility
         imagePath = imagePath,
         name = name,
         syncStatus = syncStatus,

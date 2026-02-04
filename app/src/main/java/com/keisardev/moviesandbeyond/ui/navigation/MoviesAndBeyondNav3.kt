@@ -1,6 +1,8 @@
 package com.keisardev.moviesandbeyond.ui.navigation
 
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -9,9 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -37,10 +37,31 @@ import com.keisardev.moviesandbeyond.feature.you.YouRoute as YouScreen
 import com.keisardev.moviesandbeyond.feature.you.library_items.LibraryItemsRoute as LibraryItemsScreen
 import com.keisardev.moviesandbeyond.ui.OnboardingScreen
 
-// Animation duration constants
-private const val NAVIGATION_ANIM_DURATION = 400
-private const val DETAILS_ANIM_DURATION = 350
-private const val PREDICTIVE_BACK_ANIM_DURATION = 300
+// ============================================================================
+// Material 3 Emphasized Easing Curves
+// ============================================================================
+// These curves are designed for smooth, organic motion that feels effortless
+// Reference: https://m3.material.io/styles/motion/easing-and-duration/tokens-specs
+
+/**
+ * Material 3 Emphasized Decelerate easing for enter transitions. Creates a smooth, elastic
+ * deceleration that feels natural and premium. Used when content enters the screen or grows.
+ */
+private val EmphasizedDecelerateEasing: Easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1.0f)
+
+/**
+ * Material 3 Emphasized Accelerate easing for exit transitions. Creates a quick, confident
+ * acceleration for departing content. Used when content exits the screen or shrinks.
+ */
+private val EmphasizedAccelerateEasing: Easing = CubicBezierEasing(0.3f, 0.0f, 0.8f, 0.15f)
+
+// Animation duration constants - aligned with Material Motion specs
+private const val NAVIGATION_ANIM_DURATION = 400 // Standard navigation transitions
+private const val FADE_THROUGH_EXIT_DURATION = 250 // Fade out duration for departing screen
+private const val FADE_THROUGH_ENTER_DURATION = 300 // Fade in duration for entering screen
+private const val FADE_THROUGH_GAP =
+    50 // Brief pause where only shared element is visible (hero moment)
+private const val PREDICTIVE_BACK_ANIM_DURATION = 300 // Gesture-driven transitions
 
 // Predictive back scale values - subtle to avoid jarring effect
 private const val PREDICTIVE_BACK_SCALE_INCOMING = 0.9f
@@ -58,12 +79,16 @@ private const val PREDICTIVE_BACK_SCALE_OUTGOING = 0.85f
  * @param navigationState The navigation state holder managing back stacks
  * @param paddingValues Padding from the scaffold (for bottom bar)
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: PaddingValues) {
     val backStack = navigationState.currentBackStack
 
     NavDisplay(
-        modifier = Modifier.padding(paddingValues),
+        // Only apply top padding - NOT bottom
+        // This allows the floating navigation bar to overlay content
+        // Content should handle its own bottom spacing via contentPadding on scrollable lists
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         backStack = backStack,
         onBack = { navigationState.handleBack() },
         // Global forward navigation animation: slide in from right with subtle fade
@@ -259,46 +284,78 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                         })
                 }
 
-                entry<LibraryItemsRoute> {
+                entry<LibraryItemsRoute> { key ->
                     LibraryItemsScreen(
                         onBackClick = { navigationState.topLevelBackStack.goBack() },
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
                                 com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
-                        })
+                        },
+                        libraryItemType = key.type)
                 }
 
                 // ================================================================
-                // Details Feature - Uses vertical slide for modal-like experience
+                // Details Feature - Fade Through + Shared Element Hero
                 // ================================================================
+                //
+                // MATERIAL 3 FADE THROUGH PATTERN (ACTIVE) ✅
+                //
+                // Motion Choreography:
+                //   1. List screen fades out (250ms, EmphasizedAccelerateEasing)
+                //   2. Brief 50ms pause where ONLY the shared element is visible (hero moment)
+                //   3. Details screen fades in (300ms, EmphasizedDecelerateEasing)
+                //   4. Shared element morphs continuously with spring physics (automatic)
+                //
+                // Why This Works:
+                //   - Zero competing spatial motion - users track only the poster morph
+                //   - The 50ms gap creates a "rest" where the eye focuses on the poster
+                //   - Material 3's canonical pattern for image-heavy content transitions
+                //   - Used by Google Photos, Play Store for card → detail transitions
+                //
+                // Material 3 Compliance:
+                //   - Sequential fade pattern (M3 "Fade Through")
+                //   - Emphasized easing curves (accelerate exit, decelerate enter)
+                //   - 250-300ms per phase (M3 standard for fades)
+                //   - Shared element = primary motion, fades = secondary support
+                //
                 entry<com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute>(
                     metadata =
                         NavDisplay.transitionSpec {
-                            // Slide up from bottom with scale for a modal-like entrance
-                            (slideInVertically(
-                                    initialOffsetY = { fullHeight -> fullHeight },
+                            // ENTER: Details screen fades in after brief pause
+                            // The delay creates the "gap" where only shared element is visible
+                            fadeIn(
                                     animationSpec =
                                         tween(
-                                            DETAILS_ANIM_DURATION, easing = FastOutSlowInEasing)) +
-                                    fadeIn(animationSpec = tween(DETAILS_ANIM_DURATION / 2)))
-                                .togetherWith(ExitTransition.KeepUntilTransitionsFinished)
+                                            durationMillis = FADE_THROUGH_ENTER_DURATION,
+                                            delayMillis = FADE_THROUGH_GAP,
+                                            easing = EmphasizedDecelerateEasing))
+                                .togetherWith(
+                                    // EXIT: List screen fades out quickly
+                                    fadeOut(
+                                        animationSpec =
+                                            tween(
+                                                durationMillis = FADE_THROUGH_EXIT_DURATION,
+                                                easing = EmphasizedAccelerateEasing)))
                         } +
                             NavDisplay.popTransitionSpec {
-                                // Reveal previous screen while sliding down
-                                fadeIn(animationSpec = tween(DETAILS_ANIM_DURATION / 2))
+                                // BACK NAVIGATION: Symmetric fade pattern
+                                // List fades in with delay, Details fades out quickly
+                                fadeIn(
+                                        animationSpec =
+                                            tween(
+                                                durationMillis = FADE_THROUGH_ENTER_DURATION,
+                                                delayMillis = FADE_THROUGH_GAP,
+                                                easing = EmphasizedDecelerateEasing))
                                     .togetherWith(
-                                        slideOutVertically(
-                                            targetOffsetY = { fullHeight -> fullHeight },
+                                        fadeOut(
                                             animationSpec =
                                                 tween(
-                                                    DETAILS_ANIM_DURATION,
-                                                    easing = FastOutSlowInEasing)) +
-                                            fadeOut(
-                                                animationSpec = tween(DETAILS_ANIM_DURATION / 2)))
+                                                    durationMillis = FADE_THROUGH_EXIT_DURATION,
+                                                    easing = EmphasizedAccelerateEasing)))
                             } +
                             NavDisplay.predictivePopTransitionSpec {
-                                // Predictive back: smooth vertical slide with scale
-                                // Uses LinearEasing for gesture-driven feel, no harsh fades
+                                // PREDICTIVE BACK: Gesture-driven fade with subtle scale
+                                // Uses LinearEasing for immediate gesture response
                                 scaleIn(
                                         initialScale = PREDICTIVE_BACK_SCALE_INCOMING,
                                         animationSpec =
@@ -306,8 +363,7 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                                 PREDICTIVE_BACK_ANIM_DURATION,
                                                 easing = LinearEasing))
                                     .togetherWith(
-                                        slideOutVertically(
-                                            targetOffsetY = { fullHeight -> fullHeight },
+                                        fadeOut(
                                             animationSpec =
                                                 tween(
                                                     PREDICTIVE_BACK_ANIM_DURATION,
