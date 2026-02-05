@@ -14,7 +14,8 @@
     <string name="settings_dialog_dark_no">Light</string>
     <string name="settings_dialog_seed_color">Theme Color</string>
     <string name="seed_color_selected">Selected</string>
-    <string name="custom_color_picker">Custom Color Picker</string>
+    <string name="custom_color_picker">Custom</string>
+    <string name="pick_a_color">Pick a color</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="log_in">Log In</string>

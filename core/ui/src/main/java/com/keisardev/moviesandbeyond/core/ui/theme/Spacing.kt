@@ -67,8 +67,12 @@ object Spacing {
     /** Content padding for feed screens top - 8.dp */
     val feedTopPadding = xs
 
-    /** Content padding for feed screens bottom - 16.dp */
-    val feedBottomPadding = md
+    /**
+     * Content padding for feed screens bottom - accounts for floating navigation bar. The bar is
+     * 80.dp height + 8.dp vertical padding + navigation bar insets (~48dp on most devices). Using
+     * 100.dp ensures content isn't hidden behind the floating bar.
+     */
+    val feedBottomPadding = 100.dp
 
     /** Spacing between inline elements (text, icons) - 8.dp */
     val inlineSpacing = xs

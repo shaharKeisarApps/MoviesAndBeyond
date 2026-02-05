@@ -4,6 +4,7 @@ import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
+import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestLibraryRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestUserRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.testAccountDetails
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.testUserData
@@ -23,13 +24,18 @@ import org.junit.Test
 class YouViewModelTest {
     private val authRepository = TestAuthRepository()
     private val userRepository = TestUserRepository()
+    private val libraryRepository = TestLibraryRepository()
     private lateinit var viewModel: YouViewModel
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
-        viewModel = YouViewModel(authRepository = authRepository, userRepository = userRepository)
+        viewModel =
+            YouViewModel(
+                authRepository = authRepository,
+                userRepository = userRepository,
+                libraryRepository = libraryRepository)
     }
 
     @Test
@@ -122,6 +128,27 @@ class YouViewModelTest {
         viewModel.onRefresh()
 
         assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+
+        uiStateCollectJob.cancel()
+        loggedInCollectJob.cancel()
+    }
+
+    @Test
+    fun `test refresh syncs favorites and watchlist from TMDB`() = runTest {
+        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val loggedInCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.isLoggedIn.collect() }
+
+        // Setup: user is logged in
+        authRepository.setAuthStatus(true)
+        libraryRepository.resetSyncCallCounts()
+
+        // Act: user pulls to refresh
+        viewModel.onRefresh()
+
+        // Assert: sync methods are called to pull latest TMDB data
+        assertEquals(1, libraryRepository.syncFavoritesCallCount)
+        assertEquals(1, libraryRepository.syncWatchlistCallCount)
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()

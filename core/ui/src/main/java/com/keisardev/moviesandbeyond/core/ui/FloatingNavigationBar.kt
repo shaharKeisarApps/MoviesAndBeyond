@@ -4,16 +4,19 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
@@ -21,49 +24,72 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeChild
 
 /**
  * A TIVI-style floating navigation bar with proper Surface, elevation, and gradient border.
  *
  * This navigation bar provides a modern floating appearance with:
- * - Surface with NavigationBar elevation and colors
+ * - Blur effect applied to the bar itself (not the surrounding area)
+ * - Transparent padding around the bar for true floating effect
  * - Gradient border from surfaceVariant to surfaceVariant @ 0.3 alpha
  * - ExtraLarge rounded shape
- * - 64dp height (TIVI-style)
+ * - 80dp height (TIVI-style)
  * - Accessible selectableGroup modifier
  *
+ * @param hazeState The haze state for blur effect
  * @param modifier The modifier to be applied to the navigation bar
  * @param content The navigation items to display in the bar
  */
 @Composable
-fun FloatingNavigationBar(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+fun FloatingNavigationBar(
+    hazeState: HazeState,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
     val colorScheme = MaterialTheme.colorScheme
 
-    Surface(
+    // Padding wrapper - this area is TRANSPARENT (no blur)
+    Box(
         modifier =
             modifier
-                .padding(horizontal = 16.dp)
-                .height(64.dp)
-                .border(
-                    width = 0.5.dp,
-                    brush =
-                        Brush.verticalGradient(
-                            colors =
-                                listOf(
-                                    colorScheme.surfaceVariant,
-                                    colorScheme.surfaceVariant.copy(alpha = 0.3f))),
-                    shape = MaterialTheme.shapes.extraLarge),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = NavigationBarDefaults.containerColor,
-        tonalElevation = NavigationBarDefaults.Elevation) {
-            Row(
-                modifier = Modifier.selectableGroup(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                content = content)
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 16.dp, vertical = 8.dp)) {
+            // Surface with blur - ONLY the bar itself has blur
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge,
+                color = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 0.dp,
+                border =
+                    BorderStroke(
+                        width = 0.5.dp,
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        colorScheme.surfaceVariant,
+                                        colorScheme.surfaceVariant.copy(alpha = 0.3f)))),
+                modifier =
+                    Modifier.clip(MaterialTheme.shapes.extraLarge)
+                        .hazeChild(state = hazeState) // Blur clipped to rounded shape
+                ) {
+                    Row(
+                        modifier =
+                            Modifier.padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .selectableGroup(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = content)
+                }
         }
 }
 

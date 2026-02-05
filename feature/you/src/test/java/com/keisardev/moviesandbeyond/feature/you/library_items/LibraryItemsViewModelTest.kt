@@ -3,6 +3,7 @@ package com.keisardev.moviesandbeyond.feature.you.library_items
 import androidx.lifecycle.SavedStateHandle
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
+import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestLibraryRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.testLibraryItems
 import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
@@ -19,6 +20,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class LibraryItemsViewModelTest {
     private val libraryRepository = TestLibraryRepository()
+    private val authRepository = TestAuthRepository()
     private lateinit var viewModel: LibraryItemsViewModel
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
@@ -143,5 +145,6 @@ class LibraryItemsViewModelTest {
         LibraryItemsViewModel(
             savedStateHandle =
                 SavedStateHandle(mapOf(libraryItemTypeNavigationArgument to navigationArgument)),
-            libraryRepository = libraryRepository)
+            libraryRepository = libraryRepository,
+            authRepository = authRepository)
 }

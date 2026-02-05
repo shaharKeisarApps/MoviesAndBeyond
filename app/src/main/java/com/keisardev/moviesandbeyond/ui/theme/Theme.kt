@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
@@ -9,8 +10,11 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.materialkolor.dynamiccolor.MaterialDynamicColors
 import com.materialkolor.hct.Hct
@@ -105,12 +109,12 @@ fun supportsDynamicColorTheme(): Boolean = Build.VERSION.SDK_INT >= Build.VERSIO
 /**
  * Generates a Material3 ColorScheme from a seed color using Material Design color utilities.
  *
- * @param seedColor The seed color to generate the scheme from
+ * @param seedColorArgb The seed color ARGB value to generate the scheme from
  * @param isDark Whether to generate a dark or light color scheme
  * @return A ColorScheme generated from the seed color
  */
-private fun generateColorSchemeFromSeed(seedColor: SeedColor, isDark: Boolean): ColorScheme {
-    val hct = Hct.fromInt(seedColor.argb.toInt())
+private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): ColorScheme {
+    val hct = Hct.fromInt(seedColorArgb.toInt())
     val scheme = SchemeTonalSpot(hct, isDark, 0.0)
     val dynamicColors = MaterialDynamicColors()
 
@@ -210,6 +214,7 @@ private fun generateColorSchemeFromSeed(seedColor: SeedColor, isDark: Boolean): 
  * @param darkTheme Whether to use dark theme (default: system preference)
  * @param dynamicColor Whether to use Material You dynamic colors on Android 12+
  * @param seedColor The seed color to use when dynamic color is disabled or unavailable
+ * @param customColorArgb The custom color ARGB value to use when seedColor is CUSTOM
  * @param content The composable content to apply theme to
  */
 @Composable
@@ -217,6 +222,7 @@ fun MoviesAndBeyondTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     seedColor: SeedColor = SeedColor.DEFAULT,
+    customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
     content: @Composable () -> Unit
 ) {
     val colorScheme =
@@ -229,11 +235,28 @@ fun MoviesAndBeyondTheme(
                 // Use the custom cinematic theme when DEFAULT seed color is selected
                 if (darkTheme) cinematicDarkScheme else cinematicLightScheme
             }
+            seedColor == SeedColor.CUSTOM -> {
+                // Use custom color ARGB for CUSTOM seed color
+                generateColorSchemeFromSeed(customColorArgb, darkTheme)
+            }
             else -> {
-                // Generate color scheme from seed color
-                generateColorSchemeFromSeed(seedColor, darkTheme)
+                // Generate color scheme from preset seed color
+                generateColorSchemeFromSeed(seedColor.argb, darkTheme)
             }
         }
+
+    // Update system bars to match the theme in edge-to-edge mode
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            val insetsController = WindowCompat.getInsetsController(window, view)
+
+            // Ensure status bar icons and navigation bar icons have proper contrast
+            insetsController.isAppearanceLightStatusBars = !darkTheme
+            insetsController.isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,

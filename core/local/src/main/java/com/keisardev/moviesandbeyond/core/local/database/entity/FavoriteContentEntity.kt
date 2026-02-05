@@ -28,7 +28,7 @@ data class FavoriteContentEntity(
 fun LibraryItem.asFavoriteContentEntity(syncStatus: SyncStatus = SyncStatus.SYNCED) =
     FavoriteContentEntity(
         mediaId = id,
-        mediaType = mediaType,
+        mediaType = mediaType.lowercase(), // Ensure lowercase for DAO query compatibility
         imagePath = imagePath,
         name = name,
         syncStatus = syncStatus,

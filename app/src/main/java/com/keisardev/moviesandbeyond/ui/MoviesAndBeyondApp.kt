@@ -48,9 +48,12 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
 
             HazeScaffold(
                 hazeState = hazeState,
+                blurBottomBar =
+                    false, // Don't blur the wrapper - FloatingNavigationBar handles its own blur
                 bottomBar = {
                     if (showBottomBar) {
                         MoviesAndBeyondNavigationBar(
+                            hazeState = hazeState, // Pass hazeState to FloatingNavigationBar
                             destinations = bottomBarDestinations,
                             selectedDestination =
                                 topLevelRouteToDestination(
@@ -73,18 +76,20 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
  * A TIVI-style floating navigation bar with animated navigation items.
  *
  * Features:
- * - Transparent background with gradient border
+ * - Blur effect on the bar itself (not surrounding area)
+ * - Transparent padding for true floating effect
  * - Spring scale animation on selected items
  * - Crossfade icon transitions between selected/unselected states
  */
 @Composable
 fun MoviesAndBeyondNavigationBar(
+    hazeState: HazeState,
     destinations: List<MoviesAndBeyondDestination>,
     selectedDestination: MoviesAndBeyondDestination?,
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    FloatingNavigationBar(modifier = modifier) {
+    FloatingNavigationBar(hazeState = hazeState, modifier = modifier) {
         destinations.forEach { destination ->
             val selected = destination == selectedDestination
             AnimatedNavigationItem(

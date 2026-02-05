@@ -37,10 +37,14 @@ constructor(
     private val syncScheduler: SyncScheduler
 ) : LibraryRepository {
     override val favoriteMovies: Flow<List<LibraryItem>> =
-        favoriteContentDao.getFavoriteMovies().map { it.map(FavoriteContentEntity::asLibraryItem) }
+        favoriteContentDao.getFavoriteMovies().map { entities ->
+            entities.map(FavoriteContentEntity::asLibraryItem)
+        }
 
     override val favoriteTvShows: Flow<List<LibraryItem>> =
-        favoriteContentDao.getFavoriteTvShows().map { it.map(FavoriteContentEntity::asLibraryItem) }
+        favoriteContentDao.getFavoriteTvShows().map { entities ->
+            entities.map(FavoriteContentEntity::asLibraryItem)
+        }
 
     override val moviesWatchlist: Flow<List<LibraryItem>> =
         watchlistContentDao.getMoviesWatchlist().map {
@@ -257,6 +261,11 @@ constructor(
                             mediaId = id,
                             favorite = itemExistsLocally)
                     tmdbApi.addOrRemoveFavorite(accountId, favoriteRequest)
+                    // Update sync status after successful API call
+                    if (itemExistsLocally) {
+                        favoriteContentDao.updateSyncStatus(
+                            id, mediaType.name.lowercase(), SyncStatus.SYNCED)
+                    }
                 }
 
                 LibraryItemType.WATCHLIST -> {
@@ -266,6 +275,11 @@ constructor(
                             mediaId = id,
                             watchlist = itemExistsLocally)
                     tmdbApi.addOrRemoveFromWatchlist(accountId, watchlistRequest)
+                    // Update sync status after successful API call
+                    if (itemExistsLocally) {
+                        watchlistContentDao.updateSyncStatus(
+                            id, mediaType.name.lowercase(), SyncStatus.SYNCED)
+                    }
                 }
             }
             true
@@ -314,7 +328,9 @@ constructor(
 
                 favoriteItems
                     .filter {
-                        Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
+                        // Only consider SYNCED items as stale (not LOCAL_ONLY or PENDING_PUSH)
+                        it.syncStatus == SyncStatus.SYNCED &&
+                            Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
                             syncScheduler.isWorkNotScheduled(
                                 mediaId = it.mediaId,
                                 mediaType = mediaType,
@@ -348,7 +364,10 @@ constructor(
             },
             updateLocalSource = { libraryItems, staleItems ->
                 favoriteContentDao.syncFavoriteItems(
-                    upsertItems = libraryItems.map { item -> item.asFavoriteContentEntity() },
+                    upsertItems =
+                        libraryItems.map { item ->
+                            item.asFavoriteContentEntity(SyncStatus.SYNCED)
+                        },
                     deleteItems = staleItems)
             })
     }
@@ -391,7 +410,9 @@ constructor(
 
                 watchlistItems
                     .filter {
-                        Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
+                        // Only consider SYNCED items as stale (not LOCAL_ONLY or PENDING_PUSH)
+                        it.syncStatus == SyncStatus.SYNCED &&
+                            Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
                             syncScheduler.isWorkNotScheduled(
                                 mediaId = it.mediaId,
                                 mediaType = mediaType,
@@ -425,7 +446,10 @@ constructor(
             },
             updateLocalSource = { libraryItems, staleItems ->
                 watchlistContentDao.syncWatchlistItems(
-                    upsertItems = libraryItems.map { item -> item.asWatchlistContentEntity() },
+                    upsertItems =
+                        libraryItems.map { item ->
+                            item.asWatchlistContentEntity(SyncStatus.SYNCED)
+                        },
                     deleteItems = staleItems)
             })
     }

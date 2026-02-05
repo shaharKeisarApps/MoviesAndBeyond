@@ -32,7 +32,8 @@ constructor(
                     useDynamicColor = it.useDynamicColor,
                     darkMode = it.darkMode,
                     hideOnboarding = it.hideOnboarding,
-                    seedColor = it.seedColor)
+                    seedColor = it.seedColor,
+                    customColorArgb = it.customColorArgb)
             }
             .stateInWhileSubscribed(
                 scope = viewModelScope,
@@ -60,6 +61,7 @@ sealed interface MainActivityUiState {
         val useDynamicColor: Boolean,
         val darkMode: SelectedDarkMode,
         val hideOnboarding: Boolean,
-        val seedColor: SeedColor
+        val seedColor: SeedColor,
+        val customColorArgb: Long
     ) : MainActivityUiState
 }

@@ -1,10 +1,21 @@
 package com.keisardev.moviesandbeyond.feature.you.library_items
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,30 +26,46 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Movie
+import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,17 +88,21 @@ import kotlinx.coroutines.launch
 fun LibraryItemsRoute(
     onBackClick: () -> Unit,
     navigateToDetails: (String) -> Unit,
-    viewModel: LibraryItemsViewModel = hiltViewModel()
+    viewModel: LibraryItemsViewModel = hiltViewModel(),
+    libraryItemType: String? = null
 ) {
+    // For Navigation 3: Set the type from the route key
+    libraryItemType?.let { viewModel.setLibraryItemType(it) }
+
     val movieItems by viewModel.movieItems.collectAsStateWithLifecycle()
     val tvItems by viewModel.tvItems.collectAsStateWithLifecycle()
-    val libraryItemType by viewModel.libraryItemType.collectAsStateWithLifecycle()
+    val libraryItemTypeValue by viewModel.libraryItemType.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     LibraryItemsScreen(
         movieItems = movieItems,
         tvItems = tvItems,
-        libraryItemType = libraryItemType,
+        libraryItemType = libraryItemTypeValue,
         errorMessage = errorMessage,
         onDeleteItem = viewModel::deleteItem,
         onBackClick = onBackClick,
@@ -111,7 +142,8 @@ internal fun LibraryItemsScreen(
             TopAppBarWithBackButton(
                 title = { libraryItemTitle?.let { Text(text = it) } }, onBackClick = onBackClick)
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.surface) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
                 val libraryMediaTabs = LibraryMediaType.entries
                 val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
@@ -119,14 +151,40 @@ internal fun LibraryItemsScreen(
                 val selectedTabIndex by
                     remember(pagerState.currentPage) { mutableIntStateOf(pagerState.currentPage) }
 
-                TabRow(selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()) {
-                    libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
-                        Tab(
-                            selected = selectedTabIndex == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            text = { Text(text = stringResource(id = mediaTypeTab.displayName)) })
+                // Premium M3 PrimaryTabRow with surface container and icons
+                PrimaryTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceContainerLow),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    contentColor = MaterialTheme.colorScheme.onSurface) {
+                        libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = {
+                                    scope.launch { pagerState.animateScrollToPage(index) }
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector =
+                                            when (mediaTypeTab) {
+                                                LibraryMediaType.MOVIE -> Icons.Rounded.Movie
+                                                LibraryMediaType.TV -> Icons.Rounded.Tv
+                                            },
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp))
+                                },
+                                text = {
+                                    Text(
+                                        text = stringResource(id = mediaTypeTab.displayName),
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight =
+                                            if (selectedTabIndex == index) FontWeight.SemiBold
+                                            else FontWeight.Normal)
+                                })
+                        }
                     }
-                }
 
                 Spacer(Modifier.height(Spacing.xs))
 
@@ -164,37 +222,91 @@ private fun LibraryContent(
 ) {
     Box(Modifier.fillMaxSize()) {
         if (content.isEmpty()) {
-            // Empty state with icon and message
-            Column(
-                modifier = Modifier.align(Alignment.Center).padding(Spacing.screenPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    Icon(
-                        imageVector =
-                            if (libraryItemType == LibraryItemType.FAVORITE) {
-                                Icons.Rounded.Favorite
-                            } else {
-                                Icons.Rounded.Bookmark
-                            },
-                        contentDescription = null,
-                        modifier = Modifier.size(Dimens.iconSizeLarge),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                    Spacer(modifier = Modifier.height(Spacing.xs))
-                    Text(
-                        text = stringResource(id = R.string.no_items),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface)
-                    Text(
-                        text = stringResource(id = R.string.no_items_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center)
+            // Premium empty state with surface container and animations
+            var isVisible by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(100)
+                isVisible = true
+            }
+
+            AnimatedVisibility(
+                visible = isVisible,
+                enter =
+                    fadeIn(
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow)) +
+                        scaleIn(
+                            initialScale = 0.8f,
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow)),
+                modifier = Modifier.align(Alignment.Center)) {
+                    Column(
+                        modifier =
+                            Modifier.padding(Spacing.xl)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                    shape = MaterialTheme.shapes.extraLarge)
+                                .padding(Spacing.xl),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                            // Icon with primary color accent and subtle pulse animation
+                            val iconScale by
+                                animateFloatAsState(
+                                    targetValue = if (isVisible) 1f else 0.8f,
+                                    animationSpec =
+                                        spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow),
+                                    label = "icon_scale")
+
+                            Box(
+                                modifier =
+                                    Modifier.size(120.dp)
+                                        .scale(iconScale)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                            shape = CircleShape),
+                                contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector =
+                                            if (libraryItemType == LibraryItemType.FAVORITE) {
+                                                Icons.Rounded.Favorite
+                                            } else {
+                                                Icons.Rounded.Bookmark
+                                            },
+                                        contentDescription = null,
+                                        modifier = Modifier.size(Dimens.profileMediumSize),
+                                        tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                                }
+
+                            Text(
+                                text = stringResource(id = R.string.no_items),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface)
+
+                            Text(
+                                text = stringResource(id = R.string.no_items_description),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center)
+                        }
                 }
         } else {
             LazyVerticalContentGrid(
                 pagingEnabled = false,
                 contentPadding =
-                    PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
+                    PaddingValues(
+                        start = Spacing.screenPadding,
+                        end = Spacing.screenPadding,
+                        top = Spacing.md,
+                        bottom = Spacing.xl),
+                itemSpacing = Spacing.md) {
                     items(items = content, key = { it.id }) { item ->
                         // Convert string media type to SharedMediaType for shared elements
                         val sharedMediaType =
@@ -203,54 +315,228 @@ private fun LibraryContent(
                                 "tv" -> SharedMediaType.TvShow
                                 else -> null
                             }
-                        LibraryItemCard(
-                            posterPath = item.imagePath,
-                            sharedElementKey =
-                                sharedMediaType?.let {
-                                    MediaSharedElementKey(
-                                        mediaId = item.id.toLong(),
-                                        mediaType = it,
-                                        origin = SharedElementOrigin.LIBRARY,
-                                        elementType = SharedElementType.Image)
-                                },
-                            onItemClick = {
-                                onItemClick("${item.id},${item.mediaType.uppercase()}")
-                            },
-                            onDeleteClick = { onDeleteClick(item) })
+
+                        // Staggered entrance animation
+                        val itemIndex = content.indexOf(item)
+                        var isVisible by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(Unit) {
+                            kotlinx.coroutines.delay(itemIndex * 50L)
+                            isVisible = true
+                        }
+
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            enter =
+                                fadeIn(
+                                    animationSpec =
+                                        spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow)) +
+                                    scaleIn(
+                                        initialScale = 0.8f,
+                                        animationSpec =
+                                            spring(
+                                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                stiffness = Spring.StiffnessLow)),
+                            modifier = Modifier.animateItem()) {
+                                LibraryItemCard(
+                                    item = item,
+                                    posterPath = item.imagePath,
+                                    sharedElementKey =
+                                        sharedMediaType?.let {
+                                            MediaSharedElementKey(
+                                                mediaId = item.id.toLong(),
+                                                mediaType = it,
+                                                origin = SharedElementOrigin.LIBRARY,
+                                                elementType = SharedElementType.Image)
+                                        },
+                                    onItemClick = {
+                                        onItemClick("${item.id},${item.mediaType.uppercase()}")
+                                    },
+                                    onDeleteClick = { onDeleteClick(item) })
+                            }
                     }
                 }
         }
     }
 }
 
-/** Library item card with delete button overlay. */
+/**
+ * Library item card with Material 3 swipe-to-delete pattern.
+ *
+ * Features:
+ * - Swipe gesture with error container background
+ * - Confirmation dialog before deletion (M3 requirement for destructive actions)
+ * - Haptic feedback on swipe threshold
+ * - Smooth animations (fadeOut + shrinkVertically)
+ * - Delete button fallback
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LibraryItemCard(
+    item: LibraryItem,
     posterPath: String,
     sharedElementKey: MediaSharedElementKey? = null,
     onItemClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    Box {
-        MediaItemCard(
-            posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var itemVisible by remember { mutableStateOf(true) }
+    val hapticFeedback = LocalHapticFeedback.current
 
-        // Delete button with modern styling
-        IconButton(
-            onClick = onDeleteClick,
-            colors =
-                IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
-            modifier =
-                Modifier.align(Alignment.TopEnd)
-                    .padding(Spacing.xxs)
-                    .size(32.dp)
-                    .clip(CircleShape)) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete),
-                    modifier = Modifier.size(Dimens.iconSizeSmall))
-            }
+    val dismissState =
+        rememberSwipeToDismissBoxState(
+            confirmValueChange = { dismissValue ->
+                when (dismissValue) {
+                    SwipeToDismissBoxValue.StartToEnd,
+                    SwipeToDismissBoxValue.EndToStart -> {
+                        // Haptic feedback on swipe threshold
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        // Show confirmation dialog
+                        showDeleteDialog = true
+                        false // Don't dismiss yet, wait for confirmation
+                    }
+                    SwipeToDismissBoxValue.Settled -> false
+                }
+            })
+
+    // Reset swipe state when dialog is dismissed
+    LaunchedEffect(showDeleteDialog) {
+        if (!showDeleteDialog && dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+        }
+    }
+
+    // Confirmation dialog
+    if (showDeleteDialog) {
+        DeleteConfirmationDialog(
+            onConfirm = {
+                showDeleteDialog = false
+                itemVisible = false
+                onDeleteClick()
+            },
+            onDismiss = { showDeleteDialog = false })
+    }
+
+    AnimatedVisibility(
+        visible = itemVisible,
+        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))) {
+            SwipeToDismissBox(
+                state = dismissState,
+                enableDismissFromStartToEnd = true,
+                enableDismissFromEndToStart = true,
+                backgroundContent = {
+                    // Error container background with delete icon
+                    val backgroundColor by
+                        animateFloatAsState(
+                            targetValue =
+                                when (dismissState.targetValue) {
+                                    SwipeToDismissBoxValue.StartToEnd,
+                                    SwipeToDismissBoxValue.EndToStart -> 1f
+                                    else -> 0f
+                                },
+                            animationSpec = spring(),
+                            label = "background_alpha")
+
+                    Box(
+                        modifier =
+                            Modifier.fillMaxSize()
+                                .background(
+                                    MaterialTheme.colorScheme.errorContainer.copy(
+                                        alpha = backgroundColor),
+                                    shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = Spacing.md),
+                        contentAlignment =
+                            when (dismissState.dismissDirection) {
+                                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                                else -> Alignment.Center
+                            }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(id = R.string.delete),
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.size(Dimens.iconSizeMedium))
+                        }
+                }) {
+                    // Card with delete button overlay
+                    Box {
+                        MediaItemCard(
+                            posterPath = posterPath,
+                            sharedElementKey = sharedElementKey,
+                            onItemClick = onItemClick)
+
+                        // Delete button overlay (fallback for users who don't discover swipe)
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            colors =
+                                IconButtonDefaults.iconButtonColors(
+                                    containerColor =
+                                        MaterialTheme.colorScheme.errorContainer.copy(
+                                            alpha = 0.95f),
+                                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
+                            modifier =
+                                Modifier.align(Alignment.TopEnd)
+                                    .padding(Spacing.xxs)
+                                    .size(32.dp)
+                                    .clip(CircleShape)) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(id = R.string.delete),
+                                    modifier = Modifier.size(Dimens.iconSizeSmall))
+                            }
+                    }
+                }
+        }
+}
+
+/** Material 3 confirmation dialog for destructive delete action. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp) {
+            Column(
+                modifier = Modifier.padding(Spacing.lg),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    // Icon
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(Dimens.iconSize))
+
+                    // Title
+                    Text(
+                        text = stringResource(id = R.string.delete),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold)
+
+                    // Message
+                    Text(
+                        text = "Are you sure you want to remove this item from your library?",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    // Actions
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically) {
+                            TextButton(onClick = onDismiss) {
+                                Text(stringResource(id = R.string.cancel))
+                            }
+
+                            Spacer(Modifier.size(Spacing.xs))
+
+                            TextButton(onClick = onConfirm) {
+                                Text(
+                                    stringResource(id = R.string.delete),
+                                    color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                }
+        }
     }
 }

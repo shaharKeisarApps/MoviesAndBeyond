@@ -56,9 +56,13 @@ class MainActivity : ComponentActivity() {
             val darkTheme = shouldUseDarkTheme(uiState)
             val dynamicColor = shouldUseDynamicColor(uiState)
             val seedColor = getSeedColor(uiState)
+            val customColorArgb = getCustomColorArgb(uiState)
 
             MoviesAndBeyondTheme(
-                darkTheme = darkTheme, dynamicColor = dynamicColor, seedColor = seedColor) {
+                darkTheme = darkTheme,
+                dynamicColor = dynamicColor,
+                seedColor = seedColor,
+                customColorArgb = customColorArgb) {
                     if (uiState is Success) {
                         MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
                     }
@@ -92,5 +96,12 @@ private fun getSeedColor(uiState: MainActivityUiState): SeedColor {
     return when (uiState) {
         Loading -> SeedColor.DEFAULT
         is Success -> uiState.seedColor
+    }
+}
+
+private fun getCustomColorArgb(uiState: MainActivityUiState): Long {
+    return when (uiState) {
+        Loading -> SeedColor.DEFAULT_CUSTOM_COLOR_ARGB
+        is Success -> uiState.customColorArgb
     }
 }

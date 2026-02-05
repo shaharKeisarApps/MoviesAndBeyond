@@ -27,6 +27,13 @@ class TestLibraryRepository : LibraryRepository {
     // Track sync status for test items
     private val syncStatusMap = mutableMapOf<Pair<Int, String>, SyncStatus>()
 
+    // Track sync method calls for testing
+    var syncFavoritesCallCount = 0
+        private set
+
+    var syncWatchlistCallCount = 0
+        private set
+
     override val favoriteMovies: Flow<List<LibraryItem>> = _movies.asStateFlow()
 
     override val favoriteTvShows: Flow<List<LibraryItem>> = _tvShows.asStateFlow()
@@ -115,11 +122,22 @@ class TestLibraryRepository : LibraryRepository {
         itemExistsLocally: Boolean
     ): Boolean = true
 
-    override suspend fun syncFavorites(): Boolean = true
+    override suspend fun syncFavorites(): Boolean {
+        syncFavoritesCallCount++
+        return true
+    }
 
-    override suspend fun syncWatchlist(): Boolean = true
+    override suspend fun syncWatchlist(): Boolean {
+        syncWatchlistCallCount++
+        return true
+    }
 
     fun generateError(value: Boolean) {
         generateError = value
+    }
+
+    fun resetSyncCallCounts() {
+        syncFavoritesCallCount = 0
+        syncWatchlistCallCount = 0
     }
 }

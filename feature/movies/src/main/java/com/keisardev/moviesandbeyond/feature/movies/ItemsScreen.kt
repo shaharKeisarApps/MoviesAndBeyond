@@ -3,8 +3,8 @@ package com.keisardev.moviesandbeyond.feature.movies
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,7 +29,11 @@ import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+
+/** Poster aspect ratio (2:3) for consistent grid item sizing */
+private const val POSTER_ASPECT_RATIO = 2f / 3f
 
 @Composable
 fun ItemsRoute(
@@ -72,6 +77,9 @@ internal fun ItemsScreen(
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
+    // Stable callback to avoid recomposition
+    val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
+
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
@@ -84,25 +92,45 @@ internal fun ItemsScreen(
                     itemsEmpty = content.items.isEmpty(),
                     isLoading = content.isLoading,
                     endReached = content.endReached,
-                    contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
-                    appendItems = { appendItems(content.category) }) {
-                        items(items = content.items, key = { it.id }) { item ->
-                            MediaItemCard(
-                                posterPath = item.imagePath,
-                                sharedElementKey =
-                                    MediaSharedElementKey(
-                                        mediaId = item.id.toLong(),
-                                        mediaType = SharedMediaType.Movie,
-                                        origin = SharedElementOrigin.MOVIES_ITEMS,
-                                        elementType = SharedElementType.Image),
-                                onItemClick = { onItemClick("${item.id},${MediaType.MOVIE}") },
-                                modifier = Modifier.fillMaxWidth().height(Dimens.cardHeight))
-                        }
+                    contentPadding =
+                        PaddingValues(
+                            horizontal = Dimens.gridContentPadding,
+                            vertical = Spacing.screenPaddingVertical),
+                    minCellWidth = PosterSize.MEDIUM.width,
+                    itemSpacing = Dimens.gridItemSpacing,
+                    appendItems = stableAppendItems) {
+                        items(
+                            items = content.items,
+                            key = { it.id },
+                            contentType = { "media_item" }) { item ->
+                                // Use stable callbacks to prevent unnecessary recomposition
+                                val stableItemClick =
+                                    remember(item.id) {
+                                        { onItemClick("${item.id},${MediaType.MOVIE}") }
+                                    }
+                                val sharedElementKey =
+                                    remember(item.id) {
+                                        MediaSharedElementKey(
+                                            mediaId = item.id.toLong(),
+                                            mediaType = SharedMediaType.Movie,
+                                            origin = SharedElementOrigin.MOVIES_ITEMS,
+                                            elementType = SharedElementType.Image)
+                                    }
+                                // Use aspectRatio for equal sizing that adapts to grid cell width
+                                MediaItemCard(
+                                    posterPath = item.imagePath,
+                                    sharedElementKey = sharedElementKey,
+                                    onItemClick = stableItemClick,
+                                    modifier =
+                                        Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO))
+                            }
                         if (content.isLoading) {
-                            item {
-                                Box(modifier = Modifier.fillMaxWidth().height(Dimens.cardHeight)) {
-                                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                                }
+                            item(contentType = "loading") {
+                                Box(
+                                    modifier =
+                                        Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO)) {
+                                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                                    }
                             }
                         }
                     }

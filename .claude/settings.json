@@ -1,27 +1,241 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Write|Edit|MultiEdit)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_INPUT_file_path\" ] && npx @claude-flow/cli@latest hooks pre-edit --file \"$TOOL_INPUT_file_path\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_INPUT_command\" ] && npx @claude-flow/cli@latest hooks pre-command --command \"$TOOL_INPUT_command\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Task$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_INPUT_prompt\" ] && npx @claude-flow/cli@latest hooks pre-task --task-id \"task-$(date +%s)\" --description \"$TOOL_INPUT_prompt\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Write|Edit|MultiEdit)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_INPUT_file_path\" ] && npx @claude-flow/cli@latest hooks post-edit --file \"$TOOL_INPUT_file_path\" --success \"${TOOL_SUCCESS:-true}\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_INPUT_command\" ] && npx @claude-flow/cli@latest hooks post-command --command \"$TOOL_INPUT_command\" --success \"${TOOL_SUCCESS:-true}\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Task$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$TOOL_RESULT_agent_id\" ] && npx @claude-flow/cli@latest hooks post-task --task-id \"$TOOL_RESULT_agent_id\" --success \"${TOOL_SUCCESS:-true}\" 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"\\n# PARALLEL-FIRST EXECUTION (MANDATORY)\\n\\nFor ANY multi-task request:\\n1. Identify INDEPENDENT subtasks\\n2. Route to appropriate specialist subagents (data-layer-specialist, presentation-layer-specialist, di-layer-specialist)\\n3. Launch ALL independent subagents in a SINGLE message\\n4. Do NOT execute sequentially when parallel is possible\\n\\nExamples:\\n- \\\"Execute specs: A, B, C\\\" → Launch 3 parallel Task agents\\n- \\\"Add caching to details\\\" → Launch data-layer + presentation-layer + DI parallel\\n- \\\"Research and implement X\\\" → Launch Explore + Researcher parallel\\n\\n---\\n\\n# Task Orchestrator Communication Style\\n\\nYou are coordinating task orchestration workflows. Use this communication style for clear, professional coordination.\\n\\n---\\n\\n## Voice & Tone\\n\\n**Voice:** Professional coordinator - decisive, concise, transparent\\n**Approach:** Action-oriented with clear status indicators\\n\\n**Tone by Context:**\\n- **Coordination:** Direct and confident (\\\"Loading Feature Orchestration Skill...\\\")\\n- **Progress:** Factual and concise (\\\"Batch 1: 2/2 completed\\\")\\n- **Errors:** Clear and actionable (\\\"⚠️ Blocker detected. Resolving via...\\\")\\n- **Handoffs:** Explicit and transparent (\\\"Launching Feature Architect with file path...\\\")\\n\\n---\\n\\n## Response Structure\\n\\n**Standard Format:**\\n1. **Status First** - Lead with current state/progress using indicators\\n2. **Action Second** - State what you're doing next\\n3. **Context Last** - Brief reasoning only if needed\\n\\n**Status Indicators:**\\n- ✅ Success / Completed\\n- ⚠️ Warning / Attention needed\\n- ❌ Error / Blocked\\n- 🔄 In progress / Loading\\n\\n---\\n\\n## Format Preferences\\n\\n**Phase Labels:**\\nUse clear phase markers for orchestration:\\n- \\\"Phase 1: Feature Creation\\\"\\n- \\\"Phase 2: Task Breakdown\\\"\\n- \\\"Phase 3: Task Execution\\\"\\n- \\\"Phase 4: Feature Completion\\\"\\n\\n**Progress Updates:**\\nKeep to 2-3 sentences unless error requires explanation:\\n```\\n✅ Phase 1 Complete: Feature created (ID: abc-123)\\nLoading Task Orchestration Skill for execution...\\n```\\n\\n**JSON Outputs:**\\nUse code blocks for subagent outputs:\\n```json\\n{\\n  \\\"featureId\\\": \\\"abc-123\\\",\\n  \\\"status\\\": \\\"planning\\\",\\n  \\\"readyForBreakdown\\\": true\\n}\\n```\\n\\n**Lists and Tables:**\\nUse for multi-item status:\\n```\\nBatch 1 Progress:\\n- Database schema: ✅ completed (450 chars)\\n- Backend API: ✅ completed (380 chars)\\n```\\n\\n---\\n\\n## Examples\\n\\n### ✅ Good (Follows Style)\\n\\n**Coordination:**\\n```\\nLoading Feature Orchestration Skill...\\nCreating feature from user requirements.\\n```\\n\\n**Progress:**\\n```\\n✅ Phase 1 Complete: Feature created (ID: abc-123)\\nPhase 2: Loading Feature Orchestration Skill for task breakdown...\\n```\\n\\n**Error:**\\n```\\n⚠️ Blocker: Missing config file at .taskorchestrator/config.yaml\\nOffering resolution options to user...\\n```\\n\\n**Handoff:**\\n```\\nLaunching Feature Architect (Opus) with:\\n- File path: D:\\\\requirements.md\\n- Project: MCP Task Orchestrator\\n\\nWaiting for completion...\\n```\\n\\n### ❌ Bad (Too Verbose)\\n\\n**Coordination:**\\n```\\nI'm going to now proceed to load the Feature Orchestration Skill in order to help you create a feature based on your requirements. This skill will guide me through the process of feature creation and ensure that all the necessary steps are followed correctly.\\n```\\n\\n**Progress:**\\n```\\nI've successfully completed the first phase of the orchestration workflow. The feature has been created with the following details: name, summary, description, and all required sections. The feature ID is abc-123. Now I'm going to proceed to the next phase which involves breaking down the feature into tasks.\\n```\\n\\n---\\n\\n## Consistency Guidelines\\n\\n**Skill References:**\\nAlways use proper skill names with command format:\\n- ✅ \\\"Loading Feature Orchestration Skill...\\\"\\n- ✅ \\\"Using Status Progression Skill to validate...\\\"\\n- ❌ \\\"I'll use the feature orchestration skill now...\\\"\\n\\n**Subagent References:**\\nUse agent name + model when launching:\\n- ✅ \\\"Launching Feature Architect (Opus)...\\\"\\n- ✅ \\\"Implementation Specialist (Haiku) working on database schema...\\\"\\n- ❌ \\\"Launching the feature architect subagent...\\\"\\n\\n**Status Updates:**\\nAlways include concrete metrics:\\n- ✅ \\\"Tasks: 8/10 completed\\\"\\n- ✅ \\\"Summary length: 450 chars (validated)\\\"\\n- ❌ \\\"Most tasks are done\\\"\\n\\n---\\n\\n## When NOT Orchestrating\\n\\nWhen performing standard software engineering work (not orchestration):\\n- Use professional, collaborative tone\\n- Don't use phase labels or orchestration indicators\\n- Focus on technical clarity and precision\\n- Still be concise, but less rigid in structure\\n\\n---\\n\\n**Communication style only.** For workflow guidance, use:\\n- MCP Workflow: `/coordinate_feature_development`\\n- Skills: `feature-orchestration`, `task-orchestration`, `status-progression`\\n\\n---\\n\\n**Version:** 2.0.0 (plugin-based)\\n**Token count:** ~600 tokens\\n\"}}'",
-            "timeout": 5000
+            "command": "[ -n \"$PROMPT\" ] && npx @claude-flow/cli@latest hooks route --task \"$PROMPT\" || true",
+            "timeout": 5000,
+            "continueOnError": true
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "startup",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Success'",
-            "timeout": 5000
+            "command": "npx @claude-flow/cli@latest daemon start --quiet 2>/dev/null || true",
+            "timeout": 5000,
+            "continueOnError": true
+          },
+          {
+            "type": "command",
+            "command": "[ -n \"$SESSION_ID\" ] && npx @claude-flow/cli@latest hooks session-restore --session-id \"$SESSION_ID\" 2>/dev/null || true",
+            "timeout": 10000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"ok\": true}'",
+            "timeout": 1000
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$NOTIFICATION_MESSAGE\" ] && npx @claude-flow/cli@latest memory store --namespace notifications --key \"notify-$(date +%s)\" --value \"$NOTIFICATION_MESSAGE\" 2>/dev/null || true",
+            "timeout": 3000,
+            "continueOnError": true
           }
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx @claude-flow/cli@latest hooks statusline 2>/dev/null || node .claude/helpers/statusline.cjs 2>/dev/null || echo \"▊ Claude Flow V3\"",
+    "refreshMs": 5000,
+    "enabled": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npx claude-flow:*)",
+      "Bash(npx @claude-flow/cli:*)",
+      "mcp__claude-flow__:*"
+    ],
+    "deny": []
+  },
+  "attribution": {
+    "commit": "Co-Authored-By: claude-flow <ruv@ruv.net>",
+    "pr": "🤖 Generated with [claude-flow](https://github.com/ruvnet/claude-flow)"
+  },
+  "claudeFlow": {
+    "version": "3.0.0",
+    "enabled": true,
+    "modelPreferences": {
+      "default": "claude-opus-4-5-20251101",
+      "routing": "claude-3-5-haiku-20241022"
+    },
+    "swarm": {
+      "topology": "hierarchical-mesh",
+      "maxAgents": 15
+    },
+    "memory": {
+      "backend": "hybrid",
+      "enableHNSW": true
+    },
+    "neural": {
+      "enabled": true
+    },
+    "daemon": {
+      "autoStart": true,
+      "workers": [
+        "map",
+        "audit",
+        "optimize",
+        "consolidate",
+        "testgaps",
+        "ultralearn",
+        "deepdive",
+        "document",
+        "refactor",
+        "benchmark"
+      ],
+      "schedules": {
+        "audit": {
+          "interval": "1h",
+          "priority": "critical"
+        },
+        "optimize": {
+          "interval": "30m",
+          "priority": "high"
+        },
+        "consolidate": {
+          "interval": "2h",
+          "priority": "low"
+        },
+        "document": {
+          "interval": "1h",
+          "priority": "normal",
+          "triggers": [
+            "adr-update",
+            "api-change"
+          ]
+        },
+        "deepdive": {
+          "interval": "4h",
+          "priority": "normal",
+          "triggers": [
+            "complex-change"
+          ]
+        },
+        "ultralearn": {
+          "interval": "1h",
+          "priority": "normal"
+        }
+      }
+    },
+    "learning": {
+      "enabled": true,
+      "autoTrain": true,
+      "patterns": [
+        "coordination",
+        "optimization",
+        "prediction"
+      ],
+      "retention": {
+        "shortTerm": "24h",
+        "longTerm": "30d"
+      }
+    },
+    "adr": {
+      "autoGenerate": true,
+      "directory": "/docs/adr",
+      "template": "madr"
+    },
+    "ddd": {
+      "trackDomains": true,
+      "validateBoundedContexts": true,
+      "directory": "/docs/ddd"
+    },
+    "security": {
+      "autoScan": true,
+      "scanOnEdit": true,
+      "cveCheck": true,
+      "threatModel": true
+    }
   }
 }

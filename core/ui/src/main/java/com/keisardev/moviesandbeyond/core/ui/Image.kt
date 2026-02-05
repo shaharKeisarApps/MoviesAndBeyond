@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.IntSize
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
@@ -39,6 +38,9 @@ private val backdropImageOptions =
 
 private val profileImageOptions =
     ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(185, 278))
+
+// Cache for backdrop images with different content scales to avoid recreation
+private val backdropImageOptionsCache = mutableMapOf<ContentScale, ImageOptions>()
 
 /**
  * Reusable image component for person/cast profile images. Uses CircularRevealPlugin for animated
@@ -114,7 +116,7 @@ fun TmdbImage(
                     rememberImageComponent {
                         +ShimmerPlugin(
                             Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
-                        +CrossfadePlugin(duration = 350)
+                        // CrossfadePlugin removed - cached images display instantly
                     },
                 failure = {
                     Box(Modifier.matchParentSize()) {
@@ -208,14 +210,23 @@ fun TmdbBackdropImage(
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w1280$imageUrl" }
 
+        // PERFORMANCE: No crossfade for cached images - instant display
         val component = rememberImageComponent {
             +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
-            +CrossfadePlugin(duration = 300)
+            // CrossfadePlugin removed - cached images display instantly without flash/re-render
         }
+
+        // PERFORMANCE: Cache ImageOptions per contentScale to avoid recreation on recomposition
+        val imageOptions =
+            remember(contentScale) {
+                backdropImageOptionsCache.getOrPut(contentScale) {
+                    backdropImageOptions.copy(contentScale = contentScale)
+                }
+            }
 
         LandscapistImage(
             imageModel = { fullUrl },
-            imageOptions = backdropImageOptions.copy(contentScale = contentScale),
+            imageOptions = imageOptions,
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = {

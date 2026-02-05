@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.details
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -87,12 +88,9 @@ constructor(
         viewModelScope.launch {
             try {
                 val isLoggedIn = authRepository.isLoggedIn.first()
-                if (isLoggedIn) {
-                    _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
-                    libraryRepository.addOrRemoveFavorite(libraryItem, isLoggedIn)
-                } else {
-                    _uiState.update { it.copy(showSignInSheet = true) }
-                }
+                _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
+                // Save locally for both guest and authenticated users
+                libraryRepository.addOrRemoveFavorite(libraryItem, isLoggedIn)
             } catch (e: IOException) {
                 _uiState.update {
                     it.copy(
@@ -106,12 +104,9 @@ constructor(
         viewModelScope.launch {
             try {
                 val isLoggedIn = authRepository.isLoggedIn.first()
-                if (isLoggedIn) {
-                    _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
-                    libraryRepository.addOrRemoveFromWatchlist(libraryItem, isLoggedIn)
-                } else {
-                    _uiState.update { it.copy(showSignInSheet = true) }
-                }
+                _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
+                // Save locally for both guest and authenticated users
+                libraryRepository.addOrRemoveFromWatchlist(libraryItem, isLoggedIn)
             } catch (e: IOException) {
                 _uiState.update {
                     it.copy(
@@ -203,6 +198,7 @@ constructor(
     }
 }
 
+@Immutable
 data class DetailsUiState(
     val markedFavorite: Boolean = false,
     val savedInWatchlist: Boolean = false,
@@ -210,14 +206,15 @@ data class DetailsUiState(
     val errorMessage: String? = null
 )
 
+@Immutable
 sealed interface ContentDetailUiState {
     data object Loading : ContentDetailUiState
 
     data object Empty : ContentDetailUiState
 
-    data class Movie(val data: MovieDetails) : ContentDetailUiState
+    @Immutable data class Movie(val data: MovieDetails) : ContentDetailUiState
 
-    data class TV(val data: TvDetails) : ContentDetailUiState
+    @Immutable data class TV(val data: TvDetails) : ContentDetailUiState
 
-    data class Person(val data: PersonDetails) : ContentDetailUiState
+    @Immutable data class Person(val data: PersonDetails) : ContentDetailUiState
 }

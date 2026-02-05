@@ -2,6 +2,7 @@ package com.keisardev.moviesandbeyond.feature.you
 
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,7 +26,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Settings
@@ -47,11 +47,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -81,7 +80,6 @@ import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.image.LandscapistImage
-import kotlinx.coroutines.launch
 
 @Composable
 fun YouRoute(
@@ -92,10 +90,12 @@ fun YouRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userSettings by viewModel.userSettings.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val libraryItemCounts by viewModel.libraryItemCounts.collectAsStateWithLifecycle()
     YouScreen(
         uiState = uiState,
         isLoggedIn = isLoggedIn,
         userSettings = userSettings,
+        libraryItemCounts = libraryItemCounts,
         onChangeTheme = viewModel::setDynamicColorPreference,
         onChangeDarkMode = viewModel::setDarkModePreference,
         onChangeSeedColor = viewModel::setSeedColorPreference,
@@ -116,6 +116,7 @@ internal fun YouScreen(
     uiState: YouUiState,
     isLoggedIn: Boolean?,
     userSettings: UserSettings?,
+    libraryItemCounts: LibraryItemCounts,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
     onChangeSeedColor: (SeedColor) -> Unit,
@@ -131,12 +132,13 @@ internal fun YouScreen(
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    uiState.errorMessage?.let {
-        scope.launch { snackbarHostState.showSnackbar(it) }
-        onErrorShown()
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            onErrorShown()
+        }
     }
 
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
@@ -174,6 +176,7 @@ internal fun YouScreen(
                                 LoggedInView(
                                     accountDetails = it,
                                     isLoggingOut = uiState.isLoggingOut,
+                                    libraryItemCounts = libraryItemCounts,
                                     onLibraryItemClick = onLibraryItemClick,
                                     onLogOutClick = onLogOutClick)
                             }
@@ -181,7 +184,10 @@ internal fun YouScreen(
                                     isLoading = uiState.isLoading,
                                     onReloadAccountDetailsClick = onReloadAccountDetailsClick)
                         } else {
-                            LoggedOutView(onNavigateToAuth = onNavigateToAuth)
+                            LoggedOutView(
+                                libraryItemCounts = libraryItemCounts,
+                                onNavigateToAuth = onNavigateToAuth,
+                                onLibraryItemClick = onLibraryItemClick)
                         }
                     }
                 }
@@ -231,96 +237,197 @@ internal fun YouScreen(
 private fun LoggedInView(
     accountDetails: AccountDetails,
     isLoggingOut: Boolean,
+    libraryItemCounts: LibraryItemCounts,
     onLibraryItemClick: (String) -> Unit,
     onLogOutClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
-            PersonImage(imageUrl = accountDetails.avatar ?: "", modifier = Modifier.size(64.dp))
-            Text(
-                text = accountDetails.username,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold)
-            Text(
-                text = accountDetails.name,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            LibrarySection(onLibraryItemClick = onLibraryItemClick)
-
-            if (isLoggingOut) {
-                CircularProgressIndicator()
-            } else {
-                Button(onClick = onLogOutClick, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(id = R.string.log_out))
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg)) {
+            // Profile header section with premium surface
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            shape = MaterialTheme.shapes.extraLarge)
+                        .padding(Spacing.lg)) {
+                    PersonImage(
+                        imageUrl = accountDetails.avatar ?: "",
+                        modifier = Modifier.size(Dimens.profileLargeSize))
+                    Text(
+                        text = accountDetails.username,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        text = accountDetails.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+
+            // Library section
+            LibrarySection(
+                libraryItemCounts = libraryItemCounts, onLibraryItemClick = onLibraryItemClick)
+
+            // Logout section
+            if (isLoggingOut) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(vertical = Spacing.md),
+                    color = MaterialTheme.colorScheme.primary)
+            } else {
+                Button(
+                    onClick = onLogOutClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large) {
+                        Text(
+                            text = stringResource(id = R.string.log_out),
+                            style = MaterialTheme.typography.labelLarge)
+                    }
             }
         }
 }
 
 @Composable
-private fun LoggedOutView(onNavigateToAuth: () -> Unit) {
-    Box(Modifier.fillMaxSize()) {
-        Column(
-            modifier =
-                Modifier.fillMaxWidth(0.6f).padding(horizontal = 12.dp).align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp))
-                Text(
-                    text = stringResource(id = R.string.log_in_description),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge)
-                Button(onClick = onNavigateToAuth, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(id = R.string.log_in))
+private fun LoggedOutView(
+    libraryItemCounts: LibraryItemCounts,
+    onNavigateToAuth: () -> Unit,
+    onLibraryItemClick: (String) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+        modifier =
+            Modifier.fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg)) {
+            // Welcome card with premium surface
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            shape = MaterialTheme.shapes.extraLarge)
+                        .padding(Spacing.xl)) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(Dimens.iconSizeLarge),
+                        tint = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = stringResource(id = R.string.log_in_description),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Button(
+                        onClick = onNavigateToAuth,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large) {
+                            Text(
+                                text = stringResource(id = R.string.log_in),
+                                style = MaterialTheme.typography.labelLarge)
+                        }
                 }
-            }
-    }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = Spacing.sm),
+                color = MaterialTheme.colorScheme.outlineVariant)
+
+            // Guest mode library section
+            LibrarySection(
+                libraryItemCounts = libraryItemCounts, onLibraryItemClick = onLibraryItemClick)
+        }
 }
 
 @Composable
 private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: () -> Unit) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            Button(onClick = onReloadAccountDetailsClick, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(id = R.string.reload_account_details))
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize().padding(Spacing.screenPadding)) {
+            if (isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                        Text(
+                            text = stringResource(id = R.string.reload_account_details),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center)
+                        Button(
+                            onClick = onReloadAccountDetailsClick,
+                            shape = MaterialTheme.shapes.large) {
+                                Text(
+                                    text = stringResource(id = R.string.reload_account_details),
+                                    style = MaterialTheme.typography.labelLarge)
+                            }
+                    }
             }
         }
-    }
 }
 
 @Composable
-private fun LibrarySection(onLibraryItemClick: (String) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = stringResource(id = R.string.your_library),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold)
-        LibraryItemOption(
-            optionName = stringResource(id = R.string.favorites),
-            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) })
-        LibraryItemOption(
-            optionName = stringResource(id = R.string.watchlist),
-            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) })
-    }
+private fun LibrarySection(
+    libraryItemCounts: LibraryItemCounts,
+    onLibraryItemClick: (String) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(id = R.string.your_library),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = Spacing.xs))
+            LibraryItemOption(
+                optionName = stringResource(id = R.string.favorites),
+                itemCount = libraryItemCounts.favoritesCount,
+                onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) })
+            LibraryItemOption(
+                optionName = stringResource(id = R.string.watchlist),
+                itemCount = libraryItemCounts.watchlistCount,
+                onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) })
+        }
 }
 
 @Composable
-private fun LibraryItemOption(optionName: String, onClick: () -> Unit) {
+private fun LibraryItemOption(optionName: String, itemCount: Int, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier =
-            Modifier.fillMaxWidth().clickable(onClick = onClick).height(Dimens.listItemMinHeight)) {
-            Text(text = optionName, style = MaterialTheme.typography.bodyLarge)
+            Modifier.fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = MaterialTheme.shapes.large)
+                .clickable(onClick = onClick)
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm)) {
+            Text(
+                text = optionName,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface)
+            if (itemCount > 0) {
+                Text(
+                    text = itemCount.toString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier =
+                        Modifier.background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = CircleShape)
+                            .padding(horizontal = Spacing.sm, vertical = Spacing.xxs))
+            }
         }
 }
 
@@ -329,16 +436,16 @@ private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            Text(
-                text = stringResource(R.string.settings_dialog_dismiss_text),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
-            )
+            TextButton(onClick = onDismissRequest, shape = MaterialTheme.shapes.medium) {
+                Text(
+                    text = stringResource(R.string.settings_dialog_dismiss_text),
+                    style = MaterialTheme.typography.labelLarge)
+            }
         },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
                 modifier = Modifier.fillMaxWidth()) {
                     LandscapistImage(
                         imageModel = { R.drawable.tmdb_logo },
@@ -348,12 +455,16 @@ private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
                                 contentDescription =
                                     stringResource(id = R.string.tmdb_logo_description)),
                         modifier = Modifier.size(100.dp))
-                    Spacer(Modifier.height(8.dp))
                     Text(
                         text = stringResource(id = R.string.attribution_text),
-                        textAlign = TextAlign.Center)
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-        })
+        },
+        shape = MaterialTheme.shapes.extraLarge,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 0.dp)
 }
 
 @Composable
@@ -373,33 +484,33 @@ private fun SettingsDialog(
             title = {
                 Text(
                     text = stringResource(R.string.settings_dialog_title),
-                    style = MaterialTheme.typography.titleLarge,
-                )
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface)
             },
             text = {
-                HorizontalDivider()
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        SettingsPanel(
-                            settings = userSettings,
-                            onChangeTheme = onChangeTheme,
-                            onChangeDarkMode = onChangeDarkMode,
-                            onChangeSeedColor = onChangeSeedColor,
-                            onChangeCustomColorArgb = onChangeCustomColorArgb,
-                            onChangeIncludeAdult = onChangeIncludeAdult,
-                            onChangeUseLocalOnly = onChangeUseLocalOnly)
-                    }
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(modifier = Modifier.height(Spacing.sm))
+                    SettingsPanel(
+                        settings = userSettings,
+                        onChangeTheme = onChangeTheme,
+                        onChangeDarkMode = onChangeDarkMode,
+                        onChangeSeedColor = onChangeSeedColor,
+                        onChangeCustomColorArgb = onChangeCustomColorArgb,
+                        onChangeIncludeAdult = onChangeIncludeAdult,
+                        onChangeUseLocalOnly = onChangeUseLocalOnly)
+                }
             },
             confirmButton = {
-                Text(
-                    text = stringResource(R.string.settings_dialog_dismiss_text),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 8.dp).clickable { onDismissRequest() },
-                )
+                TextButton(onClick = onDismissRequest, shape = MaterialTheme.shapes.medium) {
+                    Text(
+                        text = stringResource(R.string.settings_dialog_dismiss_text),
+                        style = MaterialTheme.typography.labelLarge)
+                }
             },
-        )
+            shape = MaterialTheme.shapes.extraLarge,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 0.dp)
     }
 }
 
@@ -453,37 +564,52 @@ private fun SettingsPanel(
             selected = settings.darkMode == LIGHT,
             onClick = { onChangeDarkMode(LIGHT) })
     }
-    Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
-        SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
-        Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
-    }
-    Column {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    SettingsDialogSectionTitle(
-                        text = stringResource(id = R.string.settings_dialog_local_only))
-                    Text(
-                        text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+    Row(
+        modifier =
+            Modifier.fillMaxWidth()
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+            SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
+            Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
+        }
+    Row(
+        modifier =
+            Modifier.fillMaxWidth()
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                SettingsDialogSectionTitle(
+                    text = stringResource(id = R.string.settings_dialog_local_only))
+                Text(
+                    text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-    }
+            Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+        }
 }
 
 /**
- * A composable that displays a horizontal row of seed color options for theme customization,
- * including preset colors and a custom color option with HSV picker.
+ * A composable that displays seed color options with an inline HSV color picker (NoteNest style).
+ *
+ * Features:
+ * - Horizontal row of preset color options
+ * - Custom color option as a radio button row (NoteNest pattern)
+ * - Inline HSV color picker using AnimatedVisibility
+ * - Live theme preview as user picks colors
+ * - Submit/Cancel buttons to confirm or revert
  *
  * @param selectedColor The currently selected seed color
  * @param customColorArgb The custom color ARGB value
  * @param onColorSelected Callback invoked when a preset color is selected
  * @param onCustomColorChanged Callback invoked when the custom color is changed
- * @param modifier Modifier to be applied to the LazyRow
+ * @param modifier Modifier to be applied to the component
  */
 @Composable
 fun SeedColorPicker(
@@ -493,141 +619,151 @@ fun SeedColorPicker(
     onCustomColorChanged: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showColorPickerDialog by remember { mutableStateOf(false) }
-
-    if (showColorPickerDialog) {
-        CustomColorPickerDialog(
-            initialColor = customColorArgb,
-            onColorConfirmed = { newColor ->
-                onCustomColorChanged(newColor)
-                onColorSelected(SeedColor.CUSTOM)
-                showColorPickerDialog = false
-            },
-            onDismiss = { showColorPickerDialog = false })
-    }
-
-    LazyRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 4.dp)) {
-            // Preset colors (excluding CUSTOM)
-            items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
-                val isSelected = seedColor == selectedColor
-                Box(
-                    modifier =
-                        Modifier.size(48.dp)
-                            .clip(CircleShape)
-                            .background(Color(seedColor.argb))
-                            .then(
-                                if (isSelected) {
-                                    Modifier.border(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = CircleShape)
-                                } else {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outlineVariant,
-                                        shape = CircleShape)
-                                })
-                            .clickable { onColorSelected(seedColor) },
-                    contentAlignment = Alignment.Center) {
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription =
-                                    stringResource(id = R.string.seed_color_selected),
-                                tint = getContrastColor(Color(seedColor.argb)),
-                                modifier = Modifier.size(24.dp))
-                        }
-                    }
-            }
-
-            // Custom color option
-            item {
-                val isCustomSelected = selectedColor == SeedColor.CUSTOM
-                Box(
-                    modifier =
-                        Modifier.size(48.dp)
-                            .clip(CircleShape)
-                            .background(Color(customColorArgb))
-                            .then(
-                                if (isCustomSelected) {
-                                    Modifier.border(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = CircleShape)
-                                } else {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outlineVariant,
-                                        shape = CircleShape)
-                                })
-                            .clickable { showColorPickerDialog = true },
-                    contentAlignment = Alignment.Center) {
-                        if (isCustomSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription =
-                                    stringResource(id = R.string.seed_color_selected),
-                                tint = getContrastColor(Color(customColorArgb)),
-                                modifier = Modifier.size(24.dp))
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription =
-                                    stringResource(id = R.string.custom_color_picker),
-                                tint = getContrastColor(Color(customColorArgb)),
-                                modifier = Modifier.size(24.dp))
-                        }
-                    }
-            }
-        }
-}
-
-@Composable
-private fun CustomColorPickerDialog(
-    initialColor: Long,
-    onColorConfirmed: (Long) -> Unit,
-    onDismiss: () -> Unit
-) {
+    var showColorPicker by remember { mutableStateOf(false) }
     val colorPickerController = rememberColorPickerController()
-    var selectedColorArgb by remember { mutableLongStateOf(initialColor) }
+    // Store original color to restore on cancel
+    val originalColorArgb = remember(showColorPicker) { customColorArgb }
+    val isCustomSelected = selectedColor == SeedColor.CUSTOM
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.custom_color_picker)) },
-        text = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    HsvColorPicker(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                        controller = colorPickerController,
-                        onColorChanged = { colorEnvelope ->
-                            selectedColorArgb = colorEnvelope.color.value.toLong()
-                        })
-
-                    // Color preview
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Preset colors row (excluding CUSTOM)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp)) {
+                items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
+                    val isSelected = seedColor == selectedColor
                     Box(
                         modifier =
-                            Modifier.size(64.dp)
+                            Modifier.size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color(selectedColorArgb))
-                                .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    shape = CircleShape))
+                                .background(Color(seedColor.argb))
+                                .then(
+                                    if (isSelected) {
+                                        Modifier.border(
+                                            width = 3.dp,
+                                            color = MaterialTheme.colorScheme.outline,
+                                            shape = CircleShape)
+                                    } else {
+                                        Modifier.border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.outlineVariant,
+                                            shape = CircleShape)
+                                    })
+                                .clickable {
+                                    showColorPicker = false
+                                    onColorSelected(seedColor)
+                                },
+                        contentAlignment = Alignment.Center) {
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription =
+                                        stringResource(id = R.string.seed_color_selected),
+                                    tint = getContrastColor(Color(seedColor.argb)),
+                                    modifier = Modifier.size(24.dp))
+                            }
+                        }
                 }
-        },
-        confirmButton = {
-            TextButton(onClick = { onColorConfirmed(selectedColorArgb) }) {
-                Text(stringResource(id = R.string.submit))
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(id = R.string.cancel)) }
-        })
+
+        // Custom color radio button row (NoteNest pattern)
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(
+                        color =
+                            if (isCustomSelected)
+                                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                            else Color.Transparent)
+                    .selectable(
+                        selected = isCustomSelected,
+                        role = Role.RadioButton,
+                        onClick = {
+                            onColorSelected(SeedColor.CUSTOM)
+                            showColorPicker = true
+                        })
+                    .padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+            verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = isCustomSelected, onClick = null)
+                Spacer(Modifier.size(Spacing.xs))
+                Text(
+                    text = stringResource(id = R.string.custom_color_picker),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color =
+                        if (isCustomSelected) MaterialTheme.colorScheme.onSecondaryContainer
+                        else MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.weight(1f))
+                // Color box preview with rounded corners
+                Box(
+                    modifier =
+                        Modifier.size(32.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(color = Color(customColorArgb))
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = MaterialTheme.shapes.small)
+                            .clickable {
+                                onColorSelected(SeedColor.CUSTOM)
+                                showColorPicker = true
+                            })
+            }
+
+        // Inline color picker (NoteNest style - appears below when Custom is selected)
+        AnimatedVisibility(visible = showColorPicker && isCustomSelected) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            shape = MaterialTheme.shapes.large)
+                        .padding(Spacing.md)) {
+                    Text(
+                        text = stringResource(id = R.string.pick_a_color),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface)
+
+                    HsvColorPicker(
+                        modifier =
+                            Modifier.fillMaxWidth().height(240.dp).padding(horizontal = Spacing.xs),
+                        controller = colorPickerController,
+                        onColorChanged = { colorEnvelope ->
+                            // Live preview: update theme in real-time as user picks
+                            onCustomColorChanged(colorEnvelope.color.value.toLong())
+                        },
+                        initialColor = Color(customColorArgb))
+
+                    // Submit and Cancel buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                            Button(
+                                onClick = { showColorPicker = false },
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.medium) {
+                                    Text(
+                                        text = stringResource(id = R.string.submit),
+                                        style = MaterialTheme.typography.labelLarge)
+                                }
+                            TextButton(
+                                onClick = {
+                                    // Restore original color on cancel
+                                    onCustomColorChanged(originalColorArgb)
+                                    showColorPicker = false
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.medium) {
+                                    Text(
+                                        text = stringResource(id = R.string.cancel),
+                                        style = MaterialTheme.typography.labelLarge)
+                                }
+                        }
+                }
+        }
+    }
 }
 
 /** Returns a contrasting color (black or white) based on the luminance of the input color. */
@@ -641,8 +777,9 @@ private fun SettingsDialogSectionTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-    )
+        fontWeight = FontWeight.Medium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(top = Spacing.md, bottom = Spacing.xs))
 }
 
 @Composable
@@ -653,21 +790,23 @@ private fun SettingsDialogChooserRow(
 ) {
     Row(
         Modifier.fillMaxWidth()
-            .selectable(
-                selected = selected,
-                role = Role.RadioButton,
-                onClick = onClick,
-            )
-            .padding(12.dp),
+            .clip(MaterialTheme.shapes.medium)
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .background(
+                color =
+                    if (selected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                    else Color.Transparent)
+            .padding(horizontal = Spacing.sm, vertical = Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = null,
-        )
-        Text(text)
-    }
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            RadioButton(selected = selected, onClick = null)
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge,
+                color =
+                    if (selected) MaterialTheme.colorScheme.onSecondaryContainer
+                    else MaterialTheme.colorScheme.onSurface)
+        }
 }
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
@@ -703,6 +842,7 @@ private fun YouScreenPreview() {
                 seedColor = SeedColor.DEFAULT,
                 useLocalOnly = false,
                 customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
+        libraryItemCounts = LibraryItemCounts(favoritesCount = 5, watchlistCount = 3),
         onChangeTheme = {},
         onChangeDarkMode = {},
         onChangeSeedColor = {},

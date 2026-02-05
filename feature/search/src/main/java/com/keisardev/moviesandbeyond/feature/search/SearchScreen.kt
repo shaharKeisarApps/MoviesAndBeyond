@@ -23,9 +23,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,7 +40,6 @@ import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
-import kotlinx.coroutines.launch
 
 @Composable
 fun SearchRoute(navigateToDetail: (String) -> Unit, viewModel: SearchViewModel = hiltViewModel()) {
@@ -68,12 +67,13 @@ internal fun SearchScreen(
     onSearchResultClick: (String) -> Unit,
     onErrorShown: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    errorMessage?.let {
-        scope.launch { snackbarHostState.showSnackbar(it) }
-        onErrorShown()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            onErrorShown()
+        }
     }
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
