@@ -45,6 +45,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -341,7 +342,6 @@ private fun LibraryContent(
                                                 stiffness = Spring.StiffnessLow)),
                             modifier = Modifier.animateItem()) {
                                 LibraryItemCard(
-                                    item = item,
                                     posterPath = item.imagePath,
                                     sharedElementKey =
                                         sharedMediaType?.let {
@@ -362,20 +362,9 @@ private fun LibraryContent(
     }
 }
 
-/**
- * Library item card with Material 3 swipe-to-delete pattern.
- *
- * Features:
- * - Swipe gesture with error container background
- * - Confirmation dialog before deletion (M3 requirement for destructive actions)
- * - Haptic feedback on swipe threshold
- * - Smooth animations (fadeOut + shrinkVertically)
- * - Delete button fallback
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LibraryItemCard(
-    item: LibraryItem,
     posterPath: String,
     sharedElementKey: MediaSharedElementKey? = null,
     onItemClick: () -> Unit,
@@ -391,24 +380,20 @@ private fun LibraryItemCard(
                 when (dismissValue) {
                     SwipeToDismissBoxValue.StartToEnd,
                     SwipeToDismissBoxValue.EndToStart -> {
-                        // Haptic feedback on swipe threshold
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        // Show confirmation dialog
                         showDeleteDialog = true
-                        false // Don't dismiss yet, wait for confirmation
+                        false
                     }
                     SwipeToDismissBoxValue.Settled -> false
                 }
             })
 
-    // Reset swipe state when dialog is dismissed
     LaunchedEffect(showDeleteDialog) {
         if (!showDeleteDialog && dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
             dismissState.snapTo(SwipeToDismissBoxValue.Settled)
         }
     }
 
-    // Confirmation dialog
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
             onConfirm = {
@@ -426,69 +411,79 @@ private fun LibraryItemCard(
                 state = dismissState,
                 enableDismissFromStartToEnd = true,
                 enableDismissFromEndToStart = true,
-                backgroundContent = {
-                    // Error container background with delete icon
-                    val backgroundColor by
-                        animateFloatAsState(
-                            targetValue =
-                                when (dismissState.targetValue) {
-                                    SwipeToDismissBoxValue.StartToEnd,
-                                    SwipeToDismissBoxValue.EndToStart -> 1f
-                                    else -> 0f
-                                },
-                            animationSpec = spring(),
-                            label = "background_alpha")
-
-                    Box(
-                        modifier =
-                            Modifier.fillMaxSize()
-                                .background(
-                                    MaterialTheme.colorScheme.errorContainer.copy(
-                                        alpha = backgroundColor),
-                                    shape = RoundedCornerShape(12.dp))
-                                .padding(horizontal = Spacing.md),
-                        contentAlignment =
-                            when (dismissState.dismissDirection) {
-                                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                                else -> Alignment.Center
-                            }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(id = R.string.delete),
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.size(Dimens.iconSizeMedium))
-                        }
-                }) {
-                    // Card with delete button overlay
-                    Box {
-                        MediaItemCard(
-                            posterPath = posterPath,
-                            sharedElementKey = sharedElementKey,
-                            onItemClick = onItemClick)
-
-                        // Delete button overlay (fallback for users who don't discover swipe)
-                        IconButton(
-                            onClick = { showDeleteDialog = true },
-                            colors =
-                                IconButtonDefaults.iconButtonColors(
-                                    containerColor =
-                                        MaterialTheme.colorScheme.errorContainer.copy(
-                                            alpha = 0.95f),
-                                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
-                            modifier =
-                                Modifier.align(Alignment.TopEnd)
-                                    .padding(Spacing.xxs)
-                                    .size(32.dp)
-                                    .clip(CircleShape)) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = stringResource(id = R.string.delete),
-                                    modifier = Modifier.size(Dimens.iconSizeSmall))
-                            }
-                    }
+                backgroundContent = { SwipeDeleteBackground(dismissState = dismissState) }) {
+                    LibraryItemCardContent(
+                        posterPath = posterPath,
+                        sharedElementKey = sharedElementKey,
+                        onItemClick = onItemClick,
+                        onDeleteClick = { showDeleteDialog = true })
                 }
         }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeDeleteBackground(dismissState: SwipeToDismissBoxState) {
+    val backgroundColor by
+        animateFloatAsState(
+            targetValue =
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.StartToEnd,
+                    SwipeToDismissBoxValue.EndToStart -> 1f
+                    else -> 0f
+                },
+            animationSpec = spring(),
+            label = "background_alpha")
+
+    Box(
+        modifier =
+            Modifier.fillMaxSize()
+                .background(
+                    MaterialTheme.colorScheme.errorContainer.copy(alpha = backgroundColor),
+                    shape = RoundedCornerShape(12.dp))
+                .padding(horizontal = Spacing.md),
+        contentAlignment =
+            when (dismissState.dismissDirection) {
+                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                else -> Alignment.Center
+            }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(id = R.string.delete),
+                tint = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.size(Dimens.iconSizeMedium))
+        }
+}
+
+@Composable
+private fun LibraryItemCardContent(
+    posterPath: String,
+    sharedElementKey: MediaSharedElementKey? = null,
+    onItemClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Box {
+        MediaItemCard(
+            posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
+
+        IconButton(
+            onClick = onDeleteClick,
+            colors =
+                IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.95f),
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
+            modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .padding(Spacing.xxs)
+                    .size(32.dp)
+                    .clip(CircleShape)) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delete),
+                    modifier = Modifier.size(Dimens.iconSizeSmall))
+            }
+    }
 }
 
 /** Material 3 confirmation dialog for destructive delete action. */
