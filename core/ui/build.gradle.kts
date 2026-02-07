@@ -1,8 +1,7 @@
 plugins {
     id("moviesandbeyond.android.library")
     id("moviesandbeyond.android.library.compose")
-    // Temporarily disabled - screenshot test discovery issue
-    // alias(libs.plugins.screenshot)
+    alias(libs.plugins.screenshot)
 }
 
 android {
@@ -10,9 +9,8 @@ android {
 
     defaultConfig { testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
 
-    // Temporarily disabled - screenshot test discovery issue
-    // @Suppress("UnstableApiUsage")
-    // experimentalProperties["android.experimental.enableScreenshotTest"] = true
+    @Suppress("UnstableApiUsage")
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -33,6 +31,5 @@ dependencies {
 
     androidTestImplementation(projects.core.testing)
 
-    // Screenshot testing - temporarily disabled
-    // screenshotTestImplementation(libs.screenshot.validation.api)
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }

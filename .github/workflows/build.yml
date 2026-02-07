@@ -47,6 +47,17 @@ jobs:
       - name: Run static analysis (Detekt)
         run: ./gradlew detekt
 
+      - name: Run lint checks
+        run: ./gradlew lintDebug
+
+      - name: Upload lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: '**/build/reports/lint-results-*.html'
+          retention-days: 7
+
       - name: Upload Detekt reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -82,9 +93,6 @@ jobs:
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug
 
-      - name: Run lint checks
-        run: ./gradlew lintDebug
-
       - name: Run unit tests
         run: ./gradlew test
 
@@ -94,14 +102,6 @@ jobs:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 14
-
-      - name: Upload lint reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lint-reports
-          path: '**/build/reports/lint-results-*.html'
-          retention-days: 7
 
       - name: Upload test results
         if: always()
