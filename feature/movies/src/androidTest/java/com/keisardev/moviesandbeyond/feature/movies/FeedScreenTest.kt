@@ -36,19 +36,19 @@ class FeedScreenTest {
     }
 
     @Test
-    fun feedScreen_withContent_showsMovieItems() {
+    fun feedScreen_withContent_showsHeroTitle() {
         val testMovie = ContentItem(id = 1, imagePath = "", name = "Test Movie", rating = 8.5)
 
         composeTestRule.setContent {
             FeedScreen(
-                nowPlayingMovies =
+                nowPlayingMovies = ContentUiState(category = MovieListCategory.NOW_PLAYING),
+                popularMovies =
                     ContentUiState(
                         items = listOf(testMovie),
                         isLoading = false,
                         endReached = false,
                         page = 1,
-                        category = MovieListCategory.NOW_PLAYING),
-                popularMovies = ContentUiState(category = MovieListCategory.POPULAR),
+                        category = MovieListCategory.POPULAR),
                 topRatedMovies = ContentUiState(category = MovieListCategory.TOP_RATED),
                 upcomingMovies = ContentUiState(category = MovieListCategory.UPCOMING),
                 errorMessage = null,

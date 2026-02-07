@@ -16,7 +16,7 @@ class FeedScreenTest {
     @Test
     fun feedScreen_whenLoading_showsSectionTitles() {
         val airingTodayText = composeTestRule.activity.getString(R.string.airing_today)
-        val popularText = composeTestRule.activity.getString(R.string.popular)
+        val onAirText = composeTestRule.activity.getString(R.string.on_air)
 
         composeTestRule.setContent {
             FeedScreen(
@@ -32,25 +32,25 @@ class FeedScreenTest {
         }
 
         composeTestRule.onNodeWithText(airingTodayText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(popularText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(onAirText).assertIsDisplayed()
     }
 
     @Test
-    fun feedScreen_withContent_showsTvItems() {
+    fun feedScreen_withContent_showsHeroTitle() {
         val testShow = ContentItem(id = 1, imagePath = "", name = "Test TV Show", rating = 9.0)
 
         composeTestRule.setContent {
             FeedScreen(
-                airingTodayTvShows =
+                airingTodayTvShows = ContentUiState(category = TvShowListCategory.AIRING_TODAY),
+                onAirTvShows = ContentUiState(category = TvShowListCategory.ON_THE_AIR),
+                topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
+                popularTvShows =
                     ContentUiState(
                         items = listOf(testShow),
                         isLoading = false,
                         endReached = false,
                         page = 1,
-                        category = TvShowListCategory.AIRING_TODAY),
-                onAirTvShows = ContentUiState(category = TvShowListCategory.ON_THE_AIR),
-                topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
-                popularTvShows = ContentUiState(category = TvShowListCategory.POPULAR),
+                        category = TvShowListCategory.POPULAR),
                 errorMessage = null,
                 appendItems = {},
                 onItemClick = {},

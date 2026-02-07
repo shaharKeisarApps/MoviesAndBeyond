@@ -36,7 +36,7 @@ class SearchScreenTest {
 
         composeTestRule.setContent {
             SearchScreen(
-                searchQuery = "Inception",
+                searchQuery = "inc",
                 errorMessage = null,
                 searchSuggestions = listOf(testItem),
                 onSearchQueryChange = {},
