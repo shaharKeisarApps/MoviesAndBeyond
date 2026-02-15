@@ -91,24 +91,43 @@ fun YouRoute(
     val userSettings by viewModel.userSettings.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
     val libraryItemCounts by viewModel.libraryItemCounts.collectAsStateWithLifecycle()
+    val callbacks =
+        YouScreenCallbacks(
+            onChangeTheme = viewModel::setDynamicColorPreference,
+            onChangeDarkMode = viewModel::setDarkModePreference,
+            onChangeSeedColor = viewModel::setSeedColorPreference,
+            onChangeCustomColorArgb = viewModel::setCustomColorArgb,
+            onChangeIncludeAdult = viewModel::setAdultResultPreference,
+            onChangeUseLocalOnly = viewModel::toggleUseLocalOnly,
+            onNavigateToAuth = navigateToAuth,
+            onLibraryItemClick = navigateToLibraryItem,
+            onReloadAccountDetailsClick = viewModel::getAccountDetails,
+            onRefresh = viewModel::onRefresh,
+            onLogOutClick = viewModel::logOut,
+            onErrorShown = viewModel::onErrorShown)
     YouScreen(
         uiState = uiState,
         isLoggedIn = isLoggedIn,
         userSettings = userSettings,
         libraryItemCounts = libraryItemCounts,
-        onChangeTheme = viewModel::setDynamicColorPreference,
-        onChangeDarkMode = viewModel::setDarkModePreference,
-        onChangeSeedColor = viewModel::setSeedColorPreference,
-        onChangeCustomColorArgb = viewModel::setCustomColorArgb,
-        onChangeIncludeAdult = viewModel::setAdultResultPreference,
-        onChangeUseLocalOnly = viewModel::toggleUseLocalOnly,
-        onNavigateToAuth = navigateToAuth,
-        onLibraryItemClick = navigateToLibraryItem,
-        onReloadAccountDetailsClick = viewModel::getAccountDetails,
-        onRefresh = viewModel::onRefresh,
-        onLogOutClick = viewModel::logOut,
-        onErrorShown = viewModel::onErrorShown)
+        callbacks = callbacks)
 }
+
+@Suppress("LongParameterList")
+internal class YouScreenCallbacks(
+    val onChangeTheme: (Boolean) -> Unit,
+    val onChangeDarkMode: (SelectedDarkMode) -> Unit,
+    val onChangeSeedColor: (SeedColor) -> Unit,
+    val onChangeCustomColorArgb: (Long) -> Unit,
+    val onChangeIncludeAdult: (Boolean) -> Unit,
+    val onChangeUseLocalOnly: (Boolean) -> Unit,
+    val onNavigateToAuth: () -> Unit,
+    val onLibraryItemClick: (String) -> Unit,
+    val onReloadAccountDetailsClick: () -> Unit,
+    val onLogOutClick: () -> Unit,
+    val onRefresh: () -> Unit,
+    val onErrorShown: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,27 +136,15 @@ internal fun YouScreen(
     isLoggedIn: Boolean?,
     userSettings: UserSettings?,
     libraryItemCounts: LibraryItemCounts,
-    onChangeTheme: (Boolean) -> Unit,
-    onChangeDarkMode: (SelectedDarkMode) -> Unit,
-    onChangeSeedColor: (SeedColor) -> Unit,
-    onChangeCustomColorArgb: (Long) -> Unit,
-    onChangeIncludeAdult: (Boolean) -> Unit,
-    onChangeUseLocalOnly: (Boolean) -> Unit,
-    onNavigateToAuth: () -> Unit,
-    onLibraryItemClick: (String) -> Unit,
-    onReloadAccountDetailsClick: () -> Unit,
-    onLogOutClick: () -> Unit,
-    onRefresh: () -> Unit,
-    onErrorShown: () -> Unit
+    callbacks: YouScreenCallbacks,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
-
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
-            onErrorShown()
+            callbacks.onErrorShown()
         }
     }
 
@@ -145,12 +152,12 @@ internal fun YouScreen(
     if (showSettingsDialog) {
         SettingsDialog(
             userSettings = userSettings,
-            onChangeTheme = onChangeTheme,
-            onChangeDarkMode = onChangeDarkMode,
-            onChangeSeedColor = onChangeSeedColor,
-            onChangeCustomColorArgb = onChangeCustomColorArgb,
-            onChangeIncludeAdult = onChangeIncludeAdult,
-            onChangeUseLocalOnly = onChangeUseLocalOnly,
+            onChangeTheme = callbacks.onChangeTheme,
+            onChangeDarkMode = callbacks.onChangeDarkMode,
+            onChangeSeedColor = callbacks.onChangeSeedColor,
+            onChangeCustomColorArgb = callbacks.onChangeCustomColorArgb,
+            onChangeIncludeAdult = callbacks.onChangeIncludeAdult,
+            onChangeUseLocalOnly = callbacks.onChangeUseLocalOnly,
             onDismissRequest = { showSettingsDialog = !showSettingsDialog })
     }
 
@@ -167,69 +174,74 @@ internal fun YouScreen(
                     .pullToRefresh(
                         isRefreshing = uiState.isRefreshing,
                         state = pullToRefreshState,
-                        onRefresh = onRefresh)) {
-                // Content FIRST (behind) - so buttons can be clickable on top
-                Column(Modifier.fillMaxSize()) {
-                    isLoggedIn?.let {
-                        if (isLoggedIn) {
-                            uiState.accountDetails?.let {
-                                LoggedInView(
-                                    accountDetails = it,
-                                    isLoggingOut = uiState.isLoggingOut,
-                                    libraryItemCounts = libraryItemCounts,
-                                    onLibraryItemClick = onLibraryItemClick,
-                                    onLogOutClick = onLogOutClick)
-                            }
-                                ?: LoadAccountDetails(
-                                    isLoading = uiState.isLoading,
-                                    onReloadAccountDetailsClick = onReloadAccountDetailsClick)
-                        } else {
-                            LoggedOutView(
-                                libraryItemCounts = libraryItemCounts,
-                                onNavigateToAuth = onNavigateToAuth,
-                                onLibraryItemClick = onLibraryItemClick)
-                        }
-                    }
-                }
+                        onRefresh = callbacks.onRefresh)) {
+                YouScreenContent(
+                    uiState = uiState,
+                    isLoggedIn = isLoggedIn,
+                    libraryItemCounts = libraryItemCounts,
+                    callbacks = callbacks)
 
-                // Floating action buttons LAST (on top) - so they're clickable
-                Row(
-                    modifier =
-                        Modifier.align(Alignment.TopEnd)
-                            .padding(top = Spacing.md, end = Spacing.sm)) {
-                        IconButton(onClick = { showAttributionInfoDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Rounded.Info,
-                                contentDescription = stringResource(id = R.string.attribution_info))
-                        }
-
-                        userSettings?.let {
-                            IconButton(onClick = { showSettingsDialog = true }) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Settings,
-                                    contentDescription =
-                                        stringResource(id = R.string.settings_dialog_title))
-                            }
-                        }
-                    }
-
-                /*  PullToRefreshContainer(
-                    state = pullToRefreshState,
-                    modifier = Modifier.align(Alignment.TopCenter),
-                )
-
-                if (pullToRefreshState.isRefreshing) {
-                    LaunchedEffect(true) { onRefresh() }
-                }
-
-                LaunchedEffect(uiState.isRefreshing) {
-                    if (uiState.isRefreshing) {
-                        pullToRefreshState.startRefresh()
-                    } else {
-                        pullToRefreshState.endRefresh()
-                    }
-                }*/
+                YouScreenActionButtons(
+                    userSettings = userSettings,
+                    onShowAttribution = { showAttributionInfoDialog = true },
+                    onShowSettings = { showSettingsDialog = true },
+                    modifier = Modifier.align(Alignment.TopEnd))
             }
+    }
+}
+
+@Composable
+private fun YouScreenContent(
+    uiState: YouUiState,
+    isLoggedIn: Boolean?,
+    libraryItemCounts: LibraryItemCounts,
+    callbacks: YouScreenCallbacks,
+) {
+    Column(Modifier.fillMaxSize()) {
+        isLoggedIn?.let {
+            if (isLoggedIn) {
+                uiState.accountDetails?.let {
+                    LoggedInView(
+                        accountDetails = it,
+                        isLoggingOut = uiState.isLoggingOut,
+                        libraryItemCounts = libraryItemCounts,
+                        onLibraryItemClick = callbacks.onLibraryItemClick,
+                        onLogOutClick = callbacks.onLogOutClick)
+                }
+                    ?: LoadAccountDetails(
+                        isLoading = uiState.isLoading,
+                        onReloadAccountDetailsClick = callbacks.onReloadAccountDetailsClick)
+            } else {
+                LoggedOutView(
+                    libraryItemCounts = libraryItemCounts,
+                    onNavigateToAuth = callbacks.onNavigateToAuth,
+                    onLibraryItemClick = callbacks.onLibraryItemClick)
+            }
+        }
+    }
+}
+
+@Composable
+private fun YouScreenActionButtons(
+    userSettings: UserSettings?,
+    onShowAttribution: () -> Unit,
+    onShowSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier.padding(top = Spacing.md, end = Spacing.sm)) {
+        IconButton(onClick = onShowAttribution) {
+            Icon(
+                imageVector = Icons.Rounded.Info,
+                contentDescription = stringResource(id = R.string.attribution_info))
+        }
+
+        userSettings?.let {
+            IconButton(onClick = onShowSettings) {
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = stringResource(id = R.string.settings_dialog_title))
+            }
+        }
     }
 }
 
@@ -843,18 +855,20 @@ private fun YouScreenPreview() {
                 useLocalOnly = false,
                 customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
         libraryItemCounts = LibraryItemCounts(favoritesCount = 5, watchlistCount = 3),
-        onChangeTheme = {},
-        onChangeDarkMode = {},
-        onChangeSeedColor = {},
-        onChangeCustomColorArgb = {},
-        onChangeIncludeAdult = {},
-        onChangeUseLocalOnly = {},
-        onNavigateToAuth = {},
-        onLibraryItemClick = {},
-        onReloadAccountDetailsClick = {},
-        onRefresh = {},
-        onLogOutClick = {},
-        onErrorShown = {})
+        callbacks =
+            YouScreenCallbacks(
+                onChangeTheme = {},
+                onChangeDarkMode = {},
+                onChangeSeedColor = {},
+                onChangeCustomColorArgb = {},
+                onChangeIncludeAdult = {},
+                onChangeUseLocalOnly = {},
+                onNavigateToAuth = {},
+                onLibraryItemClick = {},
+                onReloadAccountDetailsClick = {},
+                onRefresh = {},
+                onLogOutClick = {},
+                onErrorShown = {}))
 }
 
 @Preview(showBackground = true)
