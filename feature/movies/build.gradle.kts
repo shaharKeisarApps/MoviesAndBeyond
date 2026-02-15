@@ -1,15 +1,13 @@
 plugins {
     id("moviesandbeyond.android.feature")
-    // Temporarily disabled - screenshot test discovery issue
-    // alias(libs.plugins.screenshot)
+    alias(libs.plugins.screenshot)
 }
 
 android {
     namespace = "com.keisardev.moviesandbeyond.feature.movies"
 
-    // Temporarily disabled - screenshot test discovery issue
-    // @Suppress("UnstableApiUsage")
-    // experimentalProperties["android.experimental.enableScreenshotTest"] = true
+    @Suppress("UnstableApiUsage")
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -20,6 +18,5 @@ dependencies {
     api(libs.haze.materials)
     androidTestImplementation(projects.core.testing)
 
-    // Screenshot testing - temporarily disabled
-    // screenshotTestImplementation(libs.screenshot.validation.api)
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }
