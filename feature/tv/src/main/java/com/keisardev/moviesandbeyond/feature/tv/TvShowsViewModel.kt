@@ -133,7 +133,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     isFromCache = false)
             }
             is StoreReadResponse.Data -> {
-                val newItems = response.value
+                val newItems = response.value.orEmpty()
                 // Accumulate items for pagination
                 if (newItems.isNotEmpty()) {
                     accumulatedFlow.update { current ->

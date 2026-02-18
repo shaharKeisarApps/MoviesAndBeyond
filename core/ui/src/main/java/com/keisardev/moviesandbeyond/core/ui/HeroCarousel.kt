@@ -47,6 +47,15 @@ import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import java.util.Locale
 
+private val HeroGradientBrush =
+    Brush.verticalGradient(
+        colors = listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = 0.8f)),
+        startY = 0f,
+        endY = Float.POSITIVE_INFINITY)
+
+private val OverlayTextColor = Color.White.copy(alpha = 0.8f)
+private val OverlaySubtleTextColor = Color.White.copy(alpha = 0.7f)
+
 /**
  * Data class for hero carousel items. Abstraction layer to avoid direct dependency on domain model.
  */
@@ -87,9 +96,11 @@ fun MediaHeroCarousel(
         itemSpacing = Spacing.sm,
         contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) { index ->
             val item = displayItems[index]
+            val itemId = item.id
+            val onClick = remember(itemId) { { onItemClick(itemId) } }
             HeroCarouselItemContent(
                 item = item,
-                onItemClick = { onItemClick(item.id) },
+                onItemClick = onClick,
                 modifier = Modifier.maskClip(MaterialTheme.shapes.extraLarge))
         }
 }
@@ -121,7 +132,7 @@ private fun HeroCarouselItemContent(
                     scaleX = scale
                     scaleY = scale
                 }
-                .pointerInput(Unit) {
+                .pointerInput(onItemClick) {
                     detectTapGestures(
                         onPress = {
                             isPressed = true
@@ -138,18 +149,7 @@ private fun HeroCarouselItemContent(
                 contentScale = ContentScale.Crop)
 
             // Gradient overlay
-            Box(
-                modifier =
-                    Modifier.fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        Color.Transparent,
-                                        Color.Transparent,
-                                        Color.Black.copy(alpha = 0.8f)),
-                                startY = 0f,
-                                endY = Float.POSITIVE_INFINITY)))
+            Box(modifier = Modifier.fillMaxSize().background(HeroGradientBrush))
 
             // Content overlay
             Column(
@@ -181,7 +181,7 @@ private fun HeroCarouselItemContent(
                                 Text(
                                     text = year,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.8f))
+                                    color = OverlayTextColor)
                             }
 
                             item.rating?.let { rating ->
@@ -194,7 +194,7 @@ private fun HeroCarouselItemContent(
                                     Text(
                                         text = String.format(Locale.getDefault(), "%.1f", rating),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.White.copy(alpha = 0.8f))
+                                        color = OverlayTextColor)
                                 }
                             }
                         }
@@ -206,7 +206,7 @@ private fun HeroCarouselItemContent(
                             Text(
                                 text = overview,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = OverlaySubtleTextColor,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis)
                         }

@@ -3,6 +3,7 @@ package com.keisardev.moviesandbeyond.feature.you
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
@@ -39,6 +42,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -303,13 +307,19 @@ private fun LoggedInView(
                     modifier = Modifier.padding(vertical = Spacing.md),
                     color = MaterialTheme.colorScheme.primary)
             } else {
-                Button(
+                OutlinedButton(
                     onClick = onLogOutClick,
-                    modifier = Modifier.fillMaxWidth(),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
                     shape = MaterialTheme.shapes.large) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error)
+                        Spacer(Modifier.width(Spacing.xs))
                         Text(
                             text = stringResource(id = R.string.log_out),
-                            style = MaterialTheme.typography.labelLarge)
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.error)
                     }
             }
         }
@@ -578,6 +588,8 @@ private fun SettingsPanel(
                 selected = settings.useDynamicColor,
                 onClick = { onChangeTheme(true) })
         }
+        Spacer(modifier = Modifier.height(Spacing.sm))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 
     // Show seed color picker when dynamic color is disabled or not supported
@@ -589,6 +601,7 @@ private fun SettingsPanel(
             onColorSelected = onChangeSeedColor,
             onCustomColorChanged = onChangeCustomColorArgb,
             modifier = Modifier.padding(vertical = 8.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 
     SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_dark_mode))
@@ -606,35 +619,41 @@ private fun SettingsPanel(
             selected = settings.darkMode == LIGHT,
             onClick = { onChangeDarkMode(LIGHT) })
     }
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
-            SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
-            Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
-        }
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+    Spacer(modifier = Modifier.height(Spacing.sm))
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
                 SettingsDialogSectionTitle(
-                    text = stringResource(id = R.string.settings_dialog_local_only))
-                Text(
-                    text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    text = stringResource(id = R.string.settings_dialog_adult))
+                Switch(
+                    checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
             }
-            Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
-        }
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    SettingsDialogSectionTitle(
+                        text = stringResource(id = R.string.settings_dialog_local_only))
+                    Text(
+                        text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+            }
+    }
 }
 
 /**
@@ -725,7 +744,7 @@ fun SeedColorPicker(
                             onColorSelected(SeedColor.CUSTOM)
                             showColorPicker = true
                         })
-                    .padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+                    .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
             verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(selected = isCustomSelected, onClick = null)
                 Spacer(Modifier.size(Spacing.xs))
@@ -838,7 +857,7 @@ private fun SettingsDialogChooserRow(
                 color =
                     if (selected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
                     else Color.Transparent)
-            .padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+            .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             RadioButton(selected = selected, onClick = null)

@@ -111,14 +111,16 @@ internal fun FeedScreen(
                                         overview = item.overview)
                                 }
                             }
+                        val onHeroItemClick =
+                            remember(onItemClick) {
+                                { itemId: Int -> onItemClick("$itemId,${MediaType.TV}") }
+                            }
                         Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                             ContentSectionHeader(
                                 sectionName = stringResource(id = R.string.popular),
                                 onSeeAllClick = null,
                                 modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-                            MediaHeroCarousel(
-                                items = heroItems,
-                                onItemClick = { itemId -> onItemClick("$itemId,${MediaType.TV}") })
+                            MediaHeroCarousel(items = heroItems, onItemClick = onHeroItemClick)
                         }
                     }
                 }
@@ -152,17 +154,6 @@ internal fun FeedScreen(
                         sectionName = stringResource(id = R.string.top_rated),
                         posterSize = PosterSize.MEDIUM,
                         showRatings = true,
-                        appendItems = appendItems,
-                        onItemClick = onItemClick,
-                        onSeeAllClick = onSeeAllClick)
-                }
-
-                // Popular section - Small cards
-                item(key = "popular") {
-                    ContentSection(
-                        content = popularTvShows,
-                        sectionName = stringResource(id = R.string.popular),
-                        posterSize = PosterSize.SMALL,
                         appendItems = appendItems,
                         onItemClick = onItemClick,
                         onSeeAllClick = onSeeAllClick)

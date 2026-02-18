@@ -114,16 +114,16 @@ internal fun FeedScreen(
                                         overview = item.overview)
                                 }
                             }
+                        val onHeroItemClick =
+                            remember(onItemClick) {
+                                { itemId: Int -> onItemClick("$itemId,${MediaType.MOVIE}") }
+                            }
                         Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                             ContentSectionHeader(
                                 sectionName = stringResource(id = R.string.popular),
                                 onSeeAllClick = null,
                                 modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-                            MediaHeroCarousel(
-                                items = heroItems,
-                                onItemClick = { itemId ->
-                                    onItemClick("$itemId,${MediaType.MOVIE}")
-                                })
+                            MediaHeroCarousel(items = heroItems, onItemClick = onHeroItemClick)
                         }
                     }
                 }
@@ -134,17 +134,6 @@ internal fun FeedScreen(
                         content = nowPlayingMovies,
                         sectionName = stringResource(id = R.string.now_playing),
                         posterSize = PosterSize.LARGE,
-                        appendItems = appendItems,
-                        onItemClick = onItemClick,
-                        onSeeAllClick = onSeeAllClick)
-                }
-
-                // Popular section - Medium cards
-                item(key = "popular") {
-                    ContentSection(
-                        content = popularMovies,
-                        sectionName = stringResource(id = R.string.popular),
-                        posterSize = PosterSize.MEDIUM,
                         appendItems = appendItems,
                         onItemClick = onItemClick,
                         onSeeAllClick = onSeeAllClick)

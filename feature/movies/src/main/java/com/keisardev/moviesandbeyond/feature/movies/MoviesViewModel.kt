@@ -132,7 +132,7 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     isFromCache = false)
             }
             is StoreReadResponse.Data -> {
-                val newItems = response.value
+                val newItems = response.value.orEmpty()
                 // Accumulate items for pagination
                 if (newItems.isNotEmpty()) {
                     accumulatedFlow.update { current ->

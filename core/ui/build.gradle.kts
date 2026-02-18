@@ -14,6 +14,7 @@ android {
 }
 
 dependencies {
+    api(projects.core.model)
     api(libs.compose.material.iconsExtended)
 
     // Landscapist image loading (KMP core - no Coil/Glide)
