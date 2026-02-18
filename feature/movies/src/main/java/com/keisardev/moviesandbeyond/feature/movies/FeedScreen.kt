@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -89,7 +90,10 @@ internal fun FeedScreen(
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
             modifier = modifier.fillMaxWidth().padding(paddingValues),

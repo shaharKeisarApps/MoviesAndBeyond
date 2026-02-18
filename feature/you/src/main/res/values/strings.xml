@@ -19,6 +19,7 @@
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="log_in">Log In</string>
+    <string name="log_in_welcome">Welcome</string>
     <string name="log_in_description">Log in to view your profile and manage your collections</string>
     <string name="log_out">Log Out</string>
     <string name="your_library">Your Library</string>

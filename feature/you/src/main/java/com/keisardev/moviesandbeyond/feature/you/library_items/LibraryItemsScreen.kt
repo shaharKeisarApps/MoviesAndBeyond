@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -144,74 +145,74 @@ internal fun LibraryItemsScreen(
                 title = { libraryItemTitle?.let { Text(text = it) } }, onBackClick = onBackClick)
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.surface) { paddingValues ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-                val libraryMediaTabs = LibraryMediaType.entries
-                val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            val libraryMediaTabs = LibraryMediaType.entries
+            val pagerState = rememberPagerState(pageCount = { libraryMediaTabs.size })
 
-                val selectedTabIndex by
-                    remember(pagerState.currentPage) { mutableIntStateOf(pagerState.currentPage) }
+            val selectedTabIndex by
+                remember(pagerState.currentPage) { mutableIntStateOf(pagerState.currentPage) }
 
-                // Premium M3 PrimaryTabRow with surface container and icons
-                PrimaryTabRow(
-                    selectedTabIndex = selectedTabIndex,
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceContainerLow),
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    contentColor = MaterialTheme.colorScheme.onSurface) {
-                        libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
-                            Tab(
-                                selected = selectedTabIndex == index,
-                                onClick = {
-                                    scope.launch { pagerState.animateScrollToPage(index) }
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector =
-                                            when (mediaTypeTab) {
-                                                LibraryMediaType.MOVIE -> Icons.Rounded.Movie
-                                                LibraryMediaType.TV -> Icons.Rounded.Tv
-                                            },
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp))
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(id = mediaTypeTab.displayName),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight =
-                                            if (selectedTabIndex == index) FontWeight.SemiBold
-                                            else FontWeight.Normal)
-                                })
-                        }
+            // Premium M3 PrimaryTabRow with surface container and icons
+            PrimaryTabRow(
+                selectedTabIndex = selectedTabIndex,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow),
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                contentColor = MaterialTheme.colorScheme.onSurface) {
+                    libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            icon = {
+                                Icon(
+                                    imageVector =
+                                        when (mediaTypeTab) {
+                                            LibraryMediaType.MOVIE -> Icons.Rounded.Movie
+                                            LibraryMediaType.TV -> Icons.Rounded.Tv
+                                        },
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp))
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(id = mediaTypeTab.displayName),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight =
+                                        if (selectedTabIndex == index) FontWeight.SemiBold
+                                        else FontWeight.Normal)
+                            })
                     }
+                }
 
-                Spacer(Modifier.height(Spacing.xs))
+            Spacer(Modifier.height(Spacing.xs))
 
-                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-                    Column(Modifier.fillMaxSize()) {
-                        when (libraryMediaTabs[page]) {
-                            LibraryMediaType.MOVIE -> {
-                                LibraryContent(
-                                    content = movieItems,
-                                    libraryItemType = libraryItemType,
-                                    onItemClick = onItemClick,
-                                    onDeleteClick = onDeleteItem)
-                            }
+            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                Column(Modifier.fillMaxSize()) {
+                    when (libraryMediaTabs[page]) {
+                        LibraryMediaType.MOVIE -> {
+                            LibraryContent(
+                                content = movieItems,
+                                libraryItemType = libraryItemType,
+                                onItemClick = onItemClick,
+                                onDeleteClick = onDeleteItem)
+                        }
 
-                            LibraryMediaType.TV -> {
-                                LibraryContent(
-                                    content = tvItems,
-                                    libraryItemType = libraryItemType,
-                                    onItemClick = onItemClick,
-                                    onDeleteClick = onDeleteItem)
-                            }
+                        LibraryMediaType.TV -> {
+                            LibraryContent(
+                                content = tvItems,
+                                libraryItemType = libraryItemType,
+                                onItemClick = onItemClick,
+                                onDeleteClick = onDeleteItem)
                         }
                     }
                 }
             }
         }
+    }
 }
 
 @Composable

@@ -1,15 +1,19 @@
 package com.keisardev.moviesandbeyond.feature.details.content
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.R
 
 @Composable
@@ -64,21 +68,40 @@ private fun MovieDetailsSection(
     revenue: String
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.padding(bottom = 6.dp)) {
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        modifier =
+            Modifier.fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = MaterialTheme.shapes.large)
+                .padding(Spacing.md)) {
             DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
             DetailItem(
                 fieldName = stringResource(id = R.string.original_language),
                 value = originalLanguage)
 
-            DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
+            if (budget != "0" && budget.isNotEmpty()) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
+            }
 
-            DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
+            if (revenue != "0" && revenue.isNotEmpty()) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
+            }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
             DetailItem(
                 fieldName = stringResource(id = R.string.production_companies),
                 value = productionCompanies)
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
             DetailItem(
                 fieldName = stringResource(id = R.string.production_countries),

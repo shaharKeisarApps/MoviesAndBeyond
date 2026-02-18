@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -63,21 +64,23 @@ private fun CreditsScreen(
                         fontWeight = FontWeight.SemiBold)
                 },
                 onBackClick = onBackClick)
-        }) { paddingValues ->
-            Box(Modifier.padding(paddingValues)) {
-                when (details) {
-                    is ContentDetailUiState.Movie -> {
-                        CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
-                    }
-
-                    is ContentDetailUiState.TV -> {
-                        CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
-                    }
-
-                    else -> Unit
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { paddingValues ->
+        Box(Modifier.padding(paddingValues)) {
+            when (details) {
+                is ContentDetailUiState.Movie -> {
+                    CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
                 }
+
+                is ContentDetailUiState.TV -> {
+                    CreditsLazyColumn(credits = details.data.credits, onItemClick = onItemClick)
+                }
+
+                else -> Unit
             }
         }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

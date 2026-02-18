@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
@@ -167,7 +169,10 @@ internal fun YouScreen(
             onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog })
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { paddingValues ->
         Box(
             modifier =
                 Modifier.padding(paddingValues)
@@ -228,7 +233,7 @@ private fun YouScreenActionButtons(
     onShowSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier.padding(top = Spacing.md, end = Spacing.sm)) {
+    Row(modifier = modifier.padding(top = Spacing.xl, end = Spacing.lg)) {
         IconButton(onClick = onShowAttribution) {
             Icon(
                 imageVector = Icons.Rounded.Info,
@@ -266,6 +271,10 @@ private fun LoggedInView(
                 verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 modifier =
                     Modifier.fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = MaterialTheme.shapes.extraLarge)
                         .background(
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
                             shape = MaterialTheme.shapes.extraLarge)
@@ -335,6 +344,11 @@ private fun LoggedOutView(
                         modifier = Modifier.size(Dimens.iconSizeLarge),
                         tint = MaterialTheme.colorScheme.primary)
                     Text(
+                        text = stringResource(id = R.string.log_in_welcome),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface)
+                    Text(
                         text = stringResource(id = R.string.log_in_description),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge,
@@ -369,7 +383,13 @@ private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: 
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                shape = MaterialTheme.shapes.extraLarge)
+                            .padding(Spacing.xl)) {
                         Text(
                             text = stringResource(id = R.string.reload_account_details),
                             style = MaterialTheme.typography.bodyLarge,
@@ -377,6 +397,7 @@ private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: 
                             textAlign = TextAlign.Center)
                         Button(
                             onClick = onReloadAccountDetailsClick,
+                            modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.large) {
                                 Text(
                                     text = stringResource(id = R.string.reload_account_details),
@@ -428,18 +449,27 @@ private fun LibraryItemOption(optionName: String, itemCount: Int, onClick: () ->
                 text = optionName,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface)
-            if (itemCount > 0) {
-                Text(
-                    text = itemCount.toString(),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier =
-                        Modifier.background(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = CircleShape)
-                            .padding(horizontal = Spacing.sm, vertical = Spacing.xxs))
-            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    if (itemCount > 0) {
+                        Text(
+                            text = itemCount.toString(),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier =
+                                Modifier.background(
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        shape = CircleShape)
+                                    .padding(horizontal = Spacing.sm, vertical = Spacing.xxs))
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(Dimens.iconSizeSmall))
+                }
         }
 }
 
@@ -580,7 +610,7 @@ private fun SettingsPanel(
         modifier =
             Modifier.fillMaxWidth()
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
@@ -591,7 +621,7 @@ private fun SettingsPanel(
         modifier =
             Modifier.fillMaxWidth()
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {

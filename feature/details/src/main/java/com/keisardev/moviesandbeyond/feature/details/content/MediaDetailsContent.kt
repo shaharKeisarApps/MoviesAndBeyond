@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -46,6 +46,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -56,13 +57,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
@@ -232,11 +230,17 @@ private class ExitOnlyCollapseNestedConnection(private val heightToCollapse: Flo
 
 @Composable
 internal fun DetailItem(fieldName: String, value: String) {
-    val text = buildAnnotatedString {
-        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(fieldName) }
-        append(value)
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
+        Text(
+            text = fieldName,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface)
     }
-    Text(text)
 }
 
 /**
@@ -268,52 +272,51 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
     // Ensures status bar icons remain legible against dynamic image content
     val statusBarScrimAlpha = (1f - scrollValue).coerceIn(0f, 0.5f)
 
-    Box(
-        modifier
-            .fillMaxWidth()
-            // Apply status bar insets to the entire backdrop so it extends under status bar
-            .windowInsetsPadding(WindowInsets.statusBars)) {
-            // Hero backdrop image with parallax and fade effects
-            TmdbBackdropImage(
-                imageUrl = path,
-                modifier =
-                    Modifier.fillMaxSize().graphicsLayer {
-                        // Parallax translation for depth
-                        translationY = parallaxOffset
-                        // Fade out as it collapses (min 30% opacity for smooth transition)
-                        alpha = scrollValue.coerceIn(0.3f, 1f)
-                    },
-                contentScale = ContentScale.Crop)
+    // Use actual status bar height for the scrim
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
-            // Status bar scrim - dark overlay at top for icon legibility
-            // Fades out as backdrop collapses and title appears in app bar
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .height(48.dp) // Status bar typical height
-                        .background(
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        Color.Black.copy(alpha = statusBarScrimAlpha),
-                                        Color.Transparent))))
+    Box(modifier.fillMaxWidth().clipToBounds()) {
+        // Hero backdrop image with parallax and fade effects
+        TmdbBackdropImage(
+            imageUrl = path,
+            modifier =
+                Modifier.fillMaxSize().graphicsLayer {
+                    // Parallax translation for depth
+                    translationY = parallaxOffset
+                    // Fade out as it collapses (min 30% opacity for smooth transition)
+                    alpha = scrollValue.coerceIn(0.3f, 1f)
+                },
+            contentScale = ContentScale.Crop)
 
-            // Content gradient overlay - ensures text readability over dynamic images
-            // Uses M3 color roles for seamless transition to background
-            Box(
-                modifier =
-                    Modifier.fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        Color.Transparent,
-                                        Color.Transparent,
-                                        MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-                                        MaterialTheme.colorScheme.background),
-                                startY = 0f,
-                                endY = Float.POSITIVE_INFINITY)))
-        }
+        // Status bar scrim - dark overlay at top for icon legibility
+        // Fades out as backdrop collapses and title appears in app bar
+        Box(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .height(statusBarHeight + 8.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    Color.Black.copy(alpha = statusBarScrimAlpha),
+                                    Color.Transparent))))
+
+        // Content gradient overlay - ensures text readability over dynamic images
+        // Uses M3 color roles for seamless transition to background
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    Color.Transparent,
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                                    MaterialTheme.colorScheme.background),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY)))
+    }
 }
 
 /**
@@ -392,12 +395,12 @@ private fun InfoSection(
                     }
             }
 
-            // Tagline - italic style with quotes for distinction
+            // Tagline - italic style for distinction
             // Uses onSurfaceVariant for subtle emphasis per M3 guidelines
             if (tagline.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(Spacing.xxs))
                 Text(
-                    text = "\"$tagline\"",
+                    text = tagline,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     fontStyle = FontStyle.Italic,

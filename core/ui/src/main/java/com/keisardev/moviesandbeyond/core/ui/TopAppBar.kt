@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.core.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ fun TopAppBarWithBackButton(
     title: @Composable () -> Unit = {},
     topAppBarColors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     iconButtonColors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    windowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
     onBackClick: () -> Unit
 ) {
     TopAppBar(
@@ -33,5 +35,6 @@ fun TopAppBarWithBackButton(
             }
         },
         colors = topAppBarColors,
+        windowInsets = windowInsets,
         modifier = modifier)
 }

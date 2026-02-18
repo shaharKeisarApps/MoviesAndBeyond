@@ -13,10 +13,16 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -378,23 +384,31 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                         // Create ViewModel with the id from the route
                         // Note: For Nav3, we pass the id directly instead of via SavedStateHandle
                         val viewModel = hiltViewModel<DetailsViewModel>()
-                        DetailsRoute(
-                            onItemClick = { id ->
-                                navigationState.topLevelBackStack.navigateTo(
-                                    com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
-                            },
-                            onSeeAllCastClick = {
-                                navigationState.topLevelBackStack.navigateTo(
-                                    com.keisardev.moviesandbeyond.ui.navigation.CreditsRoute(
-                                        key.id))
-                            },
-                            navigateToAuth = {
-                                navigationState.topLevelBackStack.navigateTo(
-                                    com.keisardev.moviesandbeyond.ui.navigation.AuthRoute)
-                            },
-                            onBackClick = { navigationState.topLevelBackStack.goBack() },
-                            viewModel = viewModel,
-                            detailsId = key.id)
+                        // Pull content up behind the status bar for edge-to-edge backdrop
+                        val statusBarTop =
+                            WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                        Box(
+                            modifier =
+                                Modifier.offset { IntOffset(0, -statusBarTop.roundToPx()) }) {
+                                DetailsRoute(
+                                    onItemClick = { id ->
+                                        navigationState.topLevelBackStack.navigateTo(
+                                            com.keisardev.moviesandbeyond.ui.navigation
+                                                .DetailsRoute(id))
+                                    },
+                                    onSeeAllCastClick = {
+                                        navigationState.topLevelBackStack.navigateTo(
+                                            com.keisardev.moviesandbeyond.ui.navigation
+                                                .CreditsRoute(key.id))
+                                    },
+                                    navigateToAuth = {
+                                        navigationState.topLevelBackStack.navigateTo(
+                                            com.keisardev.moviesandbeyond.ui.navigation.AuthRoute)
+                                    },
+                                    onBackClick = { navigationState.topLevelBackStack.goBack() },
+                                    viewModel = viewModel,
+                                    detailsId = key.id)
+                            }
                     }
 
                 // Credits screen - horizontal slide from right (standard list screen)

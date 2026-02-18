@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.feature.details
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
@@ -238,23 +239,25 @@ private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () 
         iconButtonColors =
             IconButtonDefaults.iconButtonColors(
                 containerColor = Color.Black.copy(alpha = 0.5f), contentColor = Color.White),
-        onBackClick = onBackClick,
-        // Apply status bar insets so app bar doesn't overlap with system UI
-        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
+        windowInsets = WindowInsets.statusBars,
+        onBackClick = onBackClick)
 }
 
 @Composable
 internal fun OverviewSection(overview: String) {
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Text(
             text = stringResource(id = R.string.overview),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(2.dp))
         if (overview.isEmpty()) {
             Text(text = stringResource(id = R.string.not_available))
         } else {
-            Text(overview)
+            Text(
+                text = overview,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Start)
         }
     }
 }

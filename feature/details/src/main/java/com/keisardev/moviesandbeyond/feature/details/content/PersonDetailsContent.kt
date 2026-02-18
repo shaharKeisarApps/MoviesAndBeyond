@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,38 +42,39 @@ internal fun PersonDetailsContent(
                 title = { Text(text = personDetails.name, fontWeight = FontWeight.SemiBold) },
                 onBackClick = onBackClick)
         },
-        modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection)) {
-            paddingValues ->
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = modifier.fillMaxWidth().padding(paddingValues)) {
-                    item {
-                        Row(Modifier.fillMaxWidth()) {
-                            // Person profile image - doesn't need shared element transitions
-                            SimpleMediaItemCard(
-                                posterPath = personDetails.profilePath,
-                                modifier = Modifier.size(height = 200.dp, width = 140.dp))
+        modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { paddingValues ->
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = modifier.fillMaxWidth().padding(paddingValues)) {
+                item {
+                    Row(Modifier.fillMaxWidth()) {
+                        // Person profile image - doesn't need shared element transitions
+                        SimpleMediaItemCard(
+                            posterPath = personDetails.profilePath,
+                            modifier = Modifier.size(height = 200.dp, width = 140.dp))
 
-                            Spacer(Modifier.width(10.dp))
+                        Spacer(Modifier.width(10.dp))
 
-                            PersonInfoSection(
-                                name = personDetails.name,
-                                gender = personDetails.gender,
-                                birthday = personDetails.birthday,
-                                deathday = personDetails.deathday,
-                                department = personDetails.knownForDepartment)
-                        }
+                        PersonInfoSection(
+                            name = personDetails.name,
+                            gender = personDetails.gender,
+                            birthday = personDetails.birthday,
+                            deathday = personDetails.deathday,
+                            department = personDetails.knownForDepartment)
                     }
-
-                    item {
-                        PersonDetailsSection(
-                            alsoKnownAs = personDetails.alsoKnownAs,
-                            placeOfBirth = personDetails.placeOfBirth)
-                    }
-
-                    item { OverviewSection(personDetails.biography) }
                 }
-        }
+
+                item {
+                    PersonDetailsSection(
+                        alsoKnownAs = personDetails.alsoKnownAs,
+                        placeOfBirth = personDetails.placeOfBirth)
+                }
+
+                item { OverviewSection(personDetails.biography) }
+            }
+    }
 }
 
 @Composable
