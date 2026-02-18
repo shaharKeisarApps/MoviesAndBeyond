@@ -22,7 +22,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -30,7 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.materials.CupertinoMaterials
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
 /**
  * A TIVI-style floating navigation bar with proper Surface, elevation, and gradient border.
@@ -47,6 +48,7 @@ import dev.chrisbanes.haze.hazeChild
  * @param modifier The modifier to be applied to the navigation bar
  * @param content The navigation items to display in the bar
  */
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun FloatingNavigationBar(
     hazeState: HazeState,
@@ -60,7 +62,7 @@ fun FloatingNavigationBar(
         modifier =
             modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(horizontal = 16.dp, vertical = 8.dp)) {
+                .padding(horizontal = 24.dp, vertical = 8.dp)) {
             // Surface with blur - ONLY the bar itself has blur
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
@@ -74,12 +76,13 @@ fun FloatingNavigationBar(
                             Brush.verticalGradient(
                                 colors =
                                     listOf(
-                                        colorScheme.surfaceVariant,
-                                        colorScheme.surfaceVariant.copy(alpha = 0.3f)))),
+                                        colorScheme.outlineVariant,
+                                        colorScheme.outlineVariant.copy(alpha = 0.3f)))),
                 modifier =
                     Modifier.clip(MaterialTheme.shapes.extraLarge)
-                        .hazeChild(state = hazeState) // Blur clipped to rounded shape
-                ) {
+                        .hazeEffect(
+                            state = hazeState,
+                            style = CupertinoMaterials.regular(colorScheme.surface))) {
                     Row(
                         modifier =
                             Modifier.padding(horizontal = 8.dp)
@@ -87,7 +90,6 @@ fun FloatingNavigationBar(
                                 .height(80.dp)
                                 .selectableGroup(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
                         content = content)
                 }
         }
@@ -129,25 +131,24 @@ fun RowScope.AnimatedNavigationItem(
         selected = selected,
         onClick = onClick,
         icon = {
-            Box(
-                modifier =
-                    Modifier.graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    }) {
-                    Crossfade(targetState = selected, label = "icon_crossfade") { isSelected ->
-                        if (isSelected) {
-                            selectedIcon()
-                        } else {
-                            unselectedIcon()
-                        }
-                    }
+            Crossfade(targetState = selected, label = "icon_crossfade") { isSelected ->
+                if (isSelected) {
+                    selectedIcon()
+                } else {
+                    unselectedIcon()
                 }
+            }
         },
         label = label,
-        modifier = modifier,
+        modifier =
+            modifier.graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
         colors =
             NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)))
+                selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)))
 }

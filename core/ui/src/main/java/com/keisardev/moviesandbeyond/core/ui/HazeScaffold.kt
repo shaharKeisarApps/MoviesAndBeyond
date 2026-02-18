@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,11 +37,12 @@ fun HazeScaffold(
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color =
-        MaterialTheme.colorScheme.surface, // Use surface color for proper edge-to-edge backgrounds
-    contentColor: Color = MaterialTheme.colorScheme.onBackground,
+        MaterialTheme.colorScheme
+            .background, // Use surface color for proper edge-to-edge backgrounds
+    contentColor: Color = contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = WindowInsets.safeDrawing,
     hazeState: HazeState,
-    hazeStyle: HazeStyle = CupertinoMaterials.ultraThin(MaterialTheme.colorScheme.surface),
+    hazeStyle: HazeStyle = CupertinoMaterials.ultraThin(MaterialTheme.colorScheme.background),
     blurTopBar: Boolean = true,
     blurBottomBar: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
