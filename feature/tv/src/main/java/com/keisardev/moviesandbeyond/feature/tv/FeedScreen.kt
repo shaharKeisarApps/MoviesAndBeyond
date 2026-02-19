@@ -1,18 +1,12 @@
 package com.keisardev.moviesandbeyond.feature.tv
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -20,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,14 +23,9 @@ import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.HeroCarouselItem
-import com.keisardev.moviesandbeyond.core.ui.LazyRowContentSection
 import com.keisardev.moviesandbeyond.core.ui.MediaHeroCarousel
-import com.keisardev.moviesandbeyond.core.ui.MediaItemCard
-import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
-import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
-import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
-import com.keisardev.moviesandbeyond.core.ui.SharedElementType
-import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.MediaPosterCarousel
+import com.keisardev.moviesandbeyond.core.ui.ShimmerPosterCarousel
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
@@ -59,7 +47,6 @@ fun FeedRoute(
         topRatedTvShows = topRatedTvShows,
         popularTvShows = popularTvShows,
         errorMessage = errorMessage,
-        appendItems = viewModel::appendItems,
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
         onErrorShown = viewModel::onErrorShown)
@@ -73,7 +60,6 @@ internal fun FeedScreen(
     topRatedTvShows: ContentUiState,
     popularTvShows: ContentUiState,
     errorMessage: String?,
-    appendItems: (TvShowListCategory) -> Unit,
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
     onErrorShown: () -> Unit
@@ -86,6 +72,9 @@ internal fun FeedScreen(
             onErrorShown()
         }
     }
+
+    val onCarouselItemClick =
+        remember(onItemClick) { { itemId: Int -> onItemClick("$itemId,${MediaType.TV}") } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarState) },
@@ -111,113 +100,89 @@ internal fun FeedScreen(
                                         overview = item.overview)
                                 }
                             }
-                        val onHeroItemClick =
-                            remember(onItemClick) {
-                                { itemId: Int -> onItemClick("$itemId,${MediaType.TV}") }
-                            }
                         Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                             ContentSectionHeader(
                                 sectionName = stringResource(id = R.string.popular),
                                 onSeeAllClick = null,
                                 modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-                            MediaHeroCarousel(items = heroItems, onItemClick = onHeroItemClick)
+                            MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                         }
                     }
                 }
 
-                // Airing Today section - Large cards for prominence
+                // Airing Today section - Large poster carousel
                 item(key = "airing_today") {
-                    ContentSection(
-                        content = airingTodayTvShows,
+                    CarouselSection(
+                        items = airingTodayTvShows.items,
+                        isLoading =
+                            airingTodayTvShows.items.isEmpty() && airingTodayTvShows.isLoading,
                         sectionName = stringResource(id = R.string.airing_today),
                         posterSize = PosterSize.LARGE,
-                        appendItems = appendItems,
-                        onItemClick = onItemClick,
-                        onSeeAllClick = onSeeAllClick)
+                        onItemClick = onCarouselItemClick,
+                        onSeeAllClick =
+                            remember(onSeeAllClick) {
+                                { onSeeAllClick(TvShowListCategory.AIRING_TODAY.name) }
+                            })
                 }
 
-                // On Air section - Medium cards
+                // On Air section - Medium poster carousel
                 item(key = "on_air") {
-                    ContentSection(
-                        content = onAirTvShows,
+                    CarouselSection(
+                        items = onAirTvShows.items,
+                        isLoading = onAirTvShows.items.isEmpty() && onAirTvShows.isLoading,
                         sectionName = stringResource(id = R.string.on_air),
                         posterSize = PosterSize.MEDIUM,
-                        appendItems = appendItems,
-                        onItemClick = onItemClick,
-                        onSeeAllClick = onSeeAllClick)
+                        onItemClick = onCarouselItemClick,
+                        onSeeAllClick =
+                            remember(onSeeAllClick) {
+                                { onSeeAllClick(TvShowListCategory.ON_THE_AIR.name) }
+                            })
                 }
 
-                // Top Rated section - Medium cards with ratings
+                // Top Rated section - Medium poster carousel with ratings
                 item(key = "top_rated") {
-                    ContentSection(
-                        content = topRatedTvShows,
+                    CarouselSection(
+                        items = topRatedTvShows.items,
+                        isLoading = topRatedTvShows.items.isEmpty() && topRatedTvShows.isLoading,
                         sectionName = stringResource(id = R.string.top_rated),
                         posterSize = PosterSize.MEDIUM,
                         showRatings = true,
-                        appendItems = appendItems,
-                        onItemClick = onItemClick,
-                        onSeeAllClick = onSeeAllClick)
+                        onItemClick = onCarouselItemClick,
+                        onSeeAllClick =
+                            remember(onSeeAllClick) {
+                                { onSeeAllClick(TvShowListCategory.TOP_RATED.name) }
+                            })
                 }
             }
     }
 }
 
 @Composable
-private fun ContentSection(
-    content: ContentUiState,
+private fun CarouselSection(
+    items: List<ContentItem>,
+    isLoading: Boolean,
     sectionName: String,
-    appendItems: (TvShowListCategory) -> Unit,
-    onItemClick: (String) -> Unit,
-    onSeeAllClick: (String) -> Unit,
+    onItemClick: (Int) -> Unit,
+    onSeeAllClick: () -> Unit,
     posterSize: PosterSize = PosterSize.MEDIUM,
     showRatings: Boolean = false
 ) {
-    // STABLE: Only recreated when category changes
-    val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
-    val stableSeeAllClick = remember(content.category) { { onSeeAllClick(content.category.name) } }
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing)) {
+        ContentSectionHeader(
+            sectionName = sectionName,
+            onSeeAllClick = onSeeAllClick,
+            modifier = Modifier.padding(horizontal = Spacing.screenPadding))
 
-    LazyRowContentSection(
-        pagingEnabled = true,
-        isLoading = content.isLoading,
-        endReached = content.endReached,
-        itemsEmpty = content.items.isEmpty(),
-        rowContentPadding = PaddingValues(horizontal = Spacing.screenPadding),
-        appendItems = stableAppendItems,
-        sectionHeaderContent = {
-            ContentSectionHeader(
-                sectionName = sectionName,
-                onSeeAllClick = stableSeeAllClick,
-                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-        },
-        rowContent = {
-            items(items = content.items, key = { it.id }, contentType = { "media_item" }) { item ->
-                val stableItemClick =
-                    remember(item.id) { { onItemClick("${item.id},${MediaType.TV}") } }
-                val sharedElementKey =
-                    remember(item.id) {
-                        MediaSharedElementKey(
-                            mediaId = item.id.toLong(),
-                            mediaType = SharedMediaType.TvShow,
-                            origin = SharedElementOrigin.TV_FEED,
-                            elementType = SharedElementType.Image)
-                    }
-                MediaItemCard(
-                    posterPath = item.imagePath,
-                    size = posterSize,
-                    rating = if (showRatings) item.rating else null,
-                    sharedElementKey = sharedElementKey,
-                    onItemClick = stableItemClick)
-            }
-
-            if (content.isLoading) {
-                item(contentType = "loading") {
-                    Box(modifier = Modifier.fillMaxHeight().width(Dimens.loadingIndicatorWidth)) {
-                        CircularProgressIndicator(Modifier.align(Alignment.Center))
-                    }
-                }
-            }
-        },
-        modifier = Modifier.height(posterSize.height))
+        if (items.isEmpty() && isLoading) {
+            ShimmerPosterCarousel(posterSize = posterSize)
+        } else {
+            MediaPosterCarousel(
+                items = items,
+                onItemClick = onItemClick,
+                posterSize = posterSize,
+                showRatings = showRatings)
+        }
+    }
 }
 
 // region Previews
@@ -243,7 +208,6 @@ private fun TvFeedScreenPreview() {
         topRatedTvShows = previewContentUiState(TvShowListCategory.TOP_RATED),
         popularTvShows = previewContentUiState(TvShowListCategory.POPULAR),
         errorMessage = null,
-        appendItems = {},
         onItemClick = {},
         onSeeAllClick = {},
         onErrorShown = {})
@@ -258,7 +222,6 @@ private fun TvFeedScreenLoadingPreview() {
         topRatedTvShows = ContentUiState(TvShowListCategory.TOP_RATED),
         popularTvShows = ContentUiState(TvShowListCategory.POPULAR),
         errorMessage = null,
-        appendItems = {},
         onItemClick = {},
         onSeeAllClick = {},
         onErrorShown = {})

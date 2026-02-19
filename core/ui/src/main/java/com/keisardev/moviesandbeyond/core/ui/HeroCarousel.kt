@@ -42,7 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import java.util.Locale
@@ -213,6 +215,107 @@ private fun HeroCarouselItemContent(
                     }
                 }
         }
+}
+
+/**
+ * Poster-style carousel for feed content sections. Uses Material 3 HorizontalMultiBrowseCarousel
+ * with poster-card items for a consistent browsing experience.
+ *
+ * Shows up to 15 items; users tap "See All" for the full list.
+ *
+ * @param items Content items to display in the carousel
+ * @param onItemClick Callback with item ID string when a poster is tapped
+ * @param posterSize Size variant for poster cards
+ * @param modifier Modifier for the carousel
+ * @param showRatings Whether to show rating badges on cards
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MediaPosterCarousel(
+    items: List<ContentItem>,
+    onItemClick: (Int) -> Unit,
+    posterSize: PosterSize,
+    modifier: Modifier = Modifier,
+    showRatings: Boolean = false
+) {
+    if (items.isEmpty()) return
+
+    val displayItems = remember(items) { items.take(15) }
+    val carouselState = rememberCarouselState { displayItems.size }
+
+    HorizontalMultiBrowseCarousel(
+        state = carouselState,
+        modifier = modifier.fillMaxWidth().height(posterSize.height),
+        preferredItemWidth = posterSize.width,
+        itemSpacing = Spacing.itemSpacing,
+        contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) { index ->
+            val item = displayItems[index]
+            val itemId = item.id
+            val onClick = remember(itemId) { { onItemClick(itemId) } }
+            PosterCarouselItem(
+                posterPath = item.imagePath,
+                rating = if (showRatings) item.rating else null,
+                onItemClick = onClick,
+                modifier = Modifier.maskClip(MaterialTheme.shapes.large))
+        }
+}
+
+/** Single poster item inside the carousel. Renders poster image with optional rating badge. */
+@Composable
+private fun PosterCarouselItem(
+    posterPath: String,
+    rating: Double?,
+    onItemClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isPressed by remember { mutableStateOf(false) }
+
+    val scale by
+        animateFloatAsState(
+            targetValue = if (isPressed) 0.96f else 1f,
+            animationSpec =
+                spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium),
+            label = "poster_carousel_scale")
+
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
+                .pointerInput(onItemClick) {
+                    detectTapGestures(
+                        onPress = {
+                            isPressed = true
+                            tryAwaitRelease()
+                            isPressed = false
+                        },
+                        onTap = { onItemClick() })
+                }) {
+            TmdbListImage(imageUrl = posterPath)
+
+            rating?.let {
+                if (it > 0) {
+                    CompactRatingBadge(
+                        rating = it, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
+                }
+            }
+        }
+}
+
+/** Shimmer loading state for poster carousel. */
+@Composable
+fun ShimmerPosterCarousel(posterSize: PosterSize, modifier: Modifier = Modifier) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(posterSize.height)
+                .background(MaterialTheme.colorScheme.surfaceVariant))
 }
 
 /** Shimmer loading state for hero carousel. */
