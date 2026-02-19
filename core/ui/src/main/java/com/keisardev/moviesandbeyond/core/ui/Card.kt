@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -114,7 +113,7 @@ fun MediaItemCard(
                     onTap = { onItemClick() })
             }
 
-    val cardShape = RoundedCornerShape(12.dp)
+    val cardShape = MaterialTheme.shapes.medium
 
     if (useSharedElements && sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
@@ -197,7 +196,7 @@ fun SimpleMediaItemCard(
             label = "simple_card_scale")
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier =
             modifier
@@ -263,7 +262,7 @@ fun MediaBackdropCard(
             label = "backdrop_scale")
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier =
             modifier

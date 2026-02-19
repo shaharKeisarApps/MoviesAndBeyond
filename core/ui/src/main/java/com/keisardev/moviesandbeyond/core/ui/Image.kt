@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,23 +57,26 @@ fun PersonImage(
     modifier: Modifier = Modifier,
     contentDescription: String? = null
 ) {
-    Surface(color = Color.LightGray, shape = CircleShape, modifier = modifier) {
-        if (imageUrl.isEmpty()) {
-            Icon(
-                imageVector = Icons.Rounded.AccountCircle,
-                contentDescription = contentDescription,
-                modifier = Modifier.fillMaxSize())
-        } else {
-            // Remember URL to prevent lambda recreation
-            val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = CircleShape,
+        modifier = modifier) {
+            if (imageUrl.isEmpty()) {
+                Icon(
+                    imageVector = Icons.Rounded.AccountCircle,
+                    contentDescription = contentDescription,
+                    modifier = Modifier.fillMaxSize())
+            } else {
+                // Remember URL to prevent lambda recreation
+                val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
 
-            LandscapistImage(
-                imageModel = { fullUrl },
-                modifier = Modifier.fillMaxSize(),
-                imageOptions = personImageOptions,
-                component = rememberImageComponent { +CircularRevealPlugin(duration = 350) })
+                LandscapistImage(
+                    imageModel = { fullUrl },
+                    modifier = Modifier.fillMaxSize(),
+                    imageOptions = personImageOptions,
+                    component = rememberImageComponent { +CircularRevealPlugin(duration = 350) })
+            }
         }
-    }
 }
 
 /**
@@ -151,12 +155,16 @@ fun TmdbListImage(
     contentDescription: String? = null
 ) {
     if (imageUrl.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray)) {
-            Text(
-                text = stringResource(id = R.string.no_image_available),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center))
-        }
+        Box(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
+                Text(
+                    text = stringResource(id = R.string.no_image_available),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.Center))
+            }
     } else {
         // Remember the full URL to prevent lambda recreation on recomposition
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w500$imageUrl" }
@@ -201,12 +209,16 @@ fun TmdbBackdropImage(
     contentDescription: String? = null
 ) {
     if (imageUrl.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray)) {
-            Text(
-                text = stringResource(id = R.string.no_image_available),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center))
-        }
+        Box(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
+                Text(
+                    text = stringResource(id = R.string.no_image_available),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.Center))
+            }
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w1280$imageUrl" }
 
@@ -256,7 +268,11 @@ fun TmdbProfileImage(
     contentDescription: String? = null
 ) {
     if (imageUrl.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize().background(Color.DarkGray))
+        Box(
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest))
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w185$imageUrl" }
 

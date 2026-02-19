@@ -20,17 +20,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 @Composable
@@ -86,14 +87,16 @@ private fun CreditsScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp)) {
+    LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = Spacing.xxxs)) {
         stickyHeader { CategoryHeader(stringResource(id = R.string.cast)) }
-        items(items = credits.cast, key = { it.id }) {
+        items(items = credits.cast, key = { it.id }) { castMember ->
+            val stableClick =
+                remember(castMember.id) { { onItemClick("${castMember.id},${MediaType.PERSON}") } }
             CreditsItem(
-                name = it.name,
-                role = it.character,
-                imagePath = it.profilePath,
-                onItemClick = { onItemClick("${it.id},${MediaType.PERSON}") })
+                name = castMember.name,
+                role = castMember.character,
+                imagePath = castMember.profilePath,
+                onItemClick = stableClick)
         }
 
         if (credits.crew.isNotEmpty()) {
@@ -102,12 +105,16 @@ private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
             val crewListByDepartment = credits.crew.groupBy { it.department }
             crewListByDepartment.forEach { mapEntry ->
                 stickyHeader { CategoryHeader(text = mapEntry.key) }
-                items(items = mapEntry.value, key = { it.creditId }) {
+                items(items = mapEntry.value, key = { it.creditId }) { crewMember ->
+                    val stableClick =
+                        remember(crewMember.id) {
+                            { onItemClick("${crewMember.id},${MediaType.PERSON}") }
+                        }
                     CreditsItem(
-                        name = it.name,
-                        role = it.job,
-                        imagePath = it.profilePath,
-                        onItemClick = { onItemClick("${it.id},${MediaType.PERSON}") })
+                        name = crewMember.name,
+                        role = crewMember.job,
+                        imagePath = crewMember.profilePath,
+                        onItemClick = stableClick)
                 }
             }
         }
@@ -129,17 +136,20 @@ private fun CreditsItem(
                 .fillMaxWidth()
                 .noRippleClickable { onItemClick() }
                 .padding(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
-            PersonImage(imageUrl = imagePath, modifier = Modifier.size(64.dp))
+            PersonImage(imageUrl = imagePath, modifier = Modifier.size(Dimens.personAvatarSize))
 
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(Spacing.sm))
 
             Column {
                 Text(
                     text = name,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(2.dp))
-                Text(text = role)
+                Spacer(Modifier.height(Spacing.xxxs))
+                Text(
+                    text = role,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 }
@@ -150,9 +160,10 @@ private fun CategoryHeader(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface,
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(Spacing.sm))
 }

@@ -64,6 +64,15 @@ fun getRatingColor(score: Double): Color {
     }
 }
 
+/** Get the text/icon color for a rating badge ensuring WCAG contrast. */
+fun getRatingContentColor(score: Double): Color {
+    return when {
+        // Amber and orange backgrounds need dark text for WCAG AA contrast
+        score in 4.0..7.9 -> Color(0xFF1C1B1F)
+        else -> Color.White
+    }
+}
+
 /**
  * Cinematic rating badge with color-coded background. Displays movie/TV rating with star icon and
  * score.
@@ -86,6 +95,7 @@ fun RatingBadge(
     showAnimation: Boolean = true
 ) {
     val backgroundColor = remember(rating) { getRatingColor(rating) }
+    val contentColor = remember(rating) { getRatingContentColor(rating) }
 
     val scale by
         animateFloatAsState(
@@ -122,13 +132,13 @@ fun RatingBadge(
                 imageVector = Icons.Rounded.Star,
                 contentDescription = null,
                 modifier = Modifier.size(iconSize),
-                tint = Color.White)
+                tint = contentColor)
 
             Text(
                 text = String.format(Locale.getDefault(), "%.1f", rating),
                 fontSize = fontSize,
                 fontWeight = FontWeight.Bold,
-                color = Color.White)
+                color = contentColor)
         }
 }
 
@@ -139,6 +149,7 @@ fun RatingBadge(
 @Composable
 fun CompactRatingBadge(rating: Double, modifier: Modifier = Modifier) {
     val backgroundColor = remember(rating) { getRatingColor(rating) }
+    val contentColor = remember(rating) { getRatingContentColor(rating) }
 
     Row(
         modifier =
@@ -152,13 +163,13 @@ fun CompactRatingBadge(rating: Double, modifier: Modifier = Modifier) {
                 imageVector = Icons.Rounded.Star,
                 contentDescription = null,
                 modifier = Modifier.size(10.dp),
-                tint = Color.White)
+                tint = contentColor)
 
             Text(
                 text = String.format(Locale.getDefault(), "%.1f", rating),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White)
+                color = contentColor)
         }
 }
 

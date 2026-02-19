@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.keisardev.moviesandbeyond.core.model.MediaType
@@ -28,6 +29,16 @@ internal fun MovieDetailsContent(
     onSeeAllCastClick: () -> Unit,
     onBackdropCollapse: (Boolean) -> Unit,
 ) {
+    val libraryItem = remember(movieDetails.id) { movieDetails.asLibraryItem() }
+    val stableFavoriteClick =
+        remember(libraryItem, onFavoriteClick) { { onFavoriteClick(libraryItem) } }
+    val stableWatchlistClick =
+        remember(libraryItem, onWatchlistClick) { { onWatchlistClick(libraryItem) } }
+    val stableRecommendationClick =
+        remember(onRecommendationClick) {
+            { id: String -> onRecommendationClick("${id},${MediaType.MOVIE}") }
+        }
+
     MediaDetailsContent(
         backdropPath = movieDetails.backdropPath,
         voteCount = movieDetails.voteCount,
@@ -42,11 +53,11 @@ internal fun MovieDetailsContent(
         recommendations = movieDetails.recommendations,
         isFavorite = isFavorite,
         isAddedToWatchList = isAddedToWatchList,
-        onFavoriteClick = { onFavoriteClick(movieDetails.asLibraryItem()) },
-        onWatchlistClick = { onWatchlistClick(movieDetails.asLibraryItem()) },
+        onFavoriteClick = stableFavoriteClick,
+        onWatchlistClick = stableWatchlistClick,
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
-        onRecommendationClick = { id -> onRecommendationClick("${id},${MediaType.MOVIE}") },
+        onRecommendationClick = stableRecommendationClick,
         onBackdropCollapse = onBackdropCollapse) {
             MovieDetailsSection(
                 releaseDate = movieDetails.releaseDate,
@@ -67,6 +78,7 @@ private fun MovieDetailsSection(
     budget: String,
     revenue: String
 ) {
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
     Column(
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         modifier =
@@ -77,31 +89,29 @@ private fun MovieDetailsSection(
                 .padding(Spacing.md)) {
             DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = dividerColor)
 
             DetailItem(
                 fieldName = stringResource(id = R.string.original_language),
                 value = originalLanguage)
 
             if (budget != "0" && budget.isNotEmpty()) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                HorizontalDivider(color = dividerColor)
                 DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
             }
 
             if (revenue != "0" && revenue.isNotEmpty()) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                HorizontalDivider(color = dividerColor)
                 DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = dividerColor)
 
             DetailItem(
                 fieldName = stringResource(id = R.string.production_companies),
                 value = productionCompanies)
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = dividerColor)
 
             DetailItem(
                 fieldName = stringResource(id = R.string.production_countries),

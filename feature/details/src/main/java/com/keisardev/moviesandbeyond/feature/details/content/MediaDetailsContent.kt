@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -133,8 +134,9 @@ internal fun MediaDetailsContent(
         with(LocalDensity.current) {
             (backdropExpandedHeight.toPx() + nestedScrollConnection.collapseOffsetPx).toDp()
         }
-    val isBackdropCollapsed by
-        remember(backdropHeight) { derivedStateOf { backdropHeight == collapsedHeight } }
+    val isBackdropCollapsed by remember {
+        derivedStateOf { nestedScrollConnection.collapseOffsetPx <= -heightToCollapsePx }
+    }
     LaunchedEffect(isBackdropCollapsed) { onBackdropCollapse(isBackdropCollapsed) }
 
     val scrollValue = 1 - ((backdropExpandedHeight - backdropHeight) / heightToCollapse)
@@ -149,7 +151,7 @@ internal fun MediaDetailsContent(
                 PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm),
             verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
             modifier = Modifier.fillMaxWidth()) {
-                item {
+                item(key = "info") {
                     InfoSection(
                         voteCount = voteCount,
                         name = name,
@@ -159,9 +161,9 @@ internal fun MediaDetailsContent(
                         tagline = tagline)
                 }
 
-                item { GenreSection(genres) }
+                item(key = "genres") { GenreSection(genres) }
 
-                item {
+                item(key = "library_actions") {
                     LibraryActions(
                         isFavorite = isFavorite,
                         isAddedToWatchList = isAddedToWatchList,
@@ -169,18 +171,18 @@ internal fun MediaDetailsContent(
                         onWatchlistClick = onWatchlistClick)
                 }
 
-                item {
+                item(key = "cast") {
                     TopBilledCast(
                         cast = cast,
                         onCastClick = onCastClick,
                         onSeeAllCastClick = onSeeAllCastClick)
                 }
 
-                item { OverviewSection(overview) }
+                item(key = "overview") { OverviewSection(overview) }
 
-                item { content() }
+                item(key = "details") { content() }
 
-                item {
+                item(key = "recommendations") {
                     Recommendations(
                         recommendations = recommendations,
                         onRecommendationClick = onRecommendationClick)
@@ -268,12 +270,20 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
     // Uses 50dp max offset for subtle but noticeable depth effect
     val parallaxOffset = (1f - scrollValue) * 50f
 
-    // Status bar scrim opacity - fades out as backdrop collapses
-    // Ensures status bar icons remain legible against dynamic image content
-    val statusBarScrimAlpha = (1f - scrollValue).coerceIn(0f, 0.5f)
-
     // Use actual status bar height for the scrim
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+    // Cache the content gradient brush — only recreated when background color changes
+    val bgColor = MaterialTheme.colorScheme.background
+    val contentGradient =
+        remember(bgColor) {
+            Brush.verticalGradient(
+                colors =
+                    listOf(
+                        Color.Transparent, Color.Transparent, bgColor.copy(alpha = 0.7f), bgColor),
+                startY = 0f,
+                endY = Float.POSITIVE_INFINITY)
+        }
 
     Box(modifier.fillMaxWidth().clipToBounds()) {
         // Hero backdrop image with parallax and fade effects
@@ -288,34 +298,21 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
                 },
             contentScale = ContentScale.Crop)
 
-        // Status bar scrim - dark overlay at top for icon legibility
-        // Fades out as backdrop collapses and title appears in app bar
+        // Status bar scrim — uses drawBehind to defer scrollValue read to draw phase
         Box(
             modifier =
-                Modifier.fillMaxWidth()
-                    .height(statusBarHeight + 8.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors =
-                                listOf(
-                                    Color.Black.copy(alpha = statusBarScrimAlpha),
-                                    Color.Transparent))))
+                Modifier.fillMaxWidth().height(statusBarHeight + 8.dp).drawBehind {
+                    val scrimAlpha = (1f - scrollValue).coerceIn(0f, 0.5f)
+                    drawRect(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        Color.Black.copy(alpha = scrimAlpha), Color.Transparent)))
+                })
 
         // Content gradient overlay - ensures text readability over dynamic images
-        // Uses M3 color roles for seamless transition to background
-        Box(
-            modifier =
-                Modifier.fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors =
-                                listOf(
-                                    Color.Transparent,
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-                                    MaterialTheme.colorScheme.background),
-                            startY = 0f,
-                            endY = Float.POSITIVE_INFINITY)))
+        Box(modifier = Modifier.fillMaxSize().background(contentGradient))
     }
 }
 
@@ -507,6 +504,8 @@ private fun Recommendations(
                     Box(Modifier.fillMaxSize()) {
                         Text(
                             text = stringResource(id = R.string.not_available),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.align(Alignment.Center))
                     }
                 }
@@ -520,7 +519,7 @@ private fun Recommendations(
                 }
             }
         },
-        modifier = Modifier.padding(bottom = 4.dp))
+        modifier = Modifier.padding(bottom = Spacing.xxs))
 }
 
 /**
@@ -637,7 +636,7 @@ private fun LibraryActions(
                 icon = Icons.Rounded.Favorite,
                 iconTint =
                     if (isFavorite) {
-                        Color.Red // Semantic color for favorited state
+                        MaterialTheme.colorScheme.error
                     } else {
                         MaterialTheme.colorScheme.onPrimary
                     },

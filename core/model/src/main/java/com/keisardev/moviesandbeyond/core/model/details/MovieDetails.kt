@@ -5,6 +5,7 @@ import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 
+@androidx.compose.runtime.Immutable
 data class MovieDetails(
     val adult: Boolean,
     val backdropPath: String,

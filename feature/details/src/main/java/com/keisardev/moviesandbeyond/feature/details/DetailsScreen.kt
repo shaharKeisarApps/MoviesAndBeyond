@@ -129,7 +129,7 @@ internal fun DetailsScreen(
                                     text = stringResource(id = R.string.sign_in_sheet_text),
                                     style = MaterialTheme.typography.bodyLarge)
 
-                                Spacer(Modifier.height(50.dp))
+                                Spacer(Modifier.height(Spacing.xxl))
 
                                 Button(
                                     onClick = {
@@ -159,9 +159,11 @@ internal fun DetailsScreen(
                     }
 
                     ContentDetailUiState.Empty -> {
-                        uiState.errorMessage?.let {
-                            scope.launch { snackbarHostState.showSnackbar(it) }
-                            onErrorShown()
+                        LaunchedEffect(uiState.errorMessage) {
+                            uiState.errorMessage?.let {
+                                snackbarHostState.showSnackbar(it)
+                                onErrorShown()
+                            }
                         }
                     }
 
@@ -233,12 +235,14 @@ internal fun DetailsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () -> Unit) {
+    val topAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+    val iconColors =
+        IconButtonDefaults.iconButtonColors(
+            containerColor = Color.Black.copy(alpha = 0.5f), contentColor = Color.White)
     TopAppBarWithBackButton(
         title = { AnimatedText(text = title, visible = showTitle) },
-        topAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-        iconButtonColors =
-            IconButtonDefaults.iconButtonColors(
-                containerColor = Color.Black.copy(alpha = 0.5f), contentColor = Color.White),
+        topAppBarColors = topAppBarColors,
+        iconButtonColors = iconColors,
         windowInsets = WindowInsets.statusBars,
         onBackClick = onBackClick)
 }

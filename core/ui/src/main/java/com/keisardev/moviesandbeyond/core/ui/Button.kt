@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Button
@@ -16,6 +15,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,7 +60,7 @@ fun LibraryActionButton(
 
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         colors = colors,
         border = border,
         interactionSource = remember { MutableInteractionSource() },
@@ -76,8 +76,7 @@ fun LibraryActionButton(
                             isPressed = true
                             tryAwaitRelease()
                             isPressed = false
-                        },
-                        onTap = { onClick() })
+                        })
                 }) {
             Icon(imageVector = icon, contentDescription = name, tint = iconTint)
             Spacer(Modifier.width(4.dp))

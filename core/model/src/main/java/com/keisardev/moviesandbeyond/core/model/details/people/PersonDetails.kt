@@ -1,5 +1,6 @@
 package com.keisardev.moviesandbeyond.core.model.details.people
 
+@androidx.compose.runtime.Immutable
 data class PersonDetails(
     val adult: Boolean,
     val alsoKnownAs: String,

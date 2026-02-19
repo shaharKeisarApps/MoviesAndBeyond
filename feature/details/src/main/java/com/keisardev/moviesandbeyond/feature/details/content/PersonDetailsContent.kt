@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
 
@@ -46,7 +47,7 @@ internal fun PersonDetailsContent(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             modifier = modifier.fillMaxWidth().padding(paddingValues)) {
                 item {
                     Row(Modifier.fillMaxWidth()) {
@@ -55,7 +56,7 @@ internal fun PersonDetailsContent(
                             posterPath = personDetails.profilePath,
                             modifier = Modifier.size(height = 200.dp, width = 140.dp))
 
-                        Spacer(Modifier.width(10.dp))
+                        Spacer(Modifier.width(Spacing.sm))
 
                         PersonInfoSection(
                             name = personDetails.name,
@@ -85,7 +86,7 @@ private fun PersonInfoSection(
     deathday: String?,
     department: String
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xxxs)) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineSmall,
@@ -103,7 +104,7 @@ private fun PersonInfoSection(
 
 @Composable
 private fun PersonDetailsSection(alsoKnownAs: String, placeOfBirth: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
         DetailItem(fieldName = stringResource(id = R.string.birth_place), value = placeOfBirth)
         DetailItem(fieldName = stringResource(id = R.string.also_known_as), value = alsoKnownAs)
     }

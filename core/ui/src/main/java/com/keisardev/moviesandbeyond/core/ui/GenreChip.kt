@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,7 +81,7 @@ fun GenreChip(
             animationSpec = spring(),
             label = "chip_content")
 
-    val chipShape = RoundedCornerShape(8.dp)
+    val chipShape = MaterialTheme.shapes.small
 
     Box(
         modifier =
@@ -135,7 +134,7 @@ fun OutlinedGenreChip(text: String, modifier: Modifier = Modifier, onClick: (() 
                     stiffness = Spring.StiffnessHigh),
             label = "outlined_chip_scale")
 
-    val chipShape = RoundedCornerShape(8.dp)
+    val chipShape = MaterialTheme.shapes.small
 
     Box(
         modifier =

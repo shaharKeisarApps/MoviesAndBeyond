@@ -11,6 +11,7 @@ package com.keisardev.moviesandbeyond.core.model.content
  * @param releaseDate Release date string (optional)
  * @param overview Short description/synopsis (optional)
  */
+@androidx.compose.runtime.Immutable
 data class ContentItem(
     val id: Int,
     val imagePath: String,
