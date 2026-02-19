@@ -6,6 +6,6 @@ import com.keisardev.moviesandbeyond.core.model.SearchItem
 interface SearchRepository {
     suspend fun getSearchSuggestions(
         query: String,
-        includeAdult: Boolean
+        includeAdult: Boolean,
     ): NetworkResponse<List<SearchItem>>
 }

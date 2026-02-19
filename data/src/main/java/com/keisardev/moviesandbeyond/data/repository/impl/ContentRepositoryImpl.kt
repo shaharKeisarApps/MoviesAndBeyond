@@ -28,7 +28,7 @@ constructor(
     private val accountDetailsDao: AccountDetailsDao,
     private val cachedContentDao: CachedContentDao,
     private val movieContentStore: Store<MovieContentKey, List<ContentItem>>,
-    private val tvContentStore: Store<TvContentKey, List<ContentItem>>
+    private val tvContentStore: Store<TvContentKey, List<ContentItem>>,
 ) : ContentRepository {
 
     // ==================== Legacy API (Kept for backward compatibility) ====================
@@ -36,14 +36,15 @@ constructor(
     @Deprecated("Use observeMovieItems instead for offline-first support")
     override suspend fun getMovieItems(
         page: Int,
-        category: MovieListCategory
+        category: MovieListCategory,
     ): NetworkResponse<List<ContentItem>> {
         return try {
             val response =
                 tmdbApi.getMovieLists(
                     category = category.categoryName,
                     page = page,
-                    region = accountDetailsDao.getRegionCode())
+                    region = accountDetailsDao.getRegionCode(),
+                )
             NetworkResponse.Success(response.results.map(NetworkContentItem::asModel))
         } catch (e: IOException) {
             return NetworkResponse.Error()
@@ -55,7 +56,7 @@ constructor(
     @Deprecated("Use observeTvShowItems instead for offline-first support")
     override suspend fun getTvShowItems(
         page: Int,
-        category: TvShowListCategory
+        category: TvShowListCategory,
     ): NetworkResponse<List<ContentItem>> {
         return try {
             val response = tmdbApi.getTvShowLists(category = category.categoryName, page = page)
@@ -72,22 +73,24 @@ constructor(
     override fun observeMovieItems(
         category: MovieListCategory,
         page: Int,
-        refresh: Boolean
+        refresh: Boolean,
     ): Flow<StoreReadResponse<List<ContentItem>>> =
         movieContentStore.stream(
-            StoreReadRequest.cached(key = MovieContentKey(category, page), refresh = refresh))
+            StoreReadRequest.cached(key = MovieContentKey(category, page), refresh = refresh)
+        )
 
     override fun observeTvShowItems(
         category: TvShowListCategory,
         page: Int,
-        refresh: Boolean
+        refresh: Boolean,
     ): Flow<StoreReadResponse<List<ContentItem>>> =
         tvContentStore.stream(
-            StoreReadRequest.cached(key = TvContentKey(category, page), refresh = refresh))
+            StoreReadRequest.cached(key = TvContentKey(category, page), refresh = refresh)
+        )
 
     override suspend fun refreshMovieItems(
         category: MovieListCategory,
-        page: Int
+        page: Int,
     ): List<ContentItem> =
         movieContentStore
             .stream(StoreReadRequest.fresh(MovieContentKey(category, page)))
@@ -97,7 +100,7 @@ constructor(
 
     override suspend fun refreshTvShowItems(
         category: TvShowListCategory,
-        page: Int
+        page: Int,
     ): List<ContentItem> =
         tvContentStore
             .stream(StoreReadRequest.fresh(TvContentKey(category, page)))

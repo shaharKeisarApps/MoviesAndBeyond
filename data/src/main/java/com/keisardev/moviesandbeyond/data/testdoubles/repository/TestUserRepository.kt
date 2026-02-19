@@ -18,7 +18,8 @@ val testUserData =
         hideOnboarding = false,
         seedColor = SeedColor.DEFAULT,
         useLocalOnly = false,
-        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB)
+        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+    )
 
 val testAccountDetails =
     AccountDetails(
@@ -29,7 +30,8 @@ val testAccountDetails =
         iso6391 = "iso63",
         iso31661 = "iso31",
         name = "name",
-        username = "username")
+        username = "username",
+    )
 
 class TestUserRepository : UserRepository {
     private var generateError = false

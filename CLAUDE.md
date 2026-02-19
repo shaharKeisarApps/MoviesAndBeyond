@@ -177,27 +177,27 @@ BASE_URL=https://api.themoviedb.org/3/
 Obtain your access token from [TMDB API](https://api.themoviedb.org/).
 
 ### Build Configuration
-- **Kotlin Version**: 2.3.0
+- **Kotlin Version**: 2.2.21
 - **Java Version**: 17
 - **Compile SDK**: 36
 - **Min SDK**: Set in convention plugins (check `AndroidApplicationConventionPlugin`)
 - **Target SDK**: 36
 
 ## Key Dependencies
-- **Jetpack Compose BOM**: 2025.12.01
-- **Hilt**: 2.57.2
+- **Jetpack Compose BOM Alpha**: 2026.02.00
+- **Hilt**: 2.58
 - **Room**: 2.8.4
 - **Retrofit**: 3.0.0 (with Moshi converter)
-- **Ktor**: 3.3.3
+- **Ktor**: 3.4.0
 - **Kotlin Serialization**: 1.9.0
-- **Navigation Compose**: 2.9.6
-- **Coil**: 2.7.0 (image loading)
+- **Navigation Compose**: 2.9.7
+- **Landscapist**: 2.9.5 (image loading)
 - **Haze**: 1.7.1 (blur effects)
-- **WorkManager**: 2.11.0
+- **WorkManager**: 2.11.1
 - **DataStore**: 1.2.0
 - **Code Quality**:
-  - **Spotless**: 7.0.3 (code formatting)
-  - **ktfmt**: 0.51 (Kotlin formatter by Facebook)
+  - **Spotless**: 8.2.0 (code formatting)
+  - **ktfmt**: 0.61 (Kotlin formatter by Facebook)
   - **Detekt**: 1.23.8 (static analysis)
 
 ## Testing Approach

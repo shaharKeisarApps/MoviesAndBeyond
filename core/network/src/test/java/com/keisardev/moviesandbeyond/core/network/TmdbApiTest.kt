@@ -54,7 +54,8 @@ class TmdbApiTest {
                 overview =
                     "Super-Hero partners Scott Lang and Hope van Dyne, along with with Hope's parents Janet van Dyne and Hank Pym, and Scott's daughter Cassie Lang, find themselves exploring the Quantum Realm, interacting with strange new creatures and embarking on an adventure that will push them beyond the limits of what they thought possible.",
             ),
-            content.results.first())
+            content.results.first(),
+        )
     }
 
     @Test

@@ -10,5 +10,5 @@ data class UserData(
     val hideOnboarding: Boolean,
     val seedColor: SeedColor,
     val useLocalOnly: Boolean = false,
-    val customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB
+    val customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
 )

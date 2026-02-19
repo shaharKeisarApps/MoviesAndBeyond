@@ -39,7 +39,8 @@ internal object NetworkModule {
                                 .build()
 
                         chain.proceed(newRequest)
-                    })
+                    }
+                )
                 .build()
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)

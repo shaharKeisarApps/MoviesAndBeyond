@@ -10,7 +10,7 @@ class TestSearchRepository : SearchRepository {
 
     override suspend fun getSearchSuggestions(
         query: String,
-        includeAdult: Boolean
+        includeAdult: Boolean,
     ): NetworkResponse<List<SearchItem>> {
         if (generateError) return NetworkResponse.Error()
 

@@ -55,28 +55,31 @@ private val backdropImageOptionsCache = mutableMapOf<ContentScale, ImageOptions>
 fun PersonImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
-    contentDescription: String? = null
+    contentDescription: String? = null,
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = CircleShape,
-        modifier = modifier) {
-            if (imageUrl.isEmpty()) {
-                Icon(
-                    imageVector = Icons.Rounded.AccountCircle,
-                    contentDescription = contentDescription,
-                    modifier = Modifier.fillMaxSize())
-            } else {
-                // Remember URL to prevent lambda recreation
-                val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
+        modifier = modifier,
+    ) {
+        if (imageUrl.isEmpty()) {
+            Icon(
+                imageVector = Icons.Rounded.AccountCircle,
+                contentDescription = contentDescription,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            // Remember URL to prevent lambda recreation
+            val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
 
-                LandscapistImage(
-                    imageModel = { fullUrl },
-                    modifier = Modifier.fillMaxSize(),
-                    imageOptions = personImageOptions,
-                    component = rememberImageComponent { +CircularRevealPlugin(duration = 350) })
-            }
+            LandscapistImage(
+                imageModel = { fullUrl },
+                modifier = Modifier.fillMaxSize(),
+                imageOptions = personImageOptions,
+                component = rememberImageComponent { +CircularRevealPlugin(duration = 350) },
+            )
         }
+    }
 }
 
 /**
@@ -97,14 +100,15 @@ fun TmdbImage(
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
     contentScale: ContentScale = ContentScale.FillBounds,
-    alpha: Float = 1f
+    alpha: Float = 1f,
 ) {
     Box(modifier = modifier.fillMaxSize().alpha(alpha)) {
         if (imageUrl.isEmpty()) {
             Text(
                 text = stringResource(id = R.string.no_image_available),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center))
+                modifier = Modifier.align(Alignment.Center),
+            )
         } else {
             LandscapistImage(
                 imageModel = { "https://image.tmdb.org/t/p/w${width}$imageUrl" },
@@ -114,12 +118,14 @@ fun TmdbImage(
                         contentDescription = contentDescription,
                         alpha = alpha,
                         // Request size hint for automatic downsampling and better cache efficiency
-                        requestSize = IntSize(width, (width * 1.5).toInt())),
+                        requestSize = IntSize(width, (width * 1.5).toInt()),
+                    ),
                 modifier = Modifier.fillMaxSize(),
                 component =
                     rememberImageComponent {
                         +ShimmerPlugin(
-                            Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+                            Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray)
+                        )
                         // CrossfadePlugin removed - cached images display instantly
                     },
                 failure = {
@@ -127,9 +133,11 @@ fun TmdbImage(
                         Text(
                             text = stringResource(id = R.string.no_image_available),
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.Center))
+                            modifier = Modifier.align(Alignment.Center),
+                        )
                     }
-                })
+                },
+            )
         }
     }
 }
@@ -152,19 +160,19 @@ fun TmdbImage(
 fun TmdbListImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
-    contentDescription: String? = null
+    contentDescription: String? = null,
 ) {
     if (imageUrl.isEmpty()) {
         Box(
             modifier =
-                modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
-                Text(
-                    text = stringResource(id = R.string.no_image_available),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center))
-            }
+                modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        ) {
+            Text(
+                text = stringResource(id = R.string.no_image_available),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
     } else {
         // Remember the full URL to prevent lambda recreation on recomposition
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w500$imageUrl" }
@@ -185,9 +193,11 @@ fun TmdbListImage(
                     Text(
                         text = stringResource(id = R.string.no_image_available),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center))
+                        modifier = Modifier.align(Alignment.Center),
+                    )
                 }
-            })
+            },
+        )
     }
 }
 
@@ -206,19 +216,19 @@ fun TmdbBackdropImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
-    contentDescription: String? = null
+    contentDescription: String? = null,
 ) {
     if (imageUrl.isEmpty()) {
         Box(
             modifier =
-                modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
-                Text(
-                    text = stringResource(id = R.string.no_image_available),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center))
-            }
+                modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        ) {
+            Text(
+                text = stringResource(id = R.string.no_image_available),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w1280$imageUrl" }
 
@@ -246,9 +256,11 @@ fun TmdbBackdropImage(
                     Text(
                         text = stringResource(id = R.string.no_image_available),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center))
+                        modifier = Modifier.align(Alignment.Center),
+                    )
                 }
-            })
+            },
+        )
     }
 }
 
@@ -265,14 +277,13 @@ fun TmdbBackdropImage(
 fun TmdbProfileImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
-    contentDescription: String? = null
+    contentDescription: String? = null,
 ) {
     if (imageUrl.isEmpty()) {
         Box(
             modifier =
-                modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest))
+                modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        )
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w185$imageUrl" }
 
@@ -286,6 +297,7 @@ fun TmdbProfileImage(
             imageOptions = profileImageOptions,
             modifier = modifier.fillMaxSize(),
             component = component,
-            failure = { Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) })
+            failure = { Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) },
+        )
     }
 }

@@ -146,5 +146,6 @@ class LibraryItemsViewModelTest {
             savedStateHandle =
                 SavedStateHandle(mapOf(libraryItemTypeNavigationArgument to navigationArgument)),
             libraryRepository = libraryRepository,
-            authRepository = authRepository)
+            authRepository = authRepository,
+        )
 }

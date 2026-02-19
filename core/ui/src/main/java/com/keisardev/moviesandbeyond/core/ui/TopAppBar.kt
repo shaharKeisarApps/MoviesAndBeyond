@@ -23,7 +23,7 @@ fun TopAppBarWithBackButton(
     topAppBarColors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     iconButtonColors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     windowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = title,
@@ -31,10 +31,12 @@ fun TopAppBarWithBackButton(
             IconButton(colors = iconButtonColors, onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back))
+                    contentDescription = stringResource(id = R.string.back),
+                )
             }
         },
         colors = topAppBarColors,
         windowInsets = windowInsets,
-        modifier = modifier)
+        modifier = modifier,
+    )
 }

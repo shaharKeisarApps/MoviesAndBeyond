@@ -30,19 +30,18 @@ fun NavGraphBuilder.moviesScreen(
 
         composable(
             route = "${MoviesScreenRoutes.ITEMS}/{category}",
-            arguments = listOf(navArgument("category") { type = NavType.StringType })) {
-                backStackEntry ->
-                val parentEntry =
-                    remember(backStackEntry) {
-                        navController.getBackStackEntry(moviesNavigationRoute)
-                    }
-                val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
-                ItemsRoute(
-                    categoryName = backStackEntry.arguments?.getString("category")!!,
-                    onItemClick = navigateToDetails,
-                    onBackClick = navController::navigateUp,
-                    viewModel = viewModel)
-            }
+            arguments = listOf(navArgument("category") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val parentEntry =
+                remember(backStackEntry) { navController.getBackStackEntry(moviesNavigationRoute) }
+            val viewModel = hiltViewModel<MoviesViewModel>(parentEntry)
+            ItemsRoute(
+                categoryName = backStackEntry.arguments?.getString("category")!!,
+                onItemClick = navigateToDetails,
+                onBackClick = navController::navigateUp,
+                viewModel = viewModel,
+            )
+        }
     }
 }
 

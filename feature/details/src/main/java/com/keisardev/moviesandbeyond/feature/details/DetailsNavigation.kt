@@ -26,7 +26,8 @@ fun NavGraphBuilder.detailsScreen(navController: NavController, navigateToAuth: 
                 onItemClick = navController::navigateToDetails,
                 onSeeAllCastClick = navController::navigateToCredits,
                 navigateToAuth = navigateToAuth,
-                viewModel = viewModel)
+                viewModel = viewModel,
+            )
         }
 
         composable(route = creditsNavigationRoute) { backStackEntry ->
@@ -39,7 +40,8 @@ fun NavGraphBuilder.detailsScreen(navController: NavController, navigateToAuth: 
             CreditsRoute(
                 viewModel = viewModel,
                 onItemClick = navController::navigateToDetails,
-                onBackClick = navController::navigateUp)
+                onBackClick = navController::navigateUp,
+            )
         }
     }
 }

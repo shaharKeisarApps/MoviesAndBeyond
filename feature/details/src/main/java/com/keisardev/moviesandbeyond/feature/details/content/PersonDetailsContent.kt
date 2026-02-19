@@ -33,7 +33,7 @@ import com.keisardev.moviesandbeyond.feature.details.R
 internal fun PersonDetailsContent(
     personDetails: PersonDetails,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val pinnedScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -41,40 +41,45 @@ internal fun PersonDetailsContent(
         topBar = {
             TopAppBarWithBackButton(
                 title = { Text(text = personDetails.name, fontWeight = FontWeight.SemiBold) },
-                onBackClick = onBackClick)
+                onBackClick = onBackClick,
+            )
         },
         modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-            modifier = modifier.fillMaxWidth().padding(paddingValues)) {
-                item {
-                    Row(Modifier.fillMaxWidth()) {
-                        // Person profile image - doesn't need shared element transitions
-                        SimpleMediaItemCard(
-                            posterPath = personDetails.profilePath,
-                            modifier = Modifier.size(height = 200.dp, width = 140.dp))
+            modifier = modifier.fillMaxWidth().padding(paddingValues),
+        ) {
+            item {
+                Row(Modifier.fillMaxWidth()) {
+                    // Person profile image - doesn't need shared element transitions
+                    SimpleMediaItemCard(
+                        posterPath = personDetails.profilePath,
+                        modifier = Modifier.size(height = 200.dp, width = 140.dp),
+                    )
 
-                        Spacer(Modifier.width(Spacing.sm))
+                    Spacer(Modifier.width(Spacing.sm))
 
-                        PersonInfoSection(
-                            name = personDetails.name,
-                            gender = personDetails.gender,
-                            birthday = personDetails.birthday,
-                            deathday = personDetails.deathday,
-                            department = personDetails.knownForDepartment)
-                    }
+                    PersonInfoSection(
+                        name = personDetails.name,
+                        gender = personDetails.gender,
+                        birthday = personDetails.birthday,
+                        deathday = personDetails.deathday,
+                        department = personDetails.knownForDepartment,
+                    )
                 }
-
-                item {
-                    PersonDetailsSection(
-                        alsoKnownAs = personDetails.alsoKnownAs,
-                        placeOfBirth = personDetails.placeOfBirth)
-                }
-
-                item { OverviewSection(personDetails.biography) }
             }
+
+            item {
+                PersonDetailsSection(
+                    alsoKnownAs = personDetails.alsoKnownAs,
+                    placeOfBirth = personDetails.placeOfBirth,
+                )
+            }
+
+            item { OverviewSection(personDetails.biography) }
+        }
     }
 }
 
@@ -84,13 +89,14 @@ private fun PersonInfoSection(
     gender: String,
     birthday: String,
     deathday: String?,
-    department: String
+    department: String,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xxxs)) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold)
+            fontWeight = FontWeight.SemiBold,
+        )
 
         DetailItem(fieldName = stringResource(id = R.string.gender), value = gender)
 

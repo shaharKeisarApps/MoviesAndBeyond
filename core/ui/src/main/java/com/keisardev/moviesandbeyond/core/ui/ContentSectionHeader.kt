@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun ContentSectionHeader(
     sectionName: String,
     onSeeAllClick: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Expressive press state for arrow
     var isArrowPressed by remember { mutableStateOf(false) }
@@ -48,8 +48,10 @@ fun ContentSectionHeader(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessHigh),
-            label = "arrow_scale")
+                    stiffness = Spring.StiffnessHigh,
+                ),
+            label = "arrow_scale",
+        )
 
     val arrowTranslateX by
         animateFloatAsState(
@@ -57,39 +59,45 @@ fun ContentSectionHeader(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessHigh),
-            label = "arrow_translate")
+                    stiffness = Spring.StiffnessHigh,
+                ),
+            label = "arrow_translate",
+        )
 
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = sectionName,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold)
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = sectionName,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
 
-            if (onSeeAllClick != null) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                    contentDescription = stringResource(id = R.string.see_all),
-                    modifier =
-                        Modifier.graphicsLayer {
-                                scaleX = arrowScale
-                                scaleY = arrowScale
-                                translationX = arrowTranslateX
-                            }
-                            .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onPress = {
-                                        isArrowPressed = true
-                                        tryAwaitRelease()
-                                        isArrowPressed = false
-                                    },
-                                    onTap = { onSeeAllClick() })
-                            })
-            }
+        if (onSeeAllClick != null) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = stringResource(id = R.string.see_all),
+                modifier =
+                    Modifier.graphicsLayer {
+                            scaleX = arrowScale
+                            scaleY = arrowScale
+                            translationX = arrowTranslateX
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    isArrowPressed = true
+                                    tryAwaitRelease()
+                                    isArrowPressed = false
+                                },
+                                onTap = { onSeeAllClick() },
+                            )
+                        },
+            )
         }
+    }
 }
 
 // region Previews

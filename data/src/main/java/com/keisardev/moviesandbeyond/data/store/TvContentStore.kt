@@ -50,18 +50,26 @@ constructor(private val api: TmdbApi, private val cachedContentDao: CachedConten
                         writer = { key, items ->
                             // Delete old entries for this page before inserting new ones
                             cachedContentDao.deleteByCategoryAndPage(
-                                key.toCategoryString(), key.page)
+                                key.toCategoryString(),
+                                key.page,
+                            )
                             cachedContentDao.insertAll(
-                                items.toCachedEntities(key.toCategoryString(), key.page))
+                                items.toCachedEntities(key.toCategoryString(), key.page)
+                            )
                         },
                         delete = { key ->
                             cachedContentDao.deleteByCategoryAndPage(
-                                key.toCategoryString(), key.page)
+                                key.toCategoryString(),
+                                key.page,
+                            )
                         },
-                        deleteAll = { cachedContentDao.deleteAll() }))
+                        deleteAll = { cachedContentDao.deleteAll() },
+                    ),
+            )
             .cachePolicy(
                 MemoryPolicy.builder<TvContentKey, List<ContentItem>>()
                     .setMaxSize(MEMORY_CACHE_SIZE)
-                    .build())
+                    .build()
+            )
             .build()
 }

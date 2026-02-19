@@ -12,4 +12,5 @@ fun NetworkAccountDetails.asEntity() =
         iso6391 = iso6391,
         iso31661 = iso31661,
         gravatarHash = avatar.gravatar.hash,
-        tmdbAvatarPath = avatar.tmdb.avatarPath)
+        tmdbAvatarPath = avatar.tmdb.avatarPath,
+    )

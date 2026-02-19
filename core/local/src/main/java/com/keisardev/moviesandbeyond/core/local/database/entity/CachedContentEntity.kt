@@ -25,7 +25,8 @@ import androidx.room.Index
 @Entity(
     tableName = "cached_content",
     primaryKeys = ["content_id", "category"],
-    indices = [Index(value = ["category"]), Index(value = ["fetched_at"])])
+    indices = [Index(value = ["category"]), Index(value = ["fetched_at"])],
+)
 data class CachedContentEntity(
     @ColumnInfo(name = "content_id") val contentId: Int,
     val category: String,
@@ -37,5 +38,5 @@ data class CachedContentEntity(
     val rating: Double?,
     @ColumnInfo(name = "release_date") val releaseDate: String?,
     val overview: String?,
-    @ColumnInfo(name = "fetched_at") val fetchedAt: Long = System.currentTimeMillis()
+    @ColumnInfo(name = "fetched_at") val fetchedAt: Long = System.currentTimeMillis(),
 )

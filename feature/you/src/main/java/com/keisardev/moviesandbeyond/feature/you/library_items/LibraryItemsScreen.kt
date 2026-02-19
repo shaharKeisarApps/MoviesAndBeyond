@@ -91,7 +91,7 @@ fun LibraryItemsRoute(
     onBackClick: () -> Unit,
     navigateToDetails: (String) -> Unit,
     viewModel: LibraryItemsViewModel = hiltViewModel(),
-    libraryItemType: String? = null
+    libraryItemType: String? = null,
 ) {
     // For Navigation 3: Set the type from the route key
     libraryItemType?.let { viewModel.setLibraryItemType(it) }
@@ -109,7 +109,8 @@ fun LibraryItemsRoute(
         onDeleteItem = viewModel::deleteItem,
         onBackClick = onBackClick,
         onItemClick = navigateToDetails,
-        onErrorShown = viewModel::onErrorShown)
+        onErrorShown = viewModel::onErrorShown,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -122,13 +123,13 @@ internal fun LibraryItemsScreen(
     onDeleteItem: (LibraryItem) -> Unit,
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     errorMessage?.let {
-        scope.launch { snackbarHostState.showSnackbar(it) }
+        LaunchedEffect(it) { snackbarHostState.showSnackbar(it) }
         onErrorShown()
     }
 
@@ -142,7 +143,9 @@ internal fun LibraryItemsScreen(
     Scaffold(
         topBar = {
             TopAppBarWithBackButton(
-                title = { libraryItemTitle?.let { Text(text = it) } }, onBackClick = onBackClick)
+                title = { libraryItemTitle?.let { Text(text = it) } },
+                onBackClick = onBackClick,
+            )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.surface,
@@ -162,31 +165,35 @@ internal fun LibraryItemsScreen(
                     Modifier.fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceContainerLow),
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                contentColor = MaterialTheme.colorScheme.onSurface) {
-                    libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
-                        Tab(
-                            selected = selectedTabIndex == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            icon = {
-                                Icon(
-                                    imageVector =
-                                        when (mediaTypeTab) {
-                                            LibraryMediaType.MOVIE -> Icons.Rounded.Movie
-                                            LibraryMediaType.TV -> Icons.Rounded.Tv
-                                        },
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp))
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(id = mediaTypeTab.displayName),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight =
-                                        if (selectedTabIndex == index) FontWeight.SemiBold
-                                        else FontWeight.Normal)
-                            })
-                    }
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ) {
+                libraryMediaTabs.forEachIndexed { index, mediaTypeTab ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        icon = {
+                            Icon(
+                                imageVector =
+                                    when (mediaTypeTab) {
+                                        LibraryMediaType.MOVIE -> Icons.Rounded.Movie
+                                        LibraryMediaType.TV -> Icons.Rounded.Tv
+                                    },
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(id = mediaTypeTab.displayName),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight =
+                                    if (selectedTabIndex == index) FontWeight.SemiBold
+                                    else FontWeight.Normal,
+                            )
+                        },
+                    )
                 }
+            }
 
             Spacer(Modifier.height(Spacing.xs))
 
@@ -198,7 +205,8 @@ internal fun LibraryItemsScreen(
                                 content = movieItems,
                                 libraryItemType = libraryItemType,
                                 onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem)
+                                onDeleteClick = onDeleteItem,
+                            )
                         }
 
                         LibraryMediaType.TV -> {
@@ -206,7 +214,8 @@ internal fun LibraryItemsScreen(
                                 content = tvItems,
                                 libraryItemType = libraryItemType,
                                 onItemClick = onItemClick,
-                                onDeleteClick = onDeleteItem)
+                                onDeleteClick = onDeleteItem,
+                            )
                         }
                     }
                 }
@@ -220,7 +229,7 @@ private fun LibraryContent(
     content: List<LibraryItem>,
     libraryItemType: LibraryItemType?,
     onItemClick: (String) -> Unit,
-    onDeleteClick: (LibraryItem) -> Unit
+    onDeleteClick: (LibraryItem) -> Unit,
 ) {
     Box(Modifier.fillMaxSize()) {
         if (content.isEmpty()) {
@@ -239,66 +248,80 @@ private fun LibraryContent(
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow)) +
+                                stiffness = Spring.StiffnessLow,
+                            )
+                    ) +
                         scaleIn(
                             initialScale = 0.8f,
                             animationSpec =
                                 spring(
                                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow)),
-                modifier = Modifier.align(Alignment.Center)) {
-                    Column(
+                                    stiffness = Spring.StiffnessLow,
+                                ),
+                        ),
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Column(
+                    modifier =
+                        Modifier.padding(Spacing.xl)
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                shape = MaterialTheme.shapes.extraLarge,
+                            )
+                            .padding(Spacing.xl),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                ) {
+                    // Icon with primary color accent and subtle pulse animation
+                    val iconScale by
+                        animateFloatAsState(
+                            targetValue = if (isVisible) 1f else 0.8f,
+                            animationSpec =
+                                spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow,
+                                ),
+                            label = "icon_scale",
+                        )
+
+                    Box(
                         modifier =
-                            Modifier.padding(Spacing.xl)
+                            Modifier.size(120.dp)
+                                .scale(iconScale)
                                 .background(
-                                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                                    shape = MaterialTheme.shapes.extraLarge)
-                                .padding(Spacing.xl),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                            // Icon with primary color accent and subtle pulse animation
-                            val iconScale by
-                                animateFloatAsState(
-                                    targetValue = if (isVisible) 1f else 0.8f,
-                                    animationSpec =
-                                        spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessLow),
-                                    label = "icon_scale")
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector =
+                                if (libraryItemType == LibraryItemType.FAVORITE) {
+                                    Icons.Rounded.Favorite
+                                } else {
+                                    Icons.Rounded.Bookmark
+                                },
+                            contentDescription = null,
+                            modifier = Modifier.size(Dimens.profileMediumSize),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    }
 
-                            Box(
-                                modifier =
-                                    Modifier.size(120.dp)
-                                        .scale(iconScale)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.primaryContainer,
-                                            shape = CircleShape),
-                                contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector =
-                                            if (libraryItemType == LibraryItemType.FAVORITE) {
-                                                Icons.Rounded.Favorite
-                                            } else {
-                                                Icons.Rounded.Bookmark
-                                            },
-                                        contentDescription = null,
-                                        modifier = Modifier.size(Dimens.profileMediumSize),
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer)
-                                }
+                    Text(
+                        text = stringResource(id = R.string.no_items),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
 
-                            Text(
-                                text = stringResource(id = R.string.no_items),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface)
-
-                            Text(
-                                text = stringResource(id = R.string.no_items_description),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center)
-                        }
+                    Text(
+                        text = stringResource(id = R.string.no_items_description),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
                 }
+            }
         } else {
             LazyVerticalContentGrid(
                 pagingEnabled = false,
@@ -307,58 +330,67 @@ private fun LibraryContent(
                         start = Spacing.screenPadding,
                         end = Spacing.screenPadding,
                         top = Spacing.md,
-                        bottom = Spacing.xl),
-                itemSpacing = Spacing.md) {
-                    items(items = content, key = { it.id }) { item ->
-                        // Convert string media type to SharedMediaType for shared elements
-                        val sharedMediaType =
-                            when (item.mediaType.lowercase()) {
-                                "movie" -> SharedMediaType.Movie
-                                "tv" -> SharedMediaType.TvShow
-                                else -> null
-                            }
-
-                        // Staggered entrance animation
-                        val itemIndex = content.indexOf(item)
-                        var isVisible by remember { mutableStateOf(false) }
-
-                        LaunchedEffect(Unit) {
-                            kotlinx.coroutines.delay(itemIndex * 50L)
-                            isVisible = true
+                        bottom = Spacing.xl,
+                    ),
+                itemSpacing = Spacing.md,
+            ) {
+                items(items = content, key = { it.id }) { item ->
+                    // Convert string media type to SharedMediaType for shared elements
+                    val sharedMediaType =
+                        when (item.mediaType.lowercase()) {
+                            "movie" -> SharedMediaType.Movie
+                            "tv" -> SharedMediaType.TvShow
+                            else -> null
                         }
 
-                        AnimatedVisibility(
-                            visible = isVisible,
-                            enter =
-                                fadeIn(
+                    // Staggered entrance animation
+                    val itemIndex = content.indexOf(item)
+                    var isVisible by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(itemIndex * 50L)
+                        isVisible = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter =
+                            fadeIn(
+                                animationSpec =
+                                    spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow,
+                                    )
+                            ) +
+                                scaleIn(
+                                    initialScale = 0.8f,
                                     animationSpec =
                                         spring(
                                             dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessLow)) +
-                                    scaleIn(
-                                        initialScale = 0.8f,
-                                        animationSpec =
-                                            spring(
-                                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                                stiffness = Spring.StiffnessLow)),
-                            modifier = Modifier.animateItem()) {
-                                LibraryItemCard(
-                                    posterPath = item.imagePath,
-                                    sharedElementKey =
-                                        sharedMediaType?.let {
-                                            MediaSharedElementKey(
-                                                mediaId = item.id.toLong(),
-                                                mediaType = it,
-                                                origin = SharedElementOrigin.LIBRARY,
-                                                elementType = SharedElementType.Image)
-                                        },
-                                    onItemClick = {
-                                        onItemClick("${item.id},${item.mediaType.uppercase()}")
-                                    },
-                                    onDeleteClick = { onDeleteClick(item) })
-                            }
+                                            stiffness = Spring.StiffnessLow,
+                                        ),
+                                ),
+                        modifier = Modifier.animateItem(),
+                    ) {
+                        LibraryItemCard(
+                            posterPath = item.imagePath,
+                            sharedElementKey =
+                                sharedMediaType?.let {
+                                    MediaSharedElementKey(
+                                        mediaId = item.id.toLong(),
+                                        mediaType = it,
+                                        origin = SharedElementOrigin.LIBRARY,
+                                        elementType = SharedElementType.Image,
+                                    )
+                                },
+                            onItemClick = {
+                                onItemClick("${item.id},${item.mediaType.uppercase()}")
+                            },
+                            onDeleteClick = { onDeleteClick(item) },
+                        )
                     }
                 }
+            }
         }
     }
 }
@@ -369,7 +401,7 @@ private fun LibraryItemCard(
     posterPath: String,
     sharedElementKey: MediaSharedElementKey? = null,
     onItemClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemVisible by remember { mutableStateOf(true) }
@@ -387,7 +419,8 @@ private fun LibraryItemCard(
                     }
                     SwipeToDismissBoxValue.Settled -> false
                 }
-            })
+            }
+        )
 
     LaunchedEffect(showDeleteDialog) {
         if (!showDeleteDialog && dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
@@ -402,24 +435,28 @@ private fun LibraryItemCard(
                 itemVisible = false
                 onDeleteClick()
             },
-            onDismiss = { showDeleteDialog = false })
+            onDismiss = { showDeleteDialog = false },
+        )
     }
 
     AnimatedVisibility(
         visible = itemVisible,
-        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))) {
-            SwipeToDismissBox(
-                state = dismissState,
-                enableDismissFromStartToEnd = true,
-                enableDismissFromEndToStart = true,
-                backgroundContent = { SwipeDeleteBackground(dismissState = dismissState) }) {
-                    LibraryItemCardContent(
-                        posterPath = posterPath,
-                        sharedElementKey = sharedElementKey,
-                        onItemClick = onItemClick,
-                        onDeleteClick = { showDeleteDialog = true })
-                }
+        exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300)),
+    ) {
+        SwipeToDismissBox(
+            state = dismissState,
+            enableDismissFromStartToEnd = true,
+            enableDismissFromEndToStart = true,
+            backgroundContent = { SwipeDeleteBackground(dismissState = dismissState) },
+        ) {
+            LibraryItemCardContent(
+                posterPath = posterPath,
+                sharedElementKey = sharedElementKey,
+                onItemClick = onItemClick,
+                onDeleteClick = { showDeleteDialog = true },
+            )
         }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -434,27 +471,31 @@ private fun SwipeDeleteBackground(dismissState: SwipeToDismissBoxState) {
                     else -> 0f
                 },
             animationSpec = spring(),
-            label = "background_alpha")
+            label = "background_alpha",
+        )
 
     Box(
         modifier =
             Modifier.fillMaxSize()
                 .background(
                     MaterialTheme.colorScheme.errorContainer.copy(alpha = backgroundColor),
-                    shape = RoundedCornerShape(12.dp))
+                    shape = RoundedCornerShape(12.dp),
+                )
                 .padding(horizontal = Spacing.md),
         contentAlignment =
             when (dismissState.dismissDirection) {
                 SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
                 SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
                 else -> Alignment.Center
-            }) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(id = R.string.delete),
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.size(Dimens.iconSizeMedium))
-        }
+            },
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = stringResource(id = R.string.delete),
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.size(Dimens.iconSizeMedium),
+        )
+    }
 }
 
 @Composable
@@ -462,28 +503,31 @@ private fun LibraryItemCardContent(
     posterPath: String,
     sharedElementKey: MediaSharedElementKey? = null,
     onItemClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
 ) {
     Box {
         MediaItemCard(
-            posterPath = posterPath, sharedElementKey = sharedElementKey, onItemClick = onItemClick)
+            posterPath = posterPath,
+            sharedElementKey = sharedElementKey,
+            onItemClick = onItemClick,
+        )
 
         IconButton(
             onClick = onDeleteClick,
             colors =
                 IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.95f),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer),
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                ),
             modifier =
-                Modifier.align(Alignment.TopEnd)
-                    .padding(Spacing.xxs)
-                    .size(32.dp)
-                    .clip(CircleShape)) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.delete),
-                    modifier = Modifier.size(Dimens.iconSizeSmall))
-            }
+                Modifier.align(Alignment.TopEnd).padding(Spacing.xxs).size(32.dp).clip(CircleShape),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(id = R.string.delete),
+                modifier = Modifier.size(Dimens.iconSizeSmall),
+            )
+        }
     }
 }
 
@@ -495,44 +539,48 @@ private fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Uni
         Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp) {
             Column(
                 modifier = Modifier.padding(Spacing.lg),
-                verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                    // Icon
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(Dimens.iconSize))
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            ) {
+                // Icon
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(Dimens.iconSize),
+                )
 
-                    // Title
-                    Text(
-                        text = stringResource(id = R.string.delete),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold)
+                // Title
+                Text(
+                    text = stringResource(id = R.string.delete),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
 
-                    // Message
-                    Text(
-                        text = "Are you sure you want to remove this item from your library?",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                // Message
+                Text(
+                    text = "Are you sure you want to remove this item from your library?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
 
-                    // Actions
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = onDismiss) {
-                                Text(stringResource(id = R.string.cancel))
-                            }
+                // Actions
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(onClick = onDismiss) { Text(stringResource(id = R.string.cancel)) }
 
-                            Spacer(Modifier.size(Spacing.xs))
+                    Spacer(Modifier.size(Spacing.xs))
 
-                            TextButton(onClick = onConfirm) {
-                                Text(
-                                    stringResource(id = R.string.delete),
-                                    color = MaterialTheme.colorScheme.error)
-                            }
-                        }
+                    TextButton(onClick = onConfirm) {
+                        Text(
+                            stringResource(id = R.string.delete),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                 }
+            }
         }
     }
 }

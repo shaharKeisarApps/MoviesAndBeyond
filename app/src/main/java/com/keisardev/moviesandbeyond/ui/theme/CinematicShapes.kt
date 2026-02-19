@@ -73,4 +73,5 @@ val CinematicM3Shapes =
         small = CinematicShapes.small,
         medium = CinematicShapes.medium,
         large = CinematicShapes.large,
-        extraLarge = CinematicShapes.extraLarge)
+        extraLarge = CinematicShapes.extraLarge,
+    )

@@ -27,7 +27,7 @@ data class MediaSharedElementKey(
     val mediaId: Long,
     val mediaType: MediaType,
     val origin: String,
-    val elementType: SharedElementType
+    val elementType: SharedElementType,
 )
 
 /**
@@ -37,7 +37,7 @@ data class MediaSharedElementKey(
 enum class MediaType {
     Movie,
     TvShow,
-    Person
+    Person,
 }
 
 /**
@@ -54,7 +54,7 @@ enum class SharedElementType {
     /** The rating display */
     Rating,
     /** The backdrop image (detail screens) */
-    Backdrop
+    Backdrop,
 }
 
 /** Common origin values for shared element transitions. */

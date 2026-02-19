@@ -4,7 +4,9 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -154,8 +156,7 @@ private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): C
             surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
             surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
             surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
-            surfaceContainerHighest =
-                Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
         )
     } else {
         lightColorScheme(
@@ -193,8 +194,7 @@ private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): C
             surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
             surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
             surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
-            surfaceContainerHighest =
-                Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
         )
     }
 }
@@ -217,13 +217,14 @@ private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): C
  * @param customColorArgb The custom color ARGB value to use when seedColor is CUSTOM
  * @param content The composable content to apply theme to
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MoviesAndBeyondTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     seedColor: SeedColor = SeedColor.DEFAULT,
     customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme =
         when {
@@ -262,5 +263,7 @@ fun MoviesAndBeyondTheme(
         colorScheme = colorScheme,
         typography = CinematicM3Typography,
         shapes = CinematicM3Shapes,
-        content = content)
+        motionScheme = MotionScheme.expressive(),
+        content = content,
+    )
 }

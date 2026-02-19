@@ -29,33 +29,33 @@ interface TmdbApi {
         @Path("category") category: String,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int,
-        @Query("region") region: String? = null
+        @Query("region") region: String? = null,
     ): NetworkContentResponse
 
     @GET("tv/{category}")
     suspend fun getTvShowLists(
         @Path("category") category: String,
         @Query("language") language: String = "en-US",
-        @Query("page") page: Int
+        @Query("page") page: Int,
     ): NetworkContentResponse
 
     @GET("search/multi")
     suspend fun multiSearch(
         @Query("page") page: Int = 1,
         @Query("query") query: String,
-        @Query("include_adult") includeAdult: Boolean
+        @Query("include_adult") includeAdult: Boolean,
     ): SearchResponse
 
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") id: Int,
-        @Query("append_to_response") appendToResponse: String = "recommendations,credits"
+        @Query("append_to_response") appendToResponse: String = "recommendations,credits",
     ): NetworkMovieDetails
 
     @GET("tv/{series_id}")
     suspend fun getTvShowDetails(
         @Path("series_id") id: Int,
-        @Query("append_to_response") appendToResponse: String = "recommendations,credits"
+        @Query("append_to_response") appendToResponse: String = "recommendations,credits",
     ): NetworkTvDetails
 
     @GET("person/{person_id}")
@@ -66,21 +66,21 @@ interface TmdbApi {
         @Path("account_id") accountId: Int,
         @Path("item_type") itemType: String,
         @Path("media_type") mediaType: String,
-        @Query("page") page: Int
+        @Query("page") page: Int,
     ): NetworkContentResponse
 
     @Headers("content-type: application/json")
     @POST("account/{account_id}/favorite")
     suspend fun addOrRemoveFavorite(
         @Path("account_id") accountId: Int,
-        @Body favoriteRequest: FavoriteRequest
+        @Body favoriteRequest: FavoriteRequest,
     ): Response<Unit>
 
     @Headers("content-type: application/json")
     @POST("account/{account_id}/watchlist")
     suspend fun addOrRemoveFromWatchlist(
         @Path("account_id") accountId: Int,
-        @Body watchlistRequest: WatchlistRequest
+        @Body watchlistRequest: WatchlistRequest,
     ): Response<Unit>
 
     @GET("authentication/token/new") suspend fun createRequestToken(): RequestTokenResponse

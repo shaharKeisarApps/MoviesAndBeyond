@@ -58,37 +58,48 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
         createContentFlow(
                 category = MovieListCategory.NOW_PLAYING,
                 pageFlow = _nowPlayingPage,
-                accumulatedFlow = _nowPlayingAccumulated)
+                accumulatedFlow = _nowPlayingAccumulated,
+            )
             .stateInWhileSubscribed(
                 scope = viewModelScope,
-                initialValue = ContentUiState(MovieListCategory.NOW_PLAYING))
+                initialValue = ContentUiState(MovieListCategory.NOW_PLAYING),
+            )
 
     // Popular Movies with offline-first support
     val popularMovies: StateFlow<ContentUiState> =
         createContentFlow(
                 category = MovieListCategory.POPULAR,
                 pageFlow = _popularPage,
-                accumulatedFlow = _popularAccumulated)
+                accumulatedFlow = _popularAccumulated,
+            )
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.POPULAR))
+                scope = viewModelScope,
+                initialValue = ContentUiState(MovieListCategory.POPULAR),
+            )
 
     // Top Rated Movies with offline-first support
     val topRatedMovies: StateFlow<ContentUiState> =
         createContentFlow(
                 category = MovieListCategory.TOP_RATED,
                 pageFlow = _topRatedPage,
-                accumulatedFlow = _topRatedAccumulated)
+                accumulatedFlow = _topRatedAccumulated,
+            )
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.TOP_RATED))
+                scope = viewModelScope,
+                initialValue = ContentUiState(MovieListCategory.TOP_RATED),
+            )
 
     // Upcoming Movies with offline-first support
     val upcomingMovies: StateFlow<ContentUiState> =
         createContentFlow(
                 category = MovieListCategory.UPCOMING,
                 pageFlow = _upcomingPage,
-                accumulatedFlow = _upcomingAccumulated)
+                accumulatedFlow = _upcomingAccumulated,
+            )
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentUiState(MovieListCategory.UPCOMING))
+                scope = viewModelScope,
+                initialValue = ContentUiState(MovieListCategory.UPCOMING),
+            )
 
     /**
      * Creates a Flow that observes content from Store5 and combines it with accumulated items for
@@ -97,7 +108,7 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
     private fun createContentFlow(
         category: MovieListCategory,
         pageFlow: MutableStateFlow<Int>,
-        accumulatedFlow: MutableStateFlow<List<ContentItem>>
+        accumulatedFlow: MutableStateFlow<List<ContentItem>>,
     ) =
         pageFlow
             .flatMapLatest { page ->
@@ -118,7 +129,7 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
         response: StoreReadResponse<List<ContentItem>>,
         category: MovieListCategory,
         page: Int,
-        accumulatedFlow: MutableStateFlow<List<ContentItem>>
+        accumulatedFlow: MutableStateFlow<List<ContentItem>>,
     ): ContentUiState {
         return when (response) {
             is StoreReadResponse.Initial,
@@ -129,7 +140,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false)
+                    isFromCache = false,
+                )
             }
             is StoreReadResponse.Data -> {
                 val newItems = response.value.orEmpty()
@@ -145,7 +157,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     endReached = newItems.isEmpty(),
                     page = page,
                     category = category,
-                    isFromCache = response.isFromCache)
+                    isFromCache = response.isFromCache,
+                )
             }
             is StoreReadResponse.Error -> {
                 _errorMessage.update { response.errorMessageOrNull() }
@@ -155,7 +168,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false)
+                    isFromCache = false,
+                )
             }
             is StoreReadResponse.NoNewData -> {
                 // Keep current state, data hasn't changed
@@ -165,7 +179,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = true)
+                    isFromCache = true,
+                )
             }
         }
     }
@@ -231,7 +246,7 @@ data class ContentUiState(
     val endReached: Boolean,
     val page: Int,
     val category: MovieListCategory,
-    val isFromCache: Boolean = false
+    val isFromCache: Boolean = false,
 ) {
     constructor(
         category: MovieListCategory
@@ -241,5 +256,6 @@ data class ContentUiState(
         endReached = false,
         page = 1,
         category = category,
-        isFromCache = false)
+        isFromCache = false,
+    )
 }

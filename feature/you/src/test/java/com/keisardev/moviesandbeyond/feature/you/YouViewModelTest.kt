@@ -35,7 +35,8 @@ class YouViewModelTest {
             YouViewModel(
                 authRepository = authRepository,
                 userRepository = userRepository,
-                libraryRepository = libraryRepository)
+                libraryRepository = libraryRepository,
+            )
     }
 
     @Test
@@ -67,8 +68,10 @@ class YouViewModelTest {
                 darkMode = testUserData.darkMode,
                 seedColor = testUserData.seedColor,
                 useLocalOnly = testUserData.useLocalOnly,
-                customColorArgb = testUserData.customColorArgb),
-            viewModel.userSettings.value)
+                customColorArgb = testUserData.customColorArgb,
+            ),
+            viewModel.userSettings.value,
+        )
 
         collectJob.cancel()
     }

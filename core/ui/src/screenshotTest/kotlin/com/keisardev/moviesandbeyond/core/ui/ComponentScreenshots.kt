@@ -81,12 +81,14 @@ fun CompactRatingBadgePreview() {
 fun StarRatingVariants() {
     MaterialTheme {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp)) {
-                StarRating(rating = 10.0) // 5 stars
-                StarRating(rating = 7.0) // 3.5 stars
-                StarRating(rating = 4.0) // 2 stars
-                StarRating(rating = 2.0) // 1 star
-            }
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(8.dp),
+        ) {
+            StarRating(rating = 10.0) // 5 stars
+            StarRating(rating = 7.0) // 3.5 stars
+            StarRating(rating = 4.0) // 2 stars
+            StarRating(rating = 2.0) // 1 star
+        }
     }
 }
 
@@ -122,7 +124,8 @@ fun GenreChipRowPreview() {
     MaterialTheme {
         GenreChipRow(
             genres = listOf("Action", "Adventure", "Sci-Fi", "Drama", "Thriller"),
-            modifier = Modifier.padding(8.dp))
+            modifier = Modifier.padding(8.dp),
+        )
     }
 }
 
@@ -177,7 +180,8 @@ fun MediaBackdropCardPreview() {
             title = "The Dark Knight",
             year = "2008",
             rating = 9.0,
-            genres = listOf("Action", "Crime", "Drama"))
+            genres = listOf("Action", "Crime", "Drama"),
+        )
     }
 }
 

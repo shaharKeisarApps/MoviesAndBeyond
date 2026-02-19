@@ -27,7 +27,8 @@ val testMovieDetail =
         runtime = "100",
         tagline = "tagline",
         title = "Movie Name",
-        voteCount = 100)
+        voteCount = 100,
+    )
 
 val testTvShowDetails =
     TvDetails(
@@ -54,7 +55,8 @@ val testTvShowDetails =
                 showId = 0,
                 stillPath = "",
                 voteAverage = 0.0,
-                voteCount = 0),
+                voteCount = 0,
+            ),
         name = "",
         networks = "",
         nextEpisodeToAir = null,
@@ -72,7 +74,8 @@ val testTvShowDetails =
         status = "",
         tagline = "",
         type = "",
-        voteCount = 0)
+        voteCount = 0,
+    )
 
 val testPersonDetails =
     PersonDetails(
@@ -86,4 +89,5 @@ val testPersonDetails =
         knownForDepartment = "",
         name = "name",
         placeOfBirth = "",
-        profilePath = "")
+        profilePath = "",
+    )

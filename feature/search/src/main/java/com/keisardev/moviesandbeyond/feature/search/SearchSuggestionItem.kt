@@ -22,24 +22,27 @@ internal fun SearchSuggestionItem(
     name: String,
     imagePath: String,
     sharedElementKey: MediaSharedElementKey? = null,
-    onItemClick: () -> Unit
+    onItemClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-        modifier = Modifier.noRippleClickable { onItemClick() }) {
-            MediaItemCard(
-                posterPath = imagePath,
-                sharedElementKey = sharedElementKey,
-                onItemClick = onItemClick)
-            Text(
-                text = name,
-                style = MaterialTheme.typography.labelMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = Spacing.xxs))
-        }
+        modifier = Modifier.noRippleClickable { onItemClick() },
+    ) {
+        MediaItemCard(
+            posterPath = imagePath,
+            sharedElementKey = sharedElementKey,
+            onItemClick = onItemClick,
+        )
+        Text(
+            text = name,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = Spacing.xxs),
+        )
+    }
 }

@@ -41,7 +41,7 @@ fun ItemsRoute(
     categoryName: String,
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
-    viewModel: MoviesViewModel
+    viewModel: MoviesViewModel,
 ) {
     val category = enumValueOf<MovieListCategory>(categoryName)
     val content by
@@ -66,7 +66,8 @@ fun ItemsRoute(
         categoryDisplayName = categoryDisplayName,
         appendItems = viewModel::appendItems,
         onItemClick = onItemClick,
-        onBackClick = onBackClick)
+        onBackClick = onBackClick,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +77,7 @@ internal fun ItemsScreen(
     categoryDisplayName: String,
     appendItems: (MovieListCategory) -> Unit,
     onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     // Stable callback to avoid recomposition
     val stableAppendItems = remember(content.category) { { appendItems(content.category) } }
@@ -85,7 +86,8 @@ internal fun ItemsScreen(
         topBar = {
             TopAppBarWithBackButton(
                 title = { Text(text = categoryDisplayName, fontWeight = FontWeight.SemiBold) },
-                onBackClick = onBackClick)
+                onBackClick = onBackClick,
+            )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
@@ -98,40 +100,42 @@ internal fun ItemsScreen(
                 contentPadding =
                     PaddingValues(
                         horizontal = Dimens.gridContentPadding,
-                        vertical = Spacing.screenPaddingVertical),
+                        vertical = Spacing.screenPaddingVertical,
+                    ),
                 minCellWidth = PosterSize.MEDIUM.width,
                 itemSpacing = Dimens.gridItemSpacing,
-                appendItems = stableAppendItems) {
-                    items(items = content.items, key = { it.id }, contentType = { "media_item" }) {
-                        item ->
-                        // Use stable callbacks to prevent unnecessary recomposition
-                        val stableItemClick =
-                            remember(item.id) { { onItemClick("${item.id},${MediaType.MOVIE}") } }
-                        val sharedElementKey =
-                            remember(item.id) {
-                                MediaSharedElementKey(
-                                    mediaId = item.id.toLong(),
-                                    mediaType = SharedMediaType.Movie,
-                                    origin = SharedElementOrigin.MOVIES_ITEMS,
-                                    elementType = SharedElementType.Image)
-                            }
-                        // Use aspectRatio for equal sizing that adapts to grid cell width
-                        MediaItemCard(
-                            posterPath = item.imagePath,
-                            sharedElementKey = sharedElementKey,
-                            onItemClick = stableItemClick,
-                            modifier = Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO))
-                    }
-                    if (content.isLoading) {
-                        item(contentType = "loading") {
-                            Box(
-                                modifier =
-                                    Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO)) {
-                                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                                }
+                appendItems = stableAppendItems,
+            ) {
+                items(items = content.items, key = { it.id }, contentType = { "media_item" }) { item
+                    ->
+                    // Use stable callbacks to prevent unnecessary recomposition
+                    val stableItemClick =
+                        remember(item.id) { { onItemClick("${item.id},${MediaType.MOVIE}") } }
+                    val sharedElementKey =
+                        remember(item.id) {
+                            MediaSharedElementKey(
+                                mediaId = item.id.toLong(),
+                                mediaType = SharedMediaType.Movie,
+                                origin = SharedElementOrigin.MOVIES_ITEMS,
+                                elementType = SharedElementType.Image,
+                            )
+                        }
+                    // Use aspectRatio for equal sizing that adapts to grid cell width
+                    MediaItemCard(
+                        posterPath = item.imagePath,
+                        sharedElementKey = sharedElementKey,
+                        onItemClick = stableItemClick,
+                        modifier = Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO),
+                    )
+                }
+                if (content.isLoading) {
+                    item(contentType = "loading") {
+                        Box(modifier = Modifier.fillMaxWidth().aspectRatio(POSTER_ASPECT_RATIO)) {
+                            CircularProgressIndicator(Modifier.align(Alignment.Center))
                         }
                     }
                 }
+            }
         }
     }
 }

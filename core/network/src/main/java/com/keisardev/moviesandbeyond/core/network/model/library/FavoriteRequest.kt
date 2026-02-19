@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 data class FavoriteRequest(
     @Json(name = "media_type") val mediaType: String,
     @Json(name = "media_id") val mediaId: Int,
-    val favorite: Boolean
+    val favorite: Boolean,
 )

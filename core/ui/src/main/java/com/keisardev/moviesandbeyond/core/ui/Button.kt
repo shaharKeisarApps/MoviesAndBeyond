@@ -55,8 +55,10 @@ fun LibraryActionButton(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "button_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "button_scale",
+        )
 
     Button(
         onClick = onClick,
@@ -76,12 +78,14 @@ fun LibraryActionButton(
                             isPressed = true
                             tryAwaitRelease()
                             isPressed = false
-                        })
-                }) {
-            Icon(imageVector = icon, contentDescription = name, tint = iconTint)
-            Spacer(Modifier.width(4.dp))
-            Text(text = name, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-        }
+                        }
+                    )
+                },
+    ) {
+        Icon(imageVector = icon, contentDescription = name, tint = iconTint)
+        Spacer(Modifier.width(4.dp))
+        Text(text = name, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+    }
 }
 
 @Preview(showBackground = true)

@@ -25,7 +25,8 @@ class DetailsScreenTest {
                 onItemClick = {},
                 onSeeAllCastClick = {},
                 onSignInClick = {},
-                onBackClick = {})
+                onBackClick = {},
+            )
         }
 
         composeTestRule.onNodeWithContentDescription(loadingContentDescription).assertIsDisplayed()

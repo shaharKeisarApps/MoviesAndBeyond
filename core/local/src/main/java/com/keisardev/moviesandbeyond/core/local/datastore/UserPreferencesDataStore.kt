@@ -32,7 +32,8 @@ constructor(private val userPreferences: DataStore<UserPreferences>) {
                 seedColor = SeedColor.fromName(it.seedColor),
                 useLocalOnly = it.useLocalOnly,
                 customColorArgb =
-                    if (it.customColorArgb != 0L) it.customColorArgb else DEFAULT_CUSTOM_COLOR_ARGB)
+                    if (it.customColorArgb != 0L) it.customColorArgb else DEFAULT_CUSTOM_COLOR_ARGB,
+            )
         }
 
     suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {

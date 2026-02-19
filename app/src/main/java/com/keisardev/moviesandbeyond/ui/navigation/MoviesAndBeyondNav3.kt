@@ -101,27 +101,29 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
         transitionSpec = {
             (slideInHorizontally(
                     initialOffsetX = { fullWidth -> fullWidth },
-                    animationSpec = tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing)) +
-                    fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                    animationSpec = tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
                 .togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { fullWidth -> -fullWidth / 4 },
                         animationSpec =
-                            tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing)) +
-                        fadeOut(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                            tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing),
+                    ) + fadeOut(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2))
+                )
         },
         // Global back navigation animation: slide in from left
         popTransitionSpec = {
             (slideInHorizontally(
                     initialOffsetX = { fullWidth -> -fullWidth / 4 },
-                    animationSpec = tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing)) +
-                    fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                    animationSpec = tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
                 .togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { fullWidth -> fullWidth },
                         animationSpec =
-                            tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing)) +
-                        fadeOut(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                            tween(NAVIGATION_ANIM_DURATION, easing = FastOutSlowInEasing),
+                    ) + fadeOut(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2))
+                )
         },
         // Predictive back gesture animation: smooth, gesture-driven transition
         // Uses LinearEasing since the user controls the animation timing via gesture
@@ -130,22 +132,26 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
             // Incoming screen: scales up from slightly smaller, no harsh movements
             scaleIn(
                     initialScale = PREDICTIVE_BACK_SCALE_INCOMING,
-                    animationSpec = tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing))
+                    animationSpec = tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing),
+                )
                 .togetherWith(
                     // Outgoing screen: slides out to the right with slight scale down
                     slideOutHorizontally(
                         targetOffsetX = { fullWidth -> fullWidth },
-                        animationSpec =
-                            tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing)) +
+                        animationSpec = tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing),
+                    ) +
                         scaleOut(
                             targetScale = PREDICTIVE_BACK_SCALE_OUTGOING,
                             animationSpec =
-                                tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing)))
+                                tween(PREDICTIVE_BACK_ANIM_DURATION, easing = LinearEasing),
+                        )
+                )
         },
         entryDecorators =
             listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
-                rememberViewModelStoreNavEntryDecorator()),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
         entryProvider =
             entryProvider {
                 // ================================================================
@@ -170,12 +176,14 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     MoviesFeedScreen(
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         navigateToItems = { category ->
                             navigationState.topLevelBackStack.navigateTo(MoviesItemsRoute(category))
                         },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 entry<MoviesFeedRoute> {
@@ -183,12 +191,14 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     MoviesFeedScreen(
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         navigateToItems = { category ->
                             navigationState.topLevelBackStack.navigateTo(MoviesItemsRoute(category))
                         },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 entry<MoviesItemsRoute> { key ->
@@ -197,10 +207,12 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                         categoryName = key.category,
                         onItemClick = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         onBackClick = { navigationState.topLevelBackStack.goBack() },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 // ================================================================
@@ -211,13 +223,16 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     TvFeedScreen(
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         navigateToItems = { category ->
                             navigationState.topLevelBackStack.navigateTo(
-                                TvShowsItemsRoute(category))
+                                TvShowsItemsRoute(category)
+                            )
                         },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 entry<TvShowsFeedRoute> {
@@ -225,13 +240,16 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     TvFeedScreen(
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         navigateToItems = { category ->
                             navigationState.topLevelBackStack.navigateTo(
-                                TvShowsItemsRoute(category))
+                                TvShowsItemsRoute(category)
+                            )
                         },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 entry<TvShowsItemsRoute> { key ->
@@ -240,10 +258,12 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                         categoryName = key.category,
                         onItemClick = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
                         onBackClick = { navigationState.topLevelBackStack.goBack() },
-                        viewModel = viewModel)
+                        viewModel = viewModel,
+                    )
                 }
 
                 // ================================================================
@@ -253,16 +273,20 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     SearchScreen(
                         navigateToDetail = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
-                        })
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
+                        }
+                    )
                 }
 
                 entry<SearchRoute> {
                     SearchScreen(
                         navigateToDetail = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
-                        })
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
+                        }
+                    )
                 }
 
                 // ================================================================
@@ -272,22 +296,26 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                     YouScreen(
                         navigateToAuth = {
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.AuthRoute)
+                                com.keisardev.moviesandbeyond.ui.navigation.AuthRoute
+                            )
                         },
                         navigateToLibraryItem = { type ->
                             navigationState.topLevelBackStack.navigateTo(LibraryItemsRoute(type))
-                        })
+                        },
+                    )
                 }
 
                 entry<YouRoute> {
                     YouScreen(
                         navigateToAuth = {
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.AuthRoute)
+                                com.keisardev.moviesandbeyond.ui.navigation.AuthRoute
+                            )
                         },
                         navigateToLibraryItem = { type ->
                             navigationState.topLevelBackStack.navigateTo(LibraryItemsRoute(type))
-                        })
+                        },
+                    )
                 }
 
                 entry<LibraryItemsRoute> { key ->
@@ -295,9 +323,11 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                         onBackClick = { navigationState.topLevelBackStack.goBack() },
                         navigateToDetails = { id ->
                             navigationState.topLevelBackStack.navigateTo(
-                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
                         },
-                        libraryItemType = key.type)
+                        libraryItemType = key.type,
+                    )
                 }
 
                 // ================================================================
@@ -334,14 +364,19 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                         tween(
                                             durationMillis = FADE_THROUGH_ENTER_DURATION,
                                             delayMillis = FADE_THROUGH_GAP,
-                                            easing = EmphasizedDecelerateEasing))
+                                            easing = EmphasizedDecelerateEasing,
+                                        )
+                                )
                                 .togetherWith(
                                     // EXIT: List screen fades out quickly
                                     fadeOut(
                                         animationSpec =
                                             tween(
                                                 durationMillis = FADE_THROUGH_EXIT_DURATION,
-                                                easing = EmphasizedAccelerateEasing)))
+                                                easing = EmphasizedAccelerateEasing,
+                                            )
+                                    )
+                                )
                         } +
                             NavDisplay.popTransitionSpec {
                                 // BACK NAVIGATION: Symmetric fade pattern
@@ -351,13 +386,18 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                             tween(
                                                 durationMillis = FADE_THROUGH_ENTER_DURATION,
                                                 delayMillis = FADE_THROUGH_GAP,
-                                                easing = EmphasizedDecelerateEasing))
+                                                easing = EmphasizedDecelerateEasing,
+                                            )
+                                    )
                                     .togetherWith(
                                         fadeOut(
                                             animationSpec =
                                                 tween(
                                                     durationMillis = FADE_THROUGH_EXIT_DURATION,
-                                                    easing = EmphasizedAccelerateEasing)))
+                                                    easing = EmphasizedAccelerateEasing,
+                                                )
+                                        )
+                                    )
                             } +
                             NavDisplay.predictivePopTransitionSpec {
                                 // PREDICTIVE BACK: Gesture-driven fade with subtle scale
@@ -367,49 +407,57 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                         animationSpec =
                                             tween(
                                                 PREDICTIVE_BACK_ANIM_DURATION,
-                                                easing = LinearEasing))
+                                                easing = LinearEasing,
+                                            ),
+                                    )
                                     .togetherWith(
                                         fadeOut(
                                             animationSpec =
                                                 tween(
                                                     PREDICTIVE_BACK_ANIM_DURATION,
-                                                    easing = LinearEasing)) +
+                                                    easing = LinearEasing,
+                                                )
+                                        ) +
                                             scaleOut(
                                                 targetScale = PREDICTIVE_BACK_SCALE_OUTGOING,
                                                 animationSpec =
                                                     tween(
                                                         PREDICTIVE_BACK_ANIM_DURATION,
-                                                        easing = LinearEasing)))
-                            }) { key ->
-                        // Create ViewModel with the id from the route
-                        // Note: For Nav3, we pass the id directly instead of via SavedStateHandle
-                        val viewModel = hiltViewModel<DetailsViewModel>()
-                        // Pull content up behind the status bar for edge-to-edge backdrop
-                        val statusBarTop =
-                            WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                        Box(
-                            modifier =
-                                Modifier.offset { IntOffset(0, -statusBarTop.roundToPx()) }) {
-                                DetailsRoute(
-                                    onItemClick = { id ->
-                                        navigationState.topLevelBackStack.navigateTo(
-                                            com.keisardev.moviesandbeyond.ui.navigation
-                                                .DetailsRoute(id))
-                                    },
-                                    onSeeAllCastClick = {
-                                        navigationState.topLevelBackStack.navigateTo(
-                                            com.keisardev.moviesandbeyond.ui.navigation
-                                                .CreditsRoute(key.id))
-                                    },
-                                    navigateToAuth = {
-                                        navigationState.topLevelBackStack.navigateTo(
-                                            com.keisardev.moviesandbeyond.ui.navigation.AuthRoute)
-                                    },
-                                    onBackClick = { navigationState.topLevelBackStack.goBack() },
-                                    viewModel = viewModel,
-                                    detailsId = key.id)
+                                                        easing = LinearEasing,
+                                                    ),
+                                            )
+                                    )
                             }
+                ) { key ->
+                    // Create ViewModel with the id from the route
+                    // Note: For Nav3, we pass the id directly instead of via SavedStateHandle
+                    val viewModel = hiltViewModel<DetailsViewModel>()
+                    // Pull content up behind the status bar for edge-to-edge backdrop
+                    val statusBarTop =
+                        WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                    Box(modifier = Modifier.offset { IntOffset(0, -statusBarTop.roundToPx()) }) {
+                        DetailsRoute(
+                            onItemClick = { id ->
+                                navigationState.topLevelBackStack.navigateTo(
+                                    com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                                )
+                            },
+                            onSeeAllCastClick = {
+                                navigationState.topLevelBackStack.navigateTo(
+                                    com.keisardev.moviesandbeyond.ui.navigation.CreditsRoute(key.id)
+                                )
+                            },
+                            navigateToAuth = {
+                                navigationState.topLevelBackStack.navigateTo(
+                                    com.keisardev.moviesandbeyond.ui.navigation.AuthRoute
+                                )
+                            },
+                            onBackClick = { navigationState.topLevelBackStack.goBack() },
+                            viewModel = viewModel,
+                            detailsId = key.id,
+                        )
                     }
+                }
 
                 // Credits screen - horizontal slide from right (standard list screen)
                 entry<com.keisardev.moviesandbeyond.ui.navigation.CreditsRoute>(
@@ -421,17 +469,19 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                     animationSpec =
                                         tween(
                                             NAVIGATION_ANIM_DURATION,
-                                            easing = FastOutSlowInEasing)) +
-                                    fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                                            easing = FastOutSlowInEasing,
+                                        ),
+                                ) + fadeIn(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
                                 .togetherWith(
                                     slideOutHorizontally(
                                         targetOffsetX = { fullWidth -> -fullWidth / 4 },
                                         animationSpec =
                                             tween(
                                                 NAVIGATION_ANIM_DURATION,
-                                                easing = FastOutSlowInEasing)) +
-                                        fadeOut(
-                                            animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)))
+                                                easing = FastOutSlowInEasing,
+                                            ),
+                                    ) + fadeOut(animationSpec = tween(NAVIGATION_ANIM_DURATION / 2))
+                                )
                         } +
                             NavDisplay.popTransitionSpec {
                                 // Slide back (reveal details underneath)
@@ -442,10 +492,13 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                             animationSpec =
                                                 tween(
                                                     NAVIGATION_ANIM_DURATION,
-                                                    easing = FastOutSlowInEasing)) +
+                                                    easing = FastOutSlowInEasing,
+                                                ),
+                                        ) +
                                             fadeOut(
-                                                animationSpec =
-                                                    tween(NAVIGATION_ANIM_DURATION / 2)))
+                                                animationSpec = tween(NAVIGATION_ANIM_DURATION / 2)
+                                            )
+                                    )
                             } +
                             NavDisplay.predictivePopTransitionSpec {
                                 // Predictive back: smooth slide with scale, no harsh fades
@@ -454,30 +507,41 @@ fun MoviesAndBeyondNav3(navigationState: NavigationState, paddingValues: Padding
                                         animationSpec =
                                             tween(
                                                 PREDICTIVE_BACK_ANIM_DURATION,
-                                                easing = LinearEasing))
+                                                easing = LinearEasing,
+                                            ),
+                                    )
                                     .togetherWith(
                                         slideOutHorizontally(
                                             targetOffsetX = { fullWidth -> fullWidth },
                                             animationSpec =
                                                 tween(
                                                     PREDICTIVE_BACK_ANIM_DURATION,
-                                                    easing = LinearEasing)) +
+                                                    easing = LinearEasing,
+                                                ),
+                                        ) +
                                             scaleOut(
                                                 targetScale = PREDICTIVE_BACK_SCALE_OUTGOING,
                                                 animationSpec =
                                                     tween(
                                                         PREDICTIVE_BACK_ANIM_DURATION,
-                                                        easing = LinearEasing)))
-                            }) { key ->
-                        val viewModel = hiltViewModel<DetailsViewModel>()
-                        CreditsRoute(
-                            onItemClick = { id ->
-                                navigationState.topLevelBackStack.navigateTo(
-                                    com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id))
-                            },
-                            onBackClick = { navigationState.topLevelBackStack.goBack() },
-                            viewModel = viewModel,
-                            detailsId = key.id)
-                    }
-            })
+                                                        easing = LinearEasing,
+                                                    ),
+                                            )
+                                    )
+                            }
+                ) { key ->
+                    val viewModel = hiltViewModel<DetailsViewModel>()
+                    CreditsRoute(
+                        onItemClick = { id ->
+                            navigationState.topLevelBackStack.navigateTo(
+                                com.keisardev.moviesandbeyond.ui.navigation.DetailsRoute(id)
+                            )
+                        },
+                        onBackClick = { navigationState.topLevelBackStack.goBack() },
+                        viewModel = viewModel,
+                        detailsId = key.id,
+                    )
+                }
+            },
+    )
 }

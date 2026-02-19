@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "com.keisardev.moviesandbeyond"
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "0.0.2"
 
         vectorDrawables { useSupportLibrary = true }
 
@@ -27,7 +27,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             isDebuggable = false
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -39,7 +41,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 

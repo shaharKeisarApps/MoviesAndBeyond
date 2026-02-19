@@ -32,9 +32,20 @@ class ContentDaoTest {
         val favoriteItems =
             listOf(
                 FavoriteContentEntity(
-                    id = 1, mediaId = 1, mediaType = "movie", name = "", imagePath = ""),
+                    id = 1,
+                    mediaId = 1,
+                    mediaType = "movie",
+                    name = "",
+                    imagePath = "",
+                ),
                 FavoriteContentEntity(
-                    id = 2, mediaId = 1, mediaType = "tv", name = "", imagePath = ""))
+                    id = 2,
+                    mediaId = 1,
+                    mediaType = "tv",
+                    name = "",
+                    imagePath = "",
+                ),
+            )
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
         assertEquals(listOf(favoriteItems[0]), favoriteContentDao.getFavoriteMovies().first())
@@ -47,9 +58,20 @@ class ContentDaoTest {
         val watchlistItems =
             listOf(
                 WatchlistContentEntity(
-                    id = 1, mediaId = 1, mediaType = "movie", name = "", imagePath = ""),
+                    id = 1,
+                    mediaId = 1,
+                    mediaType = "movie",
+                    name = "",
+                    imagePath = "",
+                ),
                 WatchlistContentEntity(
-                    id = 2, mediaId = 1, mediaType = "tv", name = "", imagePath = ""))
+                    id = 2,
+                    mediaId = 1,
+                    mediaType = "tv",
+                    name = "",
+                    imagePath = "",
+                ),
+            )
         watchlistContentDao.upsertWatchlistItems(watchlistItems)
 
         assertEquals(listOf(watchlistItems[0]), watchlistContentDao.getMoviesWatchlist().first())
@@ -68,14 +90,17 @@ class ContentDaoTest {
                     mediaType = "movie",
                     name = "Movie 1",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 FavoriteContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "movie",
                     name = "Movie 2",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED))
+                    syncStatus = SyncStatus.SYNCED,
+                ),
+            )
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
         // Verify both items are returned
@@ -101,14 +126,17 @@ class ContentDaoTest {
                     mediaType = "tv",
                     name = "TV Show 1",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 WatchlistContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "tv",
                     name = "TV Show 2",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED))
+                    syncStatus = SyncStatus.SYNCED,
+                ),
+            )
         watchlistContentDao.upsertWatchlistItems(watchlistItems)
 
         // Verify both items are returned
@@ -134,21 +162,25 @@ class ContentDaoTest {
                     mediaType = "movie",
                     name = "Guest Favorite",
                     imagePath = "",
-                    syncStatus = SyncStatus.LOCAL_ONLY),
+                    syncStatus = SyncStatus.LOCAL_ONLY,
+                ),
                 FavoriteContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "movie",
                     name = "Synced Favorite",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 FavoriteContentEntity(
                     id = 3,
                     mediaId = 300,
                     mediaType = "movie",
                     name = "Pending Favorite",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_PUSH))
+                    syncStatus = SyncStatus.PENDING_PUSH,
+                ),
+            )
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
         // Verify all non-deleted items are returned
@@ -172,21 +204,25 @@ class ContentDaoTest {
                     mediaType = "tv",
                     name = "Guest Watchlist",
                     imagePath = "",
-                    syncStatus = SyncStatus.LOCAL_ONLY),
+                    syncStatus = SyncStatus.LOCAL_ONLY,
+                ),
                 WatchlistContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "tv",
                     name = "Synced Watchlist",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 WatchlistContentEntity(
                     id = 3,
                     mediaId = 300,
                     mediaType = "tv",
                     name = "Pending Watchlist",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_PUSH))
+                    syncStatus = SyncStatus.PENDING_PUSH,
+                ),
+            )
         watchlistContentDao.upsertWatchlistItems(watchlistItems)
 
         // Verify all non-deleted items are returned
@@ -210,28 +246,33 @@ class ContentDaoTest {
                     mediaType = "movie",
                     name = "Local Only",
                     imagePath = "",
-                    syncStatus = SyncStatus.LOCAL_ONLY),
+                    syncStatus = SyncStatus.LOCAL_ONLY,
+                ),
                 FavoriteContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "movie",
                     name = "Synced",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 FavoriteContentEntity(
                     id = 3,
                     mediaId = 300,
                     mediaType = "movie",
                     name = "Pending Push",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_PUSH),
+                    syncStatus = SyncStatus.PENDING_PUSH,
+                ),
                 FavoriteContentEntity(
                     id = 4,
                     mediaId = 400,
                     mediaType = "movie",
                     name = "Pending Delete",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_DELETE))
+                    syncStatus = SyncStatus.PENDING_DELETE,
+                ),
+            )
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
         // Verify only PENDING_DELETE is excluded (3 items returned, not 4)
@@ -258,28 +299,33 @@ class ContentDaoTest {
                     mediaType = "movie",
                     name = "Guest Favorite (LOCAL_ONLY)",
                     imagePath = "",
-                    syncStatus = SyncStatus.LOCAL_ONLY),
+                    syncStatus = SyncStatus.LOCAL_ONLY,
+                ),
                 FavoriteContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "movie",
                     name = "Synced Favorite",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 FavoriteContentEntity(
                     id = 3,
                     mediaId = 300,
                     mediaType = "movie",
                     name = "Pending Favorite",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_PUSH),
+                    syncStatus = SyncStatus.PENDING_PUSH,
+                ),
                 FavoriteContentEntity(
                     id = 4,
                     mediaId = 400,
                     mediaType = "movie",
                     name = "Pending Delete",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_DELETE))
+                    syncStatus = SyncStatus.PENDING_DELETE,
+                ),
+            )
         favoriteContentDao.upsertFavoriteItems(favoriteItems)
 
         // Delete synced items (simulating logout)
@@ -304,28 +350,33 @@ class ContentDaoTest {
                     mediaType = "tv",
                     name = "Guest Watchlist (LOCAL_ONLY)",
                     imagePath = "",
-                    syncStatus = SyncStatus.LOCAL_ONLY),
+                    syncStatus = SyncStatus.LOCAL_ONLY,
+                ),
                 WatchlistContentEntity(
                     id = 2,
                     mediaId = 200,
                     mediaType = "tv",
                     name = "Synced Watchlist",
                     imagePath = "",
-                    syncStatus = SyncStatus.SYNCED),
+                    syncStatus = SyncStatus.SYNCED,
+                ),
                 WatchlistContentEntity(
                     id = 3,
                     mediaId = 300,
                     mediaType = "tv",
                     name = "Pending Watchlist",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_PUSH),
+                    syncStatus = SyncStatus.PENDING_PUSH,
+                ),
                 WatchlistContentEntity(
                     id = 4,
                     mediaId = 400,
                     mediaType = "tv",
                     name = "Pending Delete",
                     imagePath = "",
-                    syncStatus = SyncStatus.PENDING_DELETE))
+                    syncStatus = SyncStatus.PENDING_DELETE,
+                ),
+            )
         watchlistContentDao.upsertWatchlistItems(watchlistItems)
 
         // Delete synced items (simulating logout)

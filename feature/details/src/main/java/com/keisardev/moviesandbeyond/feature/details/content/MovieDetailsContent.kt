@@ -58,15 +58,17 @@ internal fun MovieDetailsContent(
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
         onRecommendationClick = stableRecommendationClick,
-        onBackdropCollapse = onBackdropCollapse) {
-            MovieDetailsSection(
-                releaseDate = movieDetails.releaseDate,
-                originalLanguage = movieDetails.originalLanguage,
-                productionCompanies = movieDetails.productionCompanies,
-                productionCountries = movieDetails.productionCountries,
-                budget = movieDetails.budget,
-                revenue = movieDetails.revenue)
-        }
+        onBackdropCollapse = onBackdropCollapse,
+    ) {
+        MovieDetailsSection(
+            releaseDate = movieDetails.releaseDate,
+            originalLanguage = movieDetails.originalLanguage,
+            productionCompanies = movieDetails.productionCompanies,
+            productionCountries = movieDetails.productionCountries,
+            budget = movieDetails.budget,
+            revenue = movieDetails.revenue,
+        )
+    }
 }
 
 @Composable
@@ -76,7 +78,7 @@ private fun MovieDetailsSection(
     productionCompanies: String,
     productionCountries: String,
     budget: String,
-    revenue: String
+    revenue: String,
 ) {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
     Column(
@@ -85,36 +87,41 @@ private fun MovieDetailsSection(
             Modifier.fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    shape = MaterialTheme.shapes.large)
-                .padding(Spacing.md)) {
-            DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
+                    shape = MaterialTheme.shapes.large,
+                )
+                .padding(Spacing.md),
+    ) {
+        DetailItem(fieldName = stringResource(id = R.string.release_date), value = releaseDate)
 
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.original_language),
+            value = originalLanguage,
+        )
+
+        if (budget != "0" && budget.isNotEmpty()) {
             HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.original_language),
-                value = originalLanguage)
-
-            if (budget != "0" && budget.isNotEmpty()) {
-                HorizontalDivider(color = dividerColor)
-                DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
-            }
-
-            if (revenue != "0" && revenue.isNotEmpty()) {
-                HorizontalDivider(color = dividerColor)
-                DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
-            }
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.production_companies),
-                value = productionCompanies)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.production_countries),
-                value = productionCountries)
+            DetailItem(fieldName = stringResource(id = R.string.budget), value = "$${budget}")
         }
+
+        if (revenue != "0" && revenue.isNotEmpty()) {
+            HorizontalDivider(color = dividerColor)
+            DetailItem(fieldName = stringResource(id = R.string.revenue), value = "$${revenue}")
+        }
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.production_companies),
+            value = productionCompanies,
+        )
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.production_countries),
+            value = productionCountries,
+        )
+    }
 }

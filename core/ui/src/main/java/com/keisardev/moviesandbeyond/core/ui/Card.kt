@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,7 +45,6 @@ import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
-import java.util.Locale
 
 /**
  * Card component for displaying movie/TV show posters in lists. Uses [TmdbListImage] which is
@@ -71,7 +71,7 @@ fun MediaItemCard(
     size: PosterSize = PosterSize.MEDIUM,
     rating: Double? = null,
     sharedElementKey: MediaSharedElementKey? = null,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -81,14 +81,17 @@ fun MediaItemCard(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "card_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "card_scale",
+        )
 
     val elevation by
         animateDpAsState(
             targetValue = if (isPressed) 2.dp else 4.dp,
             animationSpec = spring(),
-            label = "card_elevation")
+            label = "card_elevation",
+        )
 
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
@@ -110,7 +113,8 @@ fun MediaItemCard(
                         tryAwaitRelease()
                         isPressed = false
                     },
-                    onTap = { onItemClick() })
+                    onTap = { onItemClick() },
+                )
             }
 
     val cardShape = MaterialTheme.shapes.medium
@@ -124,49 +128,58 @@ fun MediaItemCard(
                     cardModifier.sharedBounds(
                         sharedContentState =
                             rememberSharedContentState(
-                                key =
-                                    sharedElementKey!!.copy(elementType = SharedElementType.Card)),
-                        animatedVisibilityScope = animatedVisibilityScope)) {
-                    Box {
-                        TmdbListImage(
-                            imageUrl = posterPath,
-                            modifier =
-                                Modifier.sharedElement(
-                                    sharedContentState =
-                                        rememberSharedContentState(
-                                            key =
-                                                sharedElementKey.copy(
-                                                    elementType = SharedElementType.Image)),
-                                    animatedVisibilityScope = animatedVisibilityScope))
+                                key = sharedElementKey!!.copy(elementType = SharedElementType.Card)
+                            ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                    ),
+            ) {
+                Box {
+                    TmdbListImage(
+                        imageUrl = posterPath,
+                        modifier =
+                            Modifier.sharedElement(
+                                sharedContentState =
+                                    rememberSharedContentState(
+                                        key =
+                                            sharedElementKey.copy(
+                                                elementType = SharedElementType.Image
+                                            )
+                                    ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            ),
+                    )
 
-                        // Rating badge overlay
-                        rating?.let {
-                            if (it > 0) {
-                                CompactRatingBadge(
-                                    rating = it,
-                                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
-                            }
+                    // Rating badge overlay
+                    rating?.let {
+                        if (it > 0) {
+                            CompactRatingBadge(
+                                rating = it,
+                                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                            )
                         }
                     }
                 }
+            }
         }
     } else {
         ElevatedCard(
             shape = cardShape,
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
-            modifier = cardModifier) {
-                Box {
-                    TmdbListImage(imageUrl = posterPath)
+            modifier = cardModifier,
+        ) {
+            Box {
+                TmdbListImage(imageUrl = posterPath)
 
-                    rating?.let {
-                        if (it > 0) {
-                            CompactRatingBadge(
-                                rating = it,
-                                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
-                        }
+                rating?.let {
+                    if (it > 0) {
+                        CompactRatingBadge(
+                            rating = it,
+                            modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                        )
                     }
                 }
             }
+        }
     }
 }
 
@@ -182,7 +195,7 @@ fun SimpleMediaItemCard(
     modifier: Modifier = Modifier,
     size: PosterSize = PosterSize.MEDIUM,
     rating: Double? = null,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -192,8 +205,10 @@ fun SimpleMediaItemCard(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "simple_card_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "simple_card_scale",
+        )
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -212,19 +227,23 @@ fun SimpleMediaItemCard(
                             tryAwaitRelease()
                             isPressed = false
                         },
-                        onTap = { onItemClick() })
-                }) {
-            Box {
-                TmdbListImage(imageUrl = posterPath)
+                        onTap = { onItemClick() },
+                    )
+                },
+    ) {
+        Box {
+            TmdbListImage(imageUrl = posterPath)
 
-                rating?.let {
-                    if (it > 0) {
-                        CompactRatingBadge(
-                            rating = it, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
-                    }
+            rating?.let {
+                if (it > 0) {
+                    CompactRatingBadge(
+                        rating = it,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    )
                 }
             }
         }
+    }
 }
 
 /**
@@ -248,7 +267,7 @@ fun MediaBackdropCard(
     year: String? = null,
     rating: Double? = null,
     genres: List<String>? = null,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -258,8 +277,10 @@ fun MediaBackdropCard(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "backdrop_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "backdrop_scale",
+        )
 
     Card(
         shape = MaterialTheme.shapes.large,
@@ -279,78 +300,87 @@ fun MediaBackdropCard(
                             tryAwaitRelease()
                             isPressed = false
                         },
-                        onTap = { onItemClick() })
-                }) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Backdrop image
-                TmdbBackdropImage(
-                    imageUrl = backdropPath,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop)
+                        onTap = { onItemClick() },
+                    )
+                },
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Backdrop image
+            TmdbBackdropImage(
+                imageUrl = backdropPath,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
 
-                // Gradient overlay
-                Box(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors =
-                                        listOf(
-                                            Color.Black.copy(alpha = 0.8f),
-                                            Color.Black.copy(alpha = 0.4f),
-                                            Color.Transparent),
-                                    startX = 0f,
-                                    endX = 800f)))
+            // Gradient overlay
+            Box(
+                modifier =
+                    Modifier.fillMaxSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                colors =
+                                    listOf(
+                                        Color.Black.copy(alpha = 0.8f),
+                                        Color.Black.copy(alpha = 0.4f),
+                                        Color.Transparent,
+                                    ),
+                                startX = 0f,
+                                endX = 800f,
+                            )
+                        )
+            )
 
-                // Content overlay
-                Column(
-                    modifier =
-                        Modifier.fillMaxSize()
-                            .padding(horizontal = Spacing.md, vertical = Spacing.sm),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.xxs, Alignment.Bottom)) {
-                        // Title
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis)
+            // Content overlay
+            Column(
+                modifier =
+                    Modifier.fillMaxSize().padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xxs, Alignment.Bottom),
+            ) {
+                // Title
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
-                        // Year and rating row
-                        if (year != null || rating != null) {
-                            val metaText = buildString {
-                                year?.let { append(it) }
-                                if (year != null && rating != null) append(" • ")
-                                rating?.let {
-                                    append(String.format(Locale.getDefault(), "%.1f", it))
-                                }
-                            }
-                            Text(
-                                text = metaText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.8f))
-                        }
-
-                        // Genre chips (limited to 2-3)
-                        genres?.take(3)?.let { limitedGenres ->
-                            if (limitedGenres.isNotEmpty()) {
-                                GenreChipRow(genres = limitedGenres)
-                            }
-                        }
+                // Year and rating row
+                if (year != null || rating != null) {
+                    val locale = LocalLocale.current.platformLocale
+                    val metaText = buildString {
+                        year?.let { append(it) }
+                        if (year != null && rating != null) append(" • ")
+                        rating?.let { append(String.format(locale, "%.1f", it)) }
                     }
+                    Text(
+                        text = metaText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                    )
+                }
 
-                // Rating badge in top right
-                rating?.let {
-                    if (it > 0) {
-                        RatingBadge(
-                            rating = it,
-                            size = RatingBadgeSize.SMALL,
-                            modifier = Modifier.align(Alignment.TopEnd).padding(Spacing.xs))
+                // Genre chips (limited to 2-3)
+                genres?.take(3)?.let { limitedGenres ->
+                    if (limitedGenres.isNotEmpty()) {
+                        GenreChipRow(genres = limitedGenres)
                     }
                 }
             }
+
+            // Rating badge in top right
+            rating?.let {
+                if (it > 0) {
+                    RatingBadge(
+                        rating = it,
+                        size = RatingBadgeSize.SMALL,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(Spacing.xs),
+                    )
+                }
+            }
         }
+    }
 }
 
 /**
@@ -369,7 +399,7 @@ fun PersonCard(
     name: String,
     modifier: Modifier = Modifier,
     role: String? = null,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -379,8 +409,10 @@ fun PersonCard(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "person_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "person_scale",
+        )
 
     Column(
         modifier =
@@ -397,51 +429,58 @@ fun PersonCard(
                             tryAwaitRelease()
                             isPressed = false
                         },
-                        onTap = { onItemClick() })
+                        onTap = { onItemClick() },
+                    )
                 },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
-            // Circular avatar
-            if (imagePath != null) {
-                TmdbProfileImage(
-                    imageUrl = imagePath,
-                    modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape))
-            } else {
-                // Placeholder for missing image
-                Box(
-                    modifier =
-                        Modifier.size(Dimens.personAvatarSize)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center) {
-                        Text(
-                            text = name.take(1).uppercase(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-            }
-
-            // Name
-            Text(
-                text = name,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center)
-
-            // Role
-            role?.let {
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxs),
+    ) {
+        // Circular avatar
+        if (imagePath != null) {
+            TmdbProfileImage(
+                imageUrl = imagePath,
+                modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape),
+            )
+        } else {
+            // Placeholder for missing image
+            Box(
+                modifier =
+                    Modifier.size(Dimens.personAvatarSize)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center,
+            ) {
                 Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelSmall,
+                    text = name.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center)
+                )
             }
         }
+
+        // Name
+        Text(
+            text = name,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+
+        // Role
+        role?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
 }
 
 // region Previews
@@ -475,7 +514,8 @@ private fun MediaBackdropCardPreview() {
             title = "The Dark Knight",
             year = "2008",
             rating = 9.0,
-            genres = listOf("Action", "Crime", "Drama"))
+            genres = listOf("Action", "Crime", "Drama"),
+        )
     }
 }
 

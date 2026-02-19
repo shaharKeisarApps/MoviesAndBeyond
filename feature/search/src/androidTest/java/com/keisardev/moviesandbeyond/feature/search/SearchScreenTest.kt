@@ -24,7 +24,8 @@ class SearchScreenTest {
                 onSearchQueryChange = {},
                 onBack = {},
                 onSearchResultClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
@@ -42,7 +43,8 @@ class SearchScreenTest {
                 onSearchQueryChange = {},
                 onBack = {},
                 onSearchResultClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText("Inception").assertIsDisplayed()
@@ -60,7 +62,8 @@ class SearchScreenTest {
                 onSearchQueryChange = {},
                 onBack = {},
                 onSearchResultClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
@@ -78,7 +81,8 @@ class SearchScreenTest {
                 onSearchQueryChange = {},
                 onBack = {},
                 onSearchResultClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(noResultsTitle).assertIsDisplayed()

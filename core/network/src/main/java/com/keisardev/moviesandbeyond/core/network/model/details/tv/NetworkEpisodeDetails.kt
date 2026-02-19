@@ -18,7 +18,7 @@ data class NetworkEpisodeDetails(
     @Json(name = "show_id") val showId: Int,
     @Json(name = "still_path") val stillPath: String?,
     @Json(name = "vote_average") val voteAverage: Double,
-    @Json(name = "vote_count") val voteCount: Int
+    @Json(name = "vote_count") val voteCount: Int,
 ) {
     fun asModel() =
         EpisodeDetails(
@@ -33,5 +33,6 @@ data class NetworkEpisodeDetails(
             showId = showId,
             stillPath = stillPath ?: "",
             voteAverage = voteAverage,
-            voteCount = voteCount)
+            voteCount = voteCount,
+        )
 }

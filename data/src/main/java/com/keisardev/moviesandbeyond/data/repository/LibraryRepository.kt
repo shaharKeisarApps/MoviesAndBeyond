@@ -12,7 +12,7 @@ data class SyncResult(
     val pushed: Int,
     val pulled: Int,
     val conflicts: Int,
-    val errors: List<String>
+    val errors: List<String>,
 )
 
 interface LibraryRepository : UserLibrarySyncOperations, LibraryTaskSyncOperation {

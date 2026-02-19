@@ -11,7 +11,7 @@ data class NetworkAccountDetails(
     @Json(name = "iso_639_1") val iso6391: String,
     @Json(name = "iso_3166_1") val iso31661: String,
     val name: String,
-    val username: String
+    val username: String,
 )
 
 @JsonClass(generateAdapter = true) data class Avatar(val gravatar: Gravatar, val tmdb: Tmdb)

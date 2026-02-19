@@ -17,7 +17,7 @@ class LibraryTaskWorker
 constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    private val libraryRepository: LibraryRepository
+    private val libraryRepository: LibraryRepository,
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         val itemId = inputData.getInt(TASK_KEY, 0)
@@ -30,7 +30,8 @@ constructor(
                 id = itemId,
                 mediaType = mediaType,
                 libraryItemType = taskType,
-                itemExistsLocally = itemExists)
+                itemExistsLocally = itemExists,
+            )
 
         return if (syncSuccessful) {
             Result.success()

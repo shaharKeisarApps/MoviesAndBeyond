@@ -22,7 +22,7 @@ class AuthViewModel
 @Inject
 constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState = _uiState.asStateFlow()
@@ -41,7 +41,9 @@ constructor(
 
             val response =
                 authRepository.login(
-                    username = _uiState.value.username, password = _uiState.value.password)
+                    username = _uiState.value.username,
+                    password = _uiState.value.password,
+                )
             when (response) {
                 is NetworkResponse.Success -> {
                     if (hideOnboarding == false) {
@@ -86,5 +88,5 @@ data class AuthUiState(
     val password: String = "",
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
 )

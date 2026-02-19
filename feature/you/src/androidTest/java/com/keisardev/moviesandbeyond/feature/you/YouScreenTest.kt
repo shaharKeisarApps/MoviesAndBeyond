@@ -27,7 +27,8 @@ class YouScreenTest {
             onReloadAccountDetailsClick = {},
             onLogOutClick = {},
             onRefresh = {},
-            onErrorShown = {})
+            onErrorShown = {},
+        )
 
     @Test
     fun youScreen_whenLoggedOut_showsLogInButton() {
@@ -39,7 +40,8 @@ class YouScreenTest {
                 isLoggedIn = false,
                 userSettings = null,
                 libraryItemCounts = LibraryItemCounts(favoritesCount = 0, watchlistCount = 0),
-                callbacks = noopCallbacks)
+                callbacks = noopCallbacks,
+            )
         }
 
         composeTestRule.onNodeWithText(logInText).assertIsDisplayed()
@@ -60,7 +62,9 @@ class YouScreenTest {
                                 includeAdult = false,
                                 gravatar = "",
                                 iso6391 = "",
-                                iso31661 = "")),
+                                iso31661 = "",
+                            )
+                    ),
                 isLoggedIn = true,
                 userSettings =
                     UserSettings(
@@ -69,9 +73,11 @@ class YouScreenTest {
                         darkMode = SelectedDarkMode.SYSTEM,
                         seedColor = SeedColor.DEFAULT,
                         useLocalOnly = false,
-                        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
+                        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+                    ),
                 libraryItemCounts = LibraryItemCounts(favoritesCount = 3, watchlistCount = 5),
-                callbacks = noopCallbacks)
+                callbacks = noopCallbacks,
+            )
         }
 
         composeTestRule.onNodeWithText("johndoe").assertIsDisplayed()
@@ -88,7 +94,8 @@ class YouScreenTest {
                 isLoggedIn = false,
                 userSettings = null,
                 libraryItemCounts = LibraryItemCounts(favoritesCount = 7, watchlistCount = 12),
-                callbacks = noopCallbacks)
+                callbacks = noopCallbacks,
+            )
         }
 
         composeTestRule.onNodeWithText(favoritesText).assertIsDisplayed()
@@ -114,11 +121,14 @@ class YouScreenTest {
                                 includeAdult = false,
                                 gravatar = "",
                                 iso6391 = "",
-                                iso31661 = "")),
+                                iso31661 = "",
+                            )
+                    ),
                 isLoggedIn = true,
                 userSettings = null,
                 libraryItemCounts = LibraryItemCounts(favoritesCount = 0, watchlistCount = 0),
-                callbacks = noopCallbacks)
+                callbacks = noopCallbacks,
+            )
         }
 
         composeTestRule.onNodeWithText(logOutText).assertIsDisplayed()

@@ -36,7 +36,7 @@ data class TvDetails(
     val status: String,
     val tagline: String,
     val type: String,
-    val voteCount: Int
+    val voteCount: Int,
 ) {
     fun asLibraryItem() =
         LibraryItem(

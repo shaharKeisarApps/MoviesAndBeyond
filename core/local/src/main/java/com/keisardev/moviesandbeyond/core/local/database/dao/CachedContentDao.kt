@@ -23,7 +23,8 @@ interface CachedContentDao {
         SELECT * FROM cached_content
         WHERE category = :category
         ORDER BY page ASC, position ASC
-        """)
+        """
+    )
     fun observeByCategory(category: String): Flow<List<CachedContentEntity>>
 
     /** Observe cached content for a specific category and page. Used for paginated data loading. */
@@ -32,7 +33,8 @@ interface CachedContentDao {
         SELECT * FROM cached_content
         WHERE category = :category AND page = :page
         ORDER BY position ASC
-        """)
+        """
+    )
     fun observeByCategoryAndPage(category: String, page: Int): Flow<List<CachedContentEntity>>
 
     /** Get the latest fetch timestamp for a category. Used for freshness validation. */

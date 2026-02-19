@@ -211,7 +211,7 @@ enum class PosterSize(val width: Dp, val height: Dp) {
     LARGE(Dimens.posterLargeWidth, Dimens.posterLargeHeight),
 
     /** XLarge - 160x240dp - hero/showcase sections */
-    XLARGE(Dimens.posterXLargeWidth, Dimens.posterXLargeHeight)
+    XLARGE(Dimens.posterXLargeWidth, Dimens.posterXLargeHeight),
 }
 
 /** Backdrop size variants for horizontal content cards. Uses 16:9 aspect ratio. */
@@ -223,7 +223,7 @@ enum class BackdropSize(val width: Dp, val height: Dp) {
     MEDIUM(Dimens.backdropMediumWidth, Dimens.backdropMediumHeight),
 
     /** Large - 360x202dp - featured backdrop cards */
-    LARGE(Dimens.backdropLargeWidth, Dimens.backdropLargeHeight)
+    LARGE(Dimens.backdropLargeWidth, Dimens.backdropLargeHeight),
 }
 
 /** Profile image size variants for person cards and avatars. */
@@ -235,7 +235,7 @@ enum class ProfileSize(val size: Dp) {
     MEDIUM(Dimens.profileMediumSize),
 
     /** Large - 96dp - featured cast, user profiles */
-    LARGE(Dimens.profileLargeSize)
+    LARGE(Dimens.profileLargeSize),
 }
 
 /** Rating badge size variants. */
@@ -247,5 +247,5 @@ enum class RatingBadgeSize(val height: Dp) {
     MEDIUM(Dimens.ratingBadgeMedium),
 
     /** Large - hero/featured areas */
-    LARGE(Dimens.ratingBadgeLarge)
+    LARGE(Dimens.ratingBadgeLarge),
 }

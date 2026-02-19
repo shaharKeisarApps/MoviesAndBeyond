@@ -18,5 +18,5 @@ import androidx.room.PrimaryKey
 data class CachedTvDetailsEntity(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "details_json") val detailsJson: String,
-    @ColumnInfo(name = "fetched_at") val fetchedAt: Long = System.currentTimeMillis()
+    @ColumnInfo(name = "fetched_at") val fetchedAt: Long = System.currentTimeMillis(),
 )

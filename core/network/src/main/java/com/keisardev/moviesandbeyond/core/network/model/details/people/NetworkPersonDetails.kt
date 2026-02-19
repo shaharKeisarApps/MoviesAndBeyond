@@ -17,7 +17,7 @@ data class NetworkPersonDetails(
     @Json(name = "known_for_department") val knownForDepartment: String,
     val name: String,
     @Json(name = "place_of_birth") val placeOfBirth: String?,
-    @Json(name = "profile_path") val profilePath: String?
+    @Json(name = "profile_path") val profilePath: String?,
 ) {
 
     // According to https://developer.themoviedb.org/reference/person-details#genders
@@ -42,5 +42,6 @@ data class NetworkPersonDetails(
             knownForDepartment = knownForDepartment,
             name = name,
             placeOfBirth = placeOfBirth ?: "Unknown",
-            profilePath = profilePath ?: "")
+            profilePath = profilePath ?: "",
+        )
 }

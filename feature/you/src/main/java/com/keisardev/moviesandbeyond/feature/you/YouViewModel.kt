@@ -27,7 +27,7 @@ class YouViewModel
 constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val libraryRepository: com.keisardev.moviesandbeyond.data.repository.LibraryRepository
+    private val libraryRepository: com.keisardev.moviesandbeyond.data.repository.LibraryRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(YouUiState())
     val uiState = _uiState.asStateFlow()
@@ -46,7 +46,8 @@ constructor(
                     darkMode = it.darkMode,
                     seedColor = it.seedColor,
                     useLocalOnly = it.useLocalOnly,
-                    customColorArgb = it.customColorArgb)
+                    customColorArgb = it.customColorArgb,
+                )
             }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
@@ -56,15 +57,13 @@ constructor(
                 libraryRepository.favoriteMovies,
                 libraryRepository.favoriteTvShows,
                 libraryRepository.moviesWatchlist,
-                libraryRepository.tvShowsWatchlist) {
-                    favoriteMovies,
-                    favoriteTvShows,
-                    moviesWatchlist,
-                    tvShowsWatchlist ->
-                    LibraryItemCounts(
-                        favoritesCount = favoriteMovies.size + favoriteTvShows.size,
-                        watchlistCount = moviesWatchlist.size + tvShowsWatchlist.size)
-                }
+                libraryRepository.tvShowsWatchlist,
+            ) { favoriteMovies, favoriteTvShows, moviesWatchlist, tvShowsWatchlist ->
+                LibraryItemCounts(
+                    favoritesCount = favoriteMovies.size + favoriteTvShows.size,
+                    watchlistCount = moviesWatchlist.size + tvShowsWatchlist.size,
+                )
+            }
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = LibraryItemCounts(0, 0))
 
     fun setDynamicColorPreference(useDynamicColor: Boolean) {
@@ -175,7 +174,7 @@ data class YouUiState(
     val isRefreshing: Boolean = false,
     val isLoggingOut: Boolean = false,
     val accountDetails: AccountDetails? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )
 
 @Immutable

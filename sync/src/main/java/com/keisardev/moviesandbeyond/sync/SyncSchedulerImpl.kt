@@ -39,9 +39,11 @@ internal class SyncSchedulerImpl @Inject constructor(private val workManager: Wo
             generateWorkerName(
                 mediaId = libraryTask.mediaId,
                 mediaType = libraryTask.mediaType,
-                itemType = libraryTask.itemType),
+                itemType = libraryTask.itemType,
+            ),
             ExistingWorkPolicy.REPLACE,
-            libraryTaskWorkRequest)
+            libraryTaskWorkRequest,
+        )
     }
 
     override fun scheduleLibrarySyncWork() {
@@ -54,17 +56,19 @@ internal class SyncSchedulerImpl @Inject constructor(private val workManager: Wo
         workManager.enqueueUniqueWork(
             LibrarySyncWorker.SYNC_LIBRARY_WORK_NAME,
             ExistingWorkPolicy.REPLACE,
-            librarySyncWorkRequest)
+            librarySyncWorkRequest,
+        )
     }
 
     override fun isWorkNotScheduled(
         mediaId: Int,
         mediaType: MediaType,
-        itemType: LibraryItemType
+        itemType: LibraryItemType,
     ): Boolean {
         return workManager
             .getWorkInfosForUniqueWork(
-                generateWorkerName(mediaId = mediaId, mediaType = mediaType, itemType = itemType))
+                generateWorkerName(mediaId = mediaId, mediaType = mediaType, itemType = itemType)
+            )
             .get()
             .any {
                 it.state == WorkInfo.State.ENQUEUED ||
@@ -77,7 +81,7 @@ internal class SyncSchedulerImpl @Inject constructor(private val workManager: Wo
     private fun generateWorkerName(
         mediaId: Int,
         mediaType: MediaType,
-        itemType: LibraryItemType
+        itemType: LibraryItemType,
     ): String {
         return when (itemType) {
             LibraryItemType.FAVORITE -> "${FAVORITES_TAG}-${mediaId}-${mediaType.name}"

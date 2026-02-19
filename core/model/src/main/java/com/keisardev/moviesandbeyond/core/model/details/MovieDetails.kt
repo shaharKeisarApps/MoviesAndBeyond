@@ -27,12 +27,13 @@ data class MovieDetails(
     val runtime: String,
     val tagline: String,
     val title: String,
-    val voteCount: Int
+    val voteCount: Int,
 ) {
     fun asLibraryItem() =
         LibraryItem(
             id = id,
             imagePath = posterPath,
             name = title,
-            mediaType = MediaType.MOVIE.name.lowercase())
+            mediaType = MediaType.MOVIE.name.lowercase(),
+        )
 }

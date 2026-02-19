@@ -42,7 +42,7 @@ data class NetworkTvDetails(
     val tagline: String,
     val type: String,
     @Json(name = "vote_average") val voteAverage: Double,
-    @Json(name = "vote_count") val voteCount: Int
+    @Json(name = "vote_count") val voteCount: Int,
 ) {
     fun asModel() =
         TvDetails(
@@ -74,7 +74,8 @@ data class NetworkTvDetails(
             tagline = tagline,
             type = type,
             rating = voteAverage / 2,
-            voteCount = voteCount)
+            voteCount = voteCount,
+        )
 
     private fun getFormattedRuntime(): String {
         if (episodeRunTime.isEmpty()) return ""

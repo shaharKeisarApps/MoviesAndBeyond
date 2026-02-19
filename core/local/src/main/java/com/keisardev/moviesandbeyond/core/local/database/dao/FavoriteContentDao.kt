@@ -14,13 +14,15 @@ interface FavoriteContentDao {
     @Query(
         "SELECT * FROM favorite_content " +
             "WHERE LOWER(media_type) = 'movie' AND sync_status != 'PENDING_DELETE' " +
-            "ORDER BY id DESC")
+            "ORDER BY id DESC"
+    )
     fun getFavoriteMovies(): Flow<List<FavoriteContentEntity>>
 
     @Query(
         "SELECT * FROM favorite_content " +
             "WHERE LOWER(media_type) = 'tv' AND sync_status != 'PENDING_DELETE' " +
-            "ORDER BY id DESC")
+            "ORDER BY id DESC"
+    )
     fun getFavoriteTvShows(): Flow<List<FavoriteContentEntity>>
 
     @Query("SELECT * FROM favorite_content WHERE sync_status != 'PENDING_DELETE' ORDER BY id DESC")
@@ -29,7 +31,8 @@ interface FavoriteContentDao {
     @Query(
         "SELECT * FROM favorite_content " +
             "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType) " +
-            "AND sync_status != 'PENDING_DELETE'")
+            "AND sync_status != 'PENDING_DELETE'"
+    )
     suspend fun getFavoriteItem(mediaId: Int, mediaType: String): FavoriteContentEntity?
 
     @Upsert suspend fun insertFavoriteItem(favoriteContentEntity: FavoriteContentEntity)
@@ -37,11 +40,13 @@ interface FavoriteContentDao {
     @Query(
         "SELECT EXISTS(SELECT 1 FROM favorite_content " +
             "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType) " +
-            "AND sync_status != 'PENDING_DELETE')")
+            "AND sync_status != 'PENDING_DELETE')"
+    )
     suspend fun checkFavoriteItemExists(mediaId: Int, mediaType: String): Boolean
 
     @Query(
-        "DELETE FROM favorite_content WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+        "DELETE FROM favorite_content WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun deleteFavoriteItem(mediaId: Int, mediaType: String)
 
     @Query("DELETE FROM favorite_content") suspend fun deleteAllFavoriteItems()
@@ -54,7 +59,7 @@ interface FavoriteContentDao {
     @Transaction
     suspend fun syncFavoriteItems(
         upsertItems: List<FavoriteContentEntity>,
-        deleteItems: List<Pair<Int, String>>
+        deleteItems: List<Pair<Int, String>>,
     ) {
         upsertFavoriteItems(upsertItems)
         deleteItems.forEach { deleteFavoriteItem(mediaId = it.first, mediaType = it.second) }
@@ -73,7 +78,8 @@ interface FavoriteContentDao {
 
     @Query(
         "UPDATE favorite_content SET sync_status = :status " +
-            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun updateSyncStatus(mediaId: Int, mediaType: String, status: SyncStatus)
 
     @Query("UPDATE favorite_content SET sync_status = 'SYNCED' WHERE media_id IN (:mediaIds)")
@@ -81,6 +87,7 @@ interface FavoriteContentDao {
 
     @Query(
         "UPDATE favorite_content SET sync_status = 'PENDING_DELETE' " +
-            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun markForDeletion(mediaId: Int, mediaType: String)
 }

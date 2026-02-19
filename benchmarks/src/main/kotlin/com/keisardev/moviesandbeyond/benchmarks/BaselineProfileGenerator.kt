@@ -53,7 +53,8 @@ class BaselineProfileGenerator {
 
                 // Open detail screen if content is visible
                 openFirstContentItem()
-            })
+            },
+        )
     }
 
     @Test
@@ -68,7 +69,8 @@ class BaselineProfileGenerator {
 
                 // Wait for initial content load
                 device.waitForIdle()
-            })
+            },
+        )
     }
 
     private fun androidx.benchmark.macro.MacrobenchmarkScope.navigateToTab(tabName: String) {
@@ -86,7 +88,8 @@ class BaselineProfileGenerator {
             device.displayHeight * 3 / 4,
             device.displayWidth / 2,
             device.displayHeight / 4,
-            SCROLL_STEPS)
+            SCROLL_STEPS,
+        )
         device.waitForIdle()
 
         // Scroll back up
@@ -95,7 +98,8 @@ class BaselineProfileGenerator {
             device.displayHeight / 4,
             device.displayWidth / 2,
             device.displayHeight * 3 / 4,
-            SCROLL_STEPS)
+            SCROLL_STEPS,
+        )
         device.waitForIdle()
     }
 

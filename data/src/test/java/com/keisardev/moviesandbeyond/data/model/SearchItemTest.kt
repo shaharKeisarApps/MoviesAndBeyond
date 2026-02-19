@@ -15,7 +15,8 @@ class SearchItemTest {
                 posterPath = "path",
                 profilePath = null,
                 title = "title",
-                mediaType = "")
+                mediaType = "",
+            )
         val searchItem = networkSearchItem.asModel()
         assertEquals(searchItem.name, networkSearchItem.title)
         assertEquals(searchItem.imagePath, networkSearchItem.posterPath)
@@ -30,7 +31,8 @@ class SearchItemTest {
                 posterPath = "path",
                 profilePath = null,
                 title = null,
-                mediaType = "")
+                mediaType = "",
+            )
         val searchItem = networkSearchItem.asModel()
         assertEquals(searchItem.name, networkSearchItem.name)
     }
@@ -44,7 +46,8 @@ class SearchItemTest {
                 posterPath = "path",
                 profilePath = null,
                 title = null,
-                mediaType = "")
+                mediaType = "",
+            )
         val searchItem = networkSearchItem.asModel()
         assertEquals(searchItem.name, "")
     }
@@ -58,7 +61,8 @@ class SearchItemTest {
                 posterPath = null,
                 profilePath = null,
                 title = "title",
-                mediaType = "")
+                mediaType = "",
+            )
         val searchItem = networkSearchItem.asModel()
         assertEquals(searchItem.imagePath, "")
     }

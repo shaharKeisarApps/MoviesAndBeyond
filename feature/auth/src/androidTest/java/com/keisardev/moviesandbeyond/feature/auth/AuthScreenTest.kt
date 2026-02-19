@@ -25,7 +25,8 @@ class AuthScreenTest {
                 onUsernameChange = {},
                 onPasswordChange = {},
                 onBackClick = {},
-                onContinueWithoutSignInClick = {})
+                onContinueWithoutSignInClick = {},
+            )
         }
 
         composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
@@ -47,7 +48,8 @@ class AuthScreenTest {
                 onUsernameChange = {},
                 onPasswordChange = {},
                 onBackClick = {},
-                onContinueWithoutSignInClick = {})
+                onContinueWithoutSignInClick = {},
+            )
         }
 
         composeTestRule.onNode(hasContentDescription(authIndicatorDescription)).assertIsDisplayed()
@@ -68,7 +70,8 @@ class AuthScreenTest {
                 onUsernameChange = {},
                 onPasswordChange = {},
                 onBackClick = {},
-                onContinueWithoutSignInClick = {})
+                onContinueWithoutSignInClick = {},
+            )
         }
 
         composeTestRule.onNodeWithText(continueText).assertDoesNotExist()
@@ -87,7 +90,8 @@ class AuthScreenTest {
                 onUsernameChange = {},
                 onPasswordChange = {},
                 onBackClick = {},
-                onContinueWithoutSignInClick = {})
+                onContinueWithoutSignInClick = {},
+            )
         }
 
         composeTestRule.onNodeWithText(continueText).assertIsDisplayed()

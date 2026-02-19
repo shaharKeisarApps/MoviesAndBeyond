@@ -37,15 +37,16 @@ androidComponents {
         afterEvaluate {
             val protoTask =
                 project.tasks.getByName(
-                    "generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto")
-                    as GenerateProtoTask
+                    "generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto"
+                ) as GenerateProtoTask
 
             project.tasks.getByName(
-                "ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
-                    dependsOn(protoTask)
-                    // Remove the casting and use a different approach to set source
-                    inputs.files(protoTask.outputBaseDir)
-                }
+                "ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin"
+            ) {
+                dependsOn(protoTask)
+                // Remove the casting and use a different approach to set source
+                inputs.files(protoTask.outputBaseDir)
+            }
         }
     }
 }

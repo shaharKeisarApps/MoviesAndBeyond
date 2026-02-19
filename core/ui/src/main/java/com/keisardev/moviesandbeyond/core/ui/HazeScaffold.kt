@@ -58,31 +58,37 @@ fun HazeScaffold(
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioLowBouncy, // Subtle overshoot
-                                stiffness = Spring.StiffnessMediumLow // Smooth but snappy
-                                )) +
+                                stiffness = Spring.StiffnessMediumLow, // Smooth but snappy
+                            ),
+                    ) +
                         fadeIn(
                             animationSpec =
                                 spring(
                                     dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium)),
+                                    stiffness = Spring.StiffnessMedium,
+                                )
+                        ),
                 exit =
                     slideOutVertically(
                         targetOffsetY = { -it / 3 }, // Exit slightly off-screen
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessMedium)) +
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                    ) +
                         fadeOut(
                             animationSpec =
                                 spring(
                                     dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium))) {
-                    Box(
-                        modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
-                    ) {
-                        topBar()
-                    }
+                                    stiffness = Spring.StiffnessMedium,
+                                )
+                        ),
+            ) {
+                Box(modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle)) {
+                    topBar()
                 }
+            }
             if (!blurTopBar) {
                 topBar()
             }
@@ -96,33 +102,38 @@ fun HazeScaffold(
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioLowBouncy, // Gentle bounce
-                                stiffness = Spring.StiffnessLow // Slower, more deliberate
-                                )) +
+                                stiffness = Spring.StiffnessLow, // Slower, more deliberate
+                            ),
+                    ) +
                         fadeIn(
                             animationSpec =
                                 spring(
                                     dampingRatio = Spring.DampingRatioNoBouncy,
                                     stiffness = Spring.StiffnessMediumLow,
-                                    visibilityThreshold = 0.01f // Ensure fade completes naturally
-                                    )),
+                                    visibilityThreshold = 0.01f, // Ensure fade completes naturally
+                                )
+                        ),
                 exit =
                     slideOutVertically(
                         targetOffsetY = { it / 2 }, // Exit downward
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium)) +
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                    ) +
                         fadeOut(
                             animationSpec =
                                 spring(
                                     dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium))) {
-                    Box(
-                        modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle),
-                    ) {
-                        bottomBar()
-                    }
+                                    stiffness = Spring.StiffnessMedium,
+                                )
+                        ),
+            ) {
+                Box(modifier = Modifier.hazeEffect(state = hazeState, style = hazeStyle)) {
+                    bottomBar()
                 }
+            }
             if (!blurBottomBar) {
                 bottomBar()
             }

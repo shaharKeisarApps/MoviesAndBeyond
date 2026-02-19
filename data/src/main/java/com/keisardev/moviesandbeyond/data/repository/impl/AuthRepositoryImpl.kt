@@ -27,7 +27,7 @@ constructor(
     private val accountDetailsDao: AccountDetailsDao,
     private val userPreferencesDataStore: UserPreferencesDataStore,
     private val sessionManager: SessionManager,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
 ) : AuthRepository {
     override val isLoggedIn = sessionManager.isLoggedIn
 
@@ -36,7 +36,10 @@ constructor(
             val response = tmdbApi.createRequestToken()
             val loginRequest =
                 LoginRequest(
-                    username = username, password = password, requestToken = response.requestToken)
+                    username = username,
+                    password = password,
+                    requestToken = response.requestToken,
+                )
             val loginResponse = tmdbApi.validateWithLogin(loginRequest)
 
             val sessionRequest = SessionRequest(loginResponse.requestToken)

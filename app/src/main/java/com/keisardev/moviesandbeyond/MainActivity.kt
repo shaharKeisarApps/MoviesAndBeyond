@@ -62,11 +62,12 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 dynamicColor = dynamicColor,
                 seedColor = seedColor,
-                customColorArgb = customColorArgb) {
-                    if (uiState is Success) {
-                        MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
-                    }
+                customColorArgb = customColorArgb,
+            ) {
+                if (uiState is Success) {
+                    MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
                 }
+            }
         }
     }
 }

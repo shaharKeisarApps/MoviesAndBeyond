@@ -20,5 +20,5 @@ enum class SyncStatus {
     PENDING_PUSH,
 
     /** Item is marked for deletion on TMDB. Removed locally but remote deletion pending. */
-    PENDING_DELETE
+    PENDING_DELETE,
 }

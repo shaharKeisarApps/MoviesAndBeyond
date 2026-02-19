@@ -19,4 +19,5 @@ fun NetworkSearchItem.asModel() =
         id = id,
         name = title ?: name ?: "",
         mediaType = mediaType,
-        imagePath = posterPath ?: profilePath ?: "")
+        imagePath = posterPath ?: profilePath ?: "",
+    )

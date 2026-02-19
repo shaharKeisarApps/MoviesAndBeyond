@@ -112,10 +112,7 @@ object WhileSubscribedOrRetained : SharingStarted {
  * @return A [StateFlow] that shares emissions using WhileSubscribed(5000) strategy
  */
 @JvmSynthetic
-fun <T> Flow<T>.stateInWhileSubscribed(
-    scope: CoroutineScope,
-    initialValue: T,
-): StateFlow<T> =
+fun <T> Flow<T>.stateInWhileSubscribed(scope: CoroutineScope, initialValue: T): StateFlow<T> =
     stateIn(
         scope = scope,
         started = SharingStarted.WhileSubscribed(5000),

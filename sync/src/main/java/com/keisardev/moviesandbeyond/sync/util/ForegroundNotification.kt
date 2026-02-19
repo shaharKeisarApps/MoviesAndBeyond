@@ -26,10 +26,7 @@ fun Context.workNotification(): Notification {
         notificationManager?.createNotificationChannel(channel)
     }
 
-    return NotificationCompat.Builder(
-            this,
-            SYNC_NOTIFICATION_CHANNEL_ID,
-        )
+    return NotificationCompat.Builder(this, SYNC_NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.drawable.notification_icon)
         .setContentTitle(getString(R.string.work_notification_title))
         .setContentText(getString(R.string.work_notification_text))

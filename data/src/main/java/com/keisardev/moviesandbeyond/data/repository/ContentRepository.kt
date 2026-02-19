@@ -15,13 +15,13 @@ interface ContentRepository {
     @Deprecated("Use observeMovieItems instead for offline-first support")
     suspend fun getMovieItems(
         page: Int,
-        category: MovieListCategory
+        category: MovieListCategory,
     ): NetworkResponse<List<ContentItem>>
 
     @Deprecated("Use observeTvShowItems instead for offline-first support")
     suspend fun getTvShowItems(
         page: Int,
-        category: TvShowListCategory
+        category: TvShowListCategory,
     ): NetworkResponse<List<ContentItem>>
 
     // ==================== Store5 API (Offline-First) ====================
@@ -42,7 +42,7 @@ interface ContentRepository {
     fun observeMovieItems(
         category: MovieListCategory,
         page: Int,
-        refresh: Boolean = true
+        refresh: Boolean = true,
     ): Flow<StoreReadResponse<List<ContentItem>>>
 
     /**
@@ -55,7 +55,7 @@ interface ContentRepository {
     fun observeTvShowItems(
         category: TvShowListCategory,
         page: Int,
-        refresh: Boolean = true
+        refresh: Boolean = true,
     ): Flow<StoreReadResponse<List<ContentItem>>>
 
     /**

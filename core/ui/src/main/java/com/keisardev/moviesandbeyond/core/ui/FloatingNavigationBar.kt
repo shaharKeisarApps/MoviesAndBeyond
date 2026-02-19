@@ -53,7 +53,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 fun FloatingNavigationBar(
     hazeState: HazeState,
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
@@ -62,37 +62,44 @@ fun FloatingNavigationBar(
         modifier =
             modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(horizontal = 24.dp, vertical = 8.dp)) {
-            // Surface with blur - ONLY the bar itself has blur
-            Surface(
-                shape = MaterialTheme.shapes.extraLarge,
-                color = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                tonalElevation = 0.dp,
-                border =
-                    BorderStroke(
-                        width = 0.5.dp,
-                        brush =
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        colorScheme.outlineVariant,
-                                        colorScheme.outlineVariant.copy(alpha = 0.3f)))),
+                .padding(horizontal = 24.dp, vertical = 8.dp)
+    ) {
+        // Surface with blur - ONLY the bar itself has blur
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 0.dp,
+            border =
+                BorderStroke(
+                    width = 0.5.dp,
+                    brush =
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    colorScheme.outlineVariant,
+                                    colorScheme.outlineVariant.copy(alpha = 0.3f),
+                                )
+                        ),
+                ),
+            modifier =
+                Modifier.clip(MaterialTheme.shapes.extraLarge)
+                    .hazeEffect(
+                        state = hazeState,
+                        style = CupertinoMaterials.regular(colorScheme.surface),
+                    ),
+        ) {
+            Row(
                 modifier =
-                    Modifier.clip(MaterialTheme.shapes.extraLarge)
-                        .hazeEffect(
-                            state = hazeState,
-                            style = CupertinoMaterials.regular(colorScheme.surface))) {
-                    Row(
-                        modifier =
-                            Modifier.padding(horizontal = 8.dp)
-                                .fillMaxWidth()
-                                .height(80.dp)
-                                .selectableGroup(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        content = content)
-                }
+                    Modifier.padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .selectableGroup(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                content = content,
+            )
         }
+    }
 }
 
 /**
@@ -117,15 +124,18 @@ fun RowScope.AnimatedNavigationItem(
     selectedIcon: @Composable () -> Unit,
     unselectedIcon: @Composable () -> Unit,
     label: @Composable () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scale by
         animateFloatAsState(
             targetValue = if (selected) 1f else 0.95f,
             animationSpec =
                 spring(
-                    stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy),
-            label = "nav_item_scale")
+                    stiffness = Spring.StiffnessLow,
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                ),
+            label = "nav_item_scale",
+        )
 
     NavigationBarItem(
         selected = selected,
@@ -150,5 +160,7 @@ fun RowScope.AnimatedNavigationItem(
                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)))
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            ),
+    )
 }

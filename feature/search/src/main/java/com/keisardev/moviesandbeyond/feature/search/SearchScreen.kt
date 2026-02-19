@@ -55,7 +55,8 @@ fun SearchRoute(navigateToDetail: (String) -> Unit, viewModel: SearchViewModel =
         onSearchQueryChange = viewModel::changeSearchQuery,
         onBack = viewModel::onBack,
         onSearchResultClick = navigateToDetail,
-        onErrorShown = viewModel::onErrorShown)
+        onErrorShown = viewModel::onErrorShown,
+    )
 }
 
 @Composable
@@ -66,7 +67,7 @@ internal fun SearchScreen(
     onSearchQueryChange: (String) -> Unit,
     onBack: () -> Unit,
     onSearchResultClick: (String) -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -83,7 +84,9 @@ internal fun SearchScreen(
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             MoviesAndBeyondSearchBar(
-                value = searchQuery, onQueryChange = { onSearchQueryChange(it) })
+                value = searchQuery,
+                onQueryChange = { onSearchQueryChange(it) },
+            )
 
             if (searchQuery.isNotEmpty()) {
                 BackHandler {
@@ -99,37 +102,41 @@ internal fun SearchScreen(
                         columns = GridCells.Fixed(Dimens.searchGridColumns),
                         contentPadding =
                             PaddingValues(
-                                horizontal = Spacing.screenPadding, vertical = Spacing.sm),
+                                horizontal = Spacing.screenPadding,
+                                vertical = Spacing.sm,
+                            ),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
                         verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                        modifier = Modifier.fillMaxSize()) {
-                            items(items = searchSuggestions, key = { it.id }) { item ->
-                                // Convert string media type to SharedMediaType for shared elements
-                                val sharedMediaType =
-                                    when (item.mediaType.lowercase()) {
-                                        "movie" -> SharedMediaType.Movie
-                                        "tv" -> SharedMediaType.TvShow
-                                        "person" -> SharedMediaType.Person
-                                        else -> null
-                                    }
-                                SearchSuggestionItem(
-                                    name = item.name,
-                                    imagePath = item.imagePath,
-                                    sharedElementKey =
-                                        sharedMediaType?.let {
-                                            MediaSharedElementKey(
-                                                mediaId = item.id.toLong(),
-                                                mediaType = it,
-                                                origin = SharedElementOrigin.SEARCH,
-                                                elementType = SharedElementType.Image)
-                                        },
-                                    onItemClick = {
-                                        // Converting type to uppercase for [MediaType]
-                                        onSearchResultClick(
-                                            "${item.id},${item.mediaType.uppercase()}")
-                                    })
-                            }
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(items = searchSuggestions, key = { it.id }) { item ->
+                            // Convert string media type to SharedMediaType for shared elements
+                            val sharedMediaType =
+                                when (item.mediaType.lowercase()) {
+                                    "movie" -> SharedMediaType.Movie
+                                    "tv" -> SharedMediaType.TvShow
+                                    "person" -> SharedMediaType.Person
+                                    else -> null
+                                }
+                            SearchSuggestionItem(
+                                name = item.name,
+                                imagePath = item.imagePath,
+                                sharedElementKey =
+                                    sharedMediaType?.let {
+                                        MediaSharedElementKey(
+                                            mediaId = item.id.toLong(),
+                                            mediaType = it,
+                                            origin = SharedElementOrigin.SEARCH,
+                                            elementType = SharedElementType.Image,
+                                        )
+                                    },
+                                onItemClick = {
+                                    // Converting type to uppercase for [MediaType]
+                                    onSearchResultClick("${item.id},${item.mediaType.uppercase()}")
+                                },
+                            )
                         }
+                    }
                 }
             } else {
                 // Initial empty state - encourage user to search
@@ -145,24 +152,28 @@ private fun SearchInitialState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(Dimens.iconSizeLarge),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                Spacer(modifier = Modifier.height(Spacing.xs))
-                Text(
-                    text = stringResource(id = R.string.search_hint),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center)
-                Text(
-                    text = stringResource(id = R.string.search_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center)
-            }
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Search,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.iconSizeLarge),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            )
+            Spacer(modifier = Modifier.height(Spacing.xs))
+            Text(
+                text = stringResource(id = R.string.search_hint),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = stringResource(id = R.string.search_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
@@ -173,23 +184,27 @@ private fun SearchEmptyState(query: String) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-            modifier = Modifier.padding(horizontal = Spacing.screenPadding)) {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(Dimens.iconSizeLarge),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                Spacer(modifier = Modifier.height(Spacing.xs))
-                Text(
-                    text = stringResource(id = R.string.no_results_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center)
-                Text(
-                    text = stringResource(id = R.string.no_results_description, query),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center)
-            }
+            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Search,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.iconSizeLarge),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            )
+            Spacer(modifier = Modifier.height(Spacing.xs))
+            Text(
+                text = stringResource(id = R.string.no_results_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = stringResource(id = R.string.no_results_description, query),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }

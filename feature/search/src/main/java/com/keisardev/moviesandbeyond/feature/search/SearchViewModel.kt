@@ -28,7 +28,7 @@ class SearchViewModel
 @Inject
 constructor(
     private val userRepository: UserRepository,
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
 ) : ViewModel() {
     private var includeAdult: Boolean = false
 
@@ -49,7 +49,9 @@ constructor(
                 delay(200)
                 val response =
                     searchRepository.getSearchSuggestions(
-                        query = query, includeAdult = includeAdult)
+                        query = query,
+                        includeAdult = includeAdult,
+                    )
                 when (response) {
                     is NetworkResponse.Success -> response.data
 

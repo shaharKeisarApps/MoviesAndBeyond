@@ -28,7 +28,8 @@ class FeedScreenTest {
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(airingTodayText).assertIsDisplayed()
@@ -50,12 +51,14 @@ class FeedScreenTest {
                         isLoading = false,
                         endReached = false,
                         page = 1,
-                        category = TvShowListCategory.POPULAR),
+                        category = TvShowListCategory.POPULAR,
+                    ),
                 errorMessage = null,
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText("Test TV Show").assertIsDisplayed()
@@ -75,7 +78,8 @@ class FeedScreenTest {
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()

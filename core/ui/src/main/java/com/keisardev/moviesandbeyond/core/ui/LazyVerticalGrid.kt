@@ -51,7 +51,7 @@ fun LazyVerticalContentGrid(
     contentPadding: PaddingValues,
     minCellWidth: Dp = Dimens.gridCellMinWidth,
     itemSpacing: Dp = Dimens.gridItemSpacing,
-    content: LazyGridScope.() -> Unit
+    content: LazyGridScope.() -> Unit,
 ) {
     val lazyGridState = rememberLazyGridState()
 
@@ -91,9 +91,10 @@ fun LazyVerticalContentGrid(
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             verticalArrangement = Arrangement.spacedBy(itemSpacing),
             userScrollEnabled = false,
-            modifier = Modifier.fillMaxWidth()) {
-                items(6) { ShimmerGridCard() }
-            }
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            items(6) { ShimmerGridCard() }
+        }
     } else {
         // Content grid with adaptive columns for equal sizing
         LazyVerticalGrid(
@@ -103,7 +104,8 @@ fun LazyVerticalContentGrid(
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             verticalArrangement = Arrangement.spacedBy(itemSpacing),
             modifier = Modifier.fillMaxSize(),
-            content = content)
+            content = content,
+        )
     }
 }
 
@@ -131,7 +133,7 @@ fun LazyVerticalContentGridFixed(
     pagingEnabled: Boolean,
     contentPadding: PaddingValues,
     itemSpacing: Dp = Dimens.gridItemSpacing,
-    content: LazyGridScope.() -> Unit
+    content: LazyGridScope.() -> Unit,
 ) {
     val lazyGridState = rememberLazyGridState()
 
@@ -169,9 +171,10 @@ fun LazyVerticalContentGridFixed(
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             verticalArrangement = Arrangement.spacedBy(itemSpacing),
             userScrollEnabled = false,
-            modifier = Modifier.fillMaxWidth()) {
-                items(columns * 2) { ShimmerGridCard() }
-            }
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            items(columns * 2) { ShimmerGridCard() }
+        }
     } else {
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
@@ -180,6 +183,7 @@ fun LazyVerticalContentGridFixed(
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             verticalArrangement = Arrangement.spacedBy(itemSpacing),
             modifier = Modifier.fillMaxSize(),
-            content = content)
+            content = content,
+        )
     }
 }

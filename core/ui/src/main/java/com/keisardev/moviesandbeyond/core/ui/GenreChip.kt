@@ -46,7 +46,7 @@ fun GenreChip(
     text: String,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -56,8 +56,10 @@ fun GenreChip(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessHigh),
-            label = "chip_scale")
+                    stiffness = Spring.StiffnessHigh,
+                ),
+            label = "chip_scale",
+        )
 
     val backgroundColor by
         animateColorAsState(
@@ -68,7 +70,8 @@ fun GenreChip(
                     MaterialTheme.colorScheme.surfaceVariant
                 },
             animationSpec = spring(),
-            label = "chip_bg")
+            label = "chip_bg",
+        )
 
     val contentColor by
         animateColorAsState(
@@ -79,7 +82,8 @@ fun GenreChip(
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
             animationSpec = spring(),
-            label = "chip_content")
+            label = "chip_content",
+        )
 
     val chipShape = MaterialTheme.shapes.small
 
@@ -102,19 +106,23 @@ fun GenreChip(
                                     tryAwaitRelease()
                                     isPressed = false
                                 },
-                                onTap = { onClick() })
+                                onTap = { onClick() },
+                            )
                         }
                     } else {
                         Modifier
-                    })
+                    }
+                )
                 .padding(horizontal = Spacing.sm),
-        contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                color = contentColor)
-        }
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            color = contentColor,
+        )
+    }
 }
 
 /**
@@ -131,8 +139,10 @@ fun OutlinedGenreChip(text: String, modifier: Modifier = Modifier, onClick: (() 
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessHigh),
-            label = "outlined_chip_scale")
+                    stiffness = Spring.StiffnessHigh,
+                ),
+            label = "outlined_chip_scale",
+        )
 
     val chipShape = MaterialTheme.shapes.small
 
@@ -148,7 +158,8 @@ fun OutlinedGenreChip(text: String, modifier: Modifier = Modifier, onClick: (() 
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    shape = chipShape)
+                    shape = chipShape,
+                )
                 .then(
                     if (onClick != null) {
                         Modifier.pointerInput(Unit) {
@@ -158,19 +169,23 @@ fun OutlinedGenreChip(text: String, modifier: Modifier = Modifier, onClick: (() 
                                     tryAwaitRelease()
                                     isPressed = false
                                 },
-                                onTap = { onClick() })
+                                onTap = { onClick() },
+                            )
                         }
                     } else {
                         Modifier
-                    })
+                    }
+                )
                 .padding(horizontal = Spacing.sm),
-        contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 /** Row of genre chips with flow layout. Automatically wraps to next line if needed. */
@@ -179,16 +194,17 @@ fun OutlinedGenreChip(text: String, modifier: Modifier = Modifier, onClick: (() 
 fun GenreChipRow(
     genres: List<String>,
     modifier: Modifier = Modifier,
-    onGenreClick: ((String) -> Unit)? = null
+    onGenreClick: ((String) -> Unit)? = null,
 ) {
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(Spacing.chipSpacing),
-        verticalArrangement = Arrangement.spacedBy(Spacing.chipSpacing)) {
-            genres.forEach { genre ->
-                OutlinedGenreChip(text = genre, onClick = onGenreClick?.let { { it(genre) } })
-            }
+        verticalArrangement = Arrangement.spacedBy(Spacing.chipSpacing),
+    ) {
+        genres.forEach { genre ->
+            OutlinedGenreChip(text = genre, onClick = onGenreClick?.let { { it(genre) } })
         }
+    }
 }
 
 // region Previews

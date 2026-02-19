@@ -62,9 +62,15 @@ class LibraryItemsNavigationIntegrationTest {
 
             // Verify items are loaded (not empty)
             assertEquals(
-                "Should show favorite movies, not empty list", 1, viewModel.movieItems.value.size)
+                "Should show favorite movies, not empty list",
+                1,
+                viewModel.movieItems.value.size,
+            )
             assertEquals(
-                "Should show favorite TV shows, not empty list", 1, viewModel.tvItems.value.size)
+                "Should show favorite TV shows, not empty list",
+                1,
+                viewModel.tvItems.value.size,
+            )
 
             libraryItemTypeCollectJob.cancel()
             moviesCollectJob.cancel()
@@ -93,9 +99,15 @@ class LibraryItemsNavigationIntegrationTest {
 
             // Verify items are loaded (not empty)
             assertEquals(
-                "Should show watchlist movies, not empty list", 1, viewModel.movieItems.value.size)
+                "Should show watchlist movies, not empty list",
+                1,
+                viewModel.movieItems.value.size,
+            )
             assertEquals(
-                "Should show watchlist TV shows, not empty list", 1, viewModel.tvItems.value.size)
+                "Should show watchlist TV shows, not empty list",
+                1,
+                viewModel.tvItems.value.size,
+            )
 
             libraryItemTypeCollectJob.cancel()
             moviesCollectJob.cancel()
@@ -124,13 +136,20 @@ class LibraryItemsNavigationIntegrationTest {
         assertEquals(
             "Without setLibraryItemType call, type should be null",
             null,
-            viewModel.libraryItemType.value)
+            viewModel.libraryItemType.value,
+        )
 
         // Verify empty lists (bug symptom)
         assertEquals(
-            "Bug: Movies list is empty because type is null", 0, viewModel.movieItems.value.size)
+            "Bug: Movies list is empty because type is null",
+            0,
+            viewModel.movieItems.value.size,
+        )
         assertEquals(
-            "Bug: TV shows list is empty because type is null", 0, viewModel.tvItems.value.size)
+            "Bug: TV shows list is empty because type is null",
+            0,
+            viewModel.tvItems.value.size,
+        )
 
         libraryItemTypeCollectJob.cancel()
         moviesCollectJob.cancel()
@@ -145,12 +164,14 @@ class LibraryItemsNavigationIntegrationTest {
         LibraryItemsViewModel(
             savedStateHandle = SavedStateHandle(), // Empty - no type set yet
             libraryRepository = libraryRepository,
-            authRepository = authRepository)
+            authRepository = authRepository,
+        )
 
     /** Create ViewModel with pre-populated type, simulating traditional navigation argument. */
     private fun createViewModelWithType(type: String) =
         LibraryItemsViewModel(
             savedStateHandle = SavedStateHandle(mapOf(libraryItemTypeNavigationArgument to type)),
             libraryRepository = libraryRepository,
-            authRepository = authRepository)
+            authRepository = authRepository,
+        )
 }

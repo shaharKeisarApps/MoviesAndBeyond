@@ -23,7 +23,7 @@ import com.keisardev.moviesandbeyond.ui.onboardingNavigationRoute
 fun MoviesAndBeyondNavigation(
     hideOnboarding: Boolean,
     navController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     val startDestination =
         if (hideOnboarding) {
@@ -44,17 +44,22 @@ fun MoviesAndBeyondNavigation(
         authScreen(onBackClick = navController::navigateUp)
 
         moviesScreen(
-            navController = navController, navigateToDetails = navController::navigateToDetails)
+            navController = navController,
+            navigateToDetails = navController::navigateToDetails,
+        )
 
         tvShowsScreen(
-            navController = navController, navigateToDetails = navController::navigateToDetails)
+            navController = navController,
+            navigateToDetails = navController::navigateToDetails,
+        )
 
         searchScreen(navigateToDetail = navController::navigateToDetails)
 
         youScreen(
             navController = navController,
             navigateToAuth = navController::navigateToAuth,
-            navigateToDetails = navController::navigateToDetails)
+            navigateToDetails = navController::navigateToDetails,
+        )
 
         detailsScreen(navController = navController, navigateToAuth = navController::navigateToAuth)
     }

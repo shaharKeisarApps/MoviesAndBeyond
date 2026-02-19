@@ -47,18 +47,22 @@ fun Nav3TestScreen() {
                     entry<TestHomeRoute> {
                         TestHomeScreen(
                             onNavigateToDetail = { id -> backStack.add(TestDetailRoute(id)) },
-                            onNavigateToSettings = { backStack.add(TestSettingsRoute) })
+                            onNavigateToSettings = { backStack.add(TestSettingsRoute) },
+                        )
                     }
 
                     entry<TestDetailRoute> { key ->
                         TestDetailScreen(
-                            itemId = key.itemId, onBack = { backStack.removeLastOrNull() })
+                            itemId = key.itemId,
+                            onBack = { backStack.removeLastOrNull() },
+                        )
                     }
 
                     entry<TestSettingsRoute> {
                         TestSettingsScreen(onBack = { backStack.removeLastOrNull() })
                     }
-                })
+                },
+        )
     }
 }
 
@@ -67,19 +71,21 @@ private fun TestHomeScreen(onNavigateToDetail: (String) -> Unit, onNavigateToSet
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-            Text(text = "Navigation 3 Test - Home", style = MaterialTheme.typography.headlineMedium)
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(text = "Navigation 3 Test - Home", style = MaterialTheme.typography.headlineMedium)
 
-            Button(
-                onClick = { onNavigateToDetail("item-123") },
-                modifier = Modifier.padding(top = 16.dp)) {
-                    Text("Go to Detail (with argument)")
-                }
-
-            Button(onClick = { onNavigateToSettings() }, modifier = Modifier.padding(top = 8.dp)) {
-                Text("Go to Settings")
-            }
+        Button(
+            onClick = { onNavigateToDetail("item-123") },
+            modifier = Modifier.padding(top = 16.dp),
+        ) {
+            Text("Go to Detail (with argument)")
         }
+
+        Button(onClick = { onNavigateToSettings() }, modifier = Modifier.padding(top = 8.dp)) {
+            Text("Go to Settings")
+        }
+    }
 }
 
 @Composable
@@ -87,16 +93,18 @@ private fun TestDetailScreen(itemId: String, onBack: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-            Text(text = "Detail Screen", style = MaterialTheme.typography.headlineMedium)
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(text = "Detail Screen", style = MaterialTheme.typography.headlineMedium)
 
-            Text(
-                text = "Item ID: $itemId",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp))
+        Text(
+            text = "Item ID: $itemId",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 8.dp),
+        )
 
-            Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) { Text("Go Back") }
-        }
+        Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) { Text("Go Back") }
+    }
 }
 
 @Composable
@@ -104,9 +112,10 @@ private fun TestSettingsScreen(onBack: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-            Text(text = "Settings Screen", style = MaterialTheme.typography.headlineMedium)
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(text = "Settings Screen", style = MaterialTheme.typography.headlineMedium)
 
-            Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) { Text("Go Back") }
-        }
+        Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) { Text("Go Back") }
+    }
 }

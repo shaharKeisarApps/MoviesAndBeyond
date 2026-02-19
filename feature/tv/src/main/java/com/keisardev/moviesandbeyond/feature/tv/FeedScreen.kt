@@ -33,7 +33,7 @@ import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
-    viewModel: TvShowsViewModel
+    viewModel: TvShowsViewModel,
 ) {
     val airingTodayTvShows by viewModel.airingTodayTvShows.collectAsStateWithLifecycle()
     val onAirTvShows by viewModel.onAirTvShows.collectAsStateWithLifecycle()
@@ -49,7 +49,8 @@ fun FeedRoute(
         errorMessage = errorMessage,
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
-        onErrorShown = viewModel::onErrorShown)
+        onErrorShown = viewModel::onErrorShown,
+    )
 }
 
 @Suppress("LongMethod")
@@ -62,7 +63,7 @@ internal fun FeedScreen(
     errorMessage: String?,
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
-    onErrorShown: () -> Unit
+    onErrorShown: () -> Unit,
 ) {
     val snackbarState = remember { SnackbarHostState() }
 
@@ -83,77 +84,82 @@ internal fun FeedScreen(
         LazyColumn(
             contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
             modifier = Modifier.fillMaxWidth().padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing)) {
-                // Hero carousel with popular TV shows
-                item(key = "hero") {
-                    if (popularTvShows.items.isNotEmpty()) {
-                        val heroItems =
-                            remember(popularTvShows.items) {
-                                popularTvShows.items.take(5).map { item ->
-                                    HeroCarouselItem(
-                                        id = item.id,
-                                        title = item.name,
-                                        posterPath = item.imagePath,
-                                        backdropPath = item.backdropPath,
-                                        rating = item.rating,
-                                        releaseYear = item.releaseDate?.take(4),
-                                        overview = item.overview)
-                                }
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
+        ) {
+            // Hero carousel with popular TV shows
+            item(key = "hero") {
+                if (popularTvShows.items.isNotEmpty()) {
+                    val heroItems =
+                        remember(popularTvShows.items) {
+                            popularTvShows.items.take(5).map { item ->
+                                HeroCarouselItem(
+                                    id = item.id,
+                                    title = item.name,
+                                    posterPath = item.imagePath,
+                                    backdropPath = item.backdropPath,
+                                    rating = item.rating,
+                                    releaseYear = item.releaseDate?.take(4),
+                                    overview = item.overview,
+                                )
                             }
-                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                            ContentSectionHeader(
-                                sectionName = stringResource(id = R.string.popular),
-                                onSeeAllClick = null,
-                                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-                            MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                         }
+                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                        ContentSectionHeader(
+                            sectionName = stringResource(id = R.string.popular),
+                            onSeeAllClick = null,
+                            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+                        )
+                        MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                     }
                 }
-
-                // Airing Today section - Large poster carousel
-                item(key = "airing_today") {
-                    CarouselSection(
-                        items = airingTodayTvShows.items,
-                        isLoading =
-                            airingTodayTvShows.items.isEmpty() && airingTodayTvShows.isLoading,
-                        sectionName = stringResource(id = R.string.airing_today),
-                        posterSize = PosterSize.LARGE,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(TvShowListCategory.AIRING_TODAY.name) }
-                            })
-                }
-
-                // On Air section - Medium poster carousel
-                item(key = "on_air") {
-                    CarouselSection(
-                        items = onAirTvShows.items,
-                        isLoading = onAirTvShows.items.isEmpty() && onAirTvShows.isLoading,
-                        sectionName = stringResource(id = R.string.on_air),
-                        posterSize = PosterSize.MEDIUM,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(TvShowListCategory.ON_THE_AIR.name) }
-                            })
-                }
-
-                // Top Rated section - Medium poster carousel with ratings
-                item(key = "top_rated") {
-                    CarouselSection(
-                        items = topRatedTvShows.items,
-                        isLoading = topRatedTvShows.items.isEmpty() && topRatedTvShows.isLoading,
-                        sectionName = stringResource(id = R.string.top_rated),
-                        posterSize = PosterSize.MEDIUM,
-                        showRatings = true,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(TvShowListCategory.TOP_RATED.name) }
-                            })
-                }
             }
+
+            // Airing Today section - Large poster carousel
+            item(key = "airing_today") {
+                CarouselSection(
+                    items = airingTodayTvShows.items,
+                    isLoading = airingTodayTvShows.items.isEmpty() && airingTodayTvShows.isLoading,
+                    sectionName = stringResource(id = R.string.airing_today),
+                    posterSize = PosterSize.LARGE,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(TvShowListCategory.AIRING_TODAY.name) }
+                        },
+                )
+            }
+
+            // On Air section - Medium poster carousel
+            item(key = "on_air") {
+                CarouselSection(
+                    items = onAirTvShows.items,
+                    isLoading = onAirTvShows.items.isEmpty() && onAirTvShows.isLoading,
+                    sectionName = stringResource(id = R.string.on_air),
+                    posterSize = PosterSize.MEDIUM,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(TvShowListCategory.ON_THE_AIR.name) }
+                        },
+                )
+            }
+
+            // Top Rated section - Medium poster carousel with ratings
+            item(key = "top_rated") {
+                CarouselSection(
+                    items = topRatedTvShows.items,
+                    isLoading = topRatedTvShows.items.isEmpty() && topRatedTvShows.isLoading,
+                    sectionName = stringResource(id = R.string.top_rated),
+                    posterSize = PosterSize.MEDIUM,
+                    showRatings = true,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(TvShowListCategory.TOP_RATED.name) }
+                        },
+                )
+            }
+        }
     }
 }
 
@@ -165,13 +171,14 @@ private fun CarouselSection(
     onItemClick: (Int) -> Unit,
     onSeeAllClick: () -> Unit,
     posterSize: PosterSize = PosterSize.MEDIUM,
-    showRatings: Boolean = false
+    showRatings: Boolean = false,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing)) {
         ContentSectionHeader(
             sectionName = sectionName,
             onSeeAllClick = onSeeAllClick,
-            modifier = Modifier.padding(horizontal = Spacing.screenPadding))
+            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+        )
 
         if (items.isEmpty() && isLoading) {
             ShimmerPosterCarousel(posterSize = posterSize)
@@ -180,7 +187,8 @@ private fun CarouselSection(
                 items = items,
                 onItemClick = onItemClick,
                 posterSize = posterSize,
-                showRatings = showRatings)
+                showRatings = showRatings,
+            )
         }
     }
 }
@@ -193,11 +201,17 @@ private val previewItems =
         ContentItem(2, "/poster2.jpg", "Game of Thrones", "/backdrop2.jpg", 8.4, "2011-04-17"),
         ContentItem(3, "/poster3.jpg", "The Last of Us", "/backdrop3.jpg", 8.8, "2023-01-15"),
         ContentItem(4, "/poster4.jpg", "Stranger Things", "/backdrop4.jpg", 8.7, "2016-07-15"),
-        ContentItem(5, "/poster5.jpg", "The Mandalorian", "/backdrop5.jpg", 8.5, "2019-11-12"))
+        ContentItem(5, "/poster5.jpg", "The Mandalorian", "/backdrop5.jpg", 8.5, "2019-11-12"),
+    )
 
 private fun previewContentUiState(category: TvShowListCategory) =
     ContentUiState(
-        items = previewItems, isLoading = false, endReached = false, page = 1, category = category)
+        items = previewItems,
+        isLoading = false,
+        endReached = false,
+        page = 1,
+        category = category,
+    )
 
 @Preview(showBackground = true)
 @Composable
@@ -210,7 +224,8 @@ private fun TvFeedScreenPreview() {
         errorMessage = null,
         onItemClick = {},
         onSeeAllClick = {},
-        onErrorShown = {})
+        onErrorShown = {},
+    )
 }
 
 @Preview(showBackground = true)
@@ -224,7 +239,8 @@ private fun TvFeedScreenLoadingPreview() {
         errorMessage = null,
         onItemClick = {},
         onSeeAllClick = {},
-        onErrorShown = {})
+        onErrorShown = {},
+    )
 }
 
 // endregion

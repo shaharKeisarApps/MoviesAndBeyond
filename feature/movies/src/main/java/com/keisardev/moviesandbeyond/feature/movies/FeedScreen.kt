@@ -34,7 +34,7 @@ fun FeedRoute(
     navigateToDetails: (String) -> Unit,
     navigateToItems: (String) -> Unit,
     viewModel: MoviesViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val nowPlayingMovies by viewModel.nowPlayingMovies.collectAsStateWithLifecycle()
     val popularMovies by viewModel.popularMovies.collectAsStateWithLifecycle()
@@ -51,7 +51,8 @@ fun FeedRoute(
         onItemClick = navigateToDetails,
         onSeeAllClick = navigateToItems,
         onErrorShown = viewModel::onErrorShown,
-        modifier = modifier)
+        modifier = modifier,
+    )
 }
 
 @Suppress("LongMethod")
@@ -65,7 +66,7 @@ internal fun FeedScreen(
     onItemClick: (String) -> Unit,
     onSeeAllClick: (String) -> Unit,
     onErrorShown: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val snackbarState = remember { SnackbarHostState() }
 
@@ -86,76 +87,82 @@ internal fun FeedScreen(
         LazyColumn(
             contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
             modifier = modifier.fillMaxWidth().padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing)) {
-                // Hero carousel with popular movies
-                item(key = "hero") {
-                    if (popularMovies.items.isNotEmpty()) {
-                        val heroItems =
-                            remember(popularMovies.items) {
-                                popularMovies.items.take(5).map { item ->
-                                    HeroCarouselItem(
-                                        id = item.id,
-                                        title = item.name,
-                                        posterPath = item.imagePath,
-                                        backdropPath = item.backdropPath,
-                                        rating = item.rating,
-                                        releaseYear = item.releaseDate?.take(4),
-                                        overview = item.overview)
-                                }
+            verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
+        ) {
+            // Hero carousel with popular movies
+            item(key = "hero") {
+                if (popularMovies.items.isNotEmpty()) {
+                    val heroItems =
+                        remember(popularMovies.items) {
+                            popularMovies.items.take(5).map { item ->
+                                HeroCarouselItem(
+                                    id = item.id,
+                                    title = item.name,
+                                    posterPath = item.imagePath,
+                                    backdropPath = item.backdropPath,
+                                    rating = item.rating,
+                                    releaseYear = item.releaseDate?.take(4),
+                                    overview = item.overview,
+                                )
                             }
-                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                            ContentSectionHeader(
-                                sectionName = stringResource(id = R.string.popular),
-                                onSeeAllClick = null,
-                                modifier = Modifier.padding(horizontal = Spacing.screenPadding))
-                            MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                         }
+                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                        ContentSectionHeader(
+                            sectionName = stringResource(id = R.string.popular),
+                            onSeeAllClick = null,
+                            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+                        )
+                        MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                     }
                 }
-
-                // Now Playing section - Large poster carousel
-                item(key = "now_playing") {
-                    CarouselSection(
-                        items = nowPlayingMovies.items,
-                        isLoading = nowPlayingMovies.items.isEmpty() && nowPlayingMovies.isLoading,
-                        sectionName = stringResource(id = R.string.now_playing),
-                        posterSize = PosterSize.LARGE,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(MovieListCategory.NOW_PLAYING.name) }
-                            })
-                }
-
-                // Top Rated section - Medium poster carousel with ratings
-                item(key = "top_rated") {
-                    CarouselSection(
-                        items = topRatedMovies.items,
-                        isLoading = topRatedMovies.items.isEmpty() && topRatedMovies.isLoading,
-                        sectionName = stringResource(id = R.string.top_rated),
-                        posterSize = PosterSize.MEDIUM,
-                        showRatings = true,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(MovieListCategory.TOP_RATED.name) }
-                            })
-                }
-
-                // Upcoming section - Small poster carousel
-                item(key = "upcoming") {
-                    CarouselSection(
-                        items = upcomingMovies.items,
-                        isLoading = upcomingMovies.items.isEmpty() && upcomingMovies.isLoading,
-                        sectionName = stringResource(id = R.string.upcoming),
-                        posterSize = PosterSize.SMALL,
-                        onItemClick = onCarouselItemClick,
-                        onSeeAllClick =
-                            remember(onSeeAllClick) {
-                                { onSeeAllClick(MovieListCategory.UPCOMING.name) }
-                            })
-                }
             }
+
+            // Now Playing section - Large poster carousel
+            item(key = "now_playing") {
+                CarouselSection(
+                    items = nowPlayingMovies.items,
+                    isLoading = nowPlayingMovies.items.isEmpty() && nowPlayingMovies.isLoading,
+                    sectionName = stringResource(id = R.string.now_playing),
+                    posterSize = PosterSize.LARGE,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(MovieListCategory.NOW_PLAYING.name) }
+                        },
+                )
+            }
+
+            // Top Rated section - Medium poster carousel with ratings
+            item(key = "top_rated") {
+                CarouselSection(
+                    items = topRatedMovies.items,
+                    isLoading = topRatedMovies.items.isEmpty() && topRatedMovies.isLoading,
+                    sectionName = stringResource(id = R.string.top_rated),
+                    posterSize = PosterSize.MEDIUM,
+                    showRatings = true,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(MovieListCategory.TOP_RATED.name) }
+                        },
+                )
+            }
+
+            // Upcoming section - Small poster carousel
+            item(key = "upcoming") {
+                CarouselSection(
+                    items = upcomingMovies.items,
+                    isLoading = upcomingMovies.items.isEmpty() && upcomingMovies.isLoading,
+                    sectionName = stringResource(id = R.string.upcoming),
+                    posterSize = PosterSize.SMALL,
+                    onItemClick = onCarouselItemClick,
+                    onSeeAllClick =
+                        remember(onSeeAllClick) {
+                            { onSeeAllClick(MovieListCategory.UPCOMING.name) }
+                        },
+                )
+            }
+        }
     }
 }
 
@@ -167,13 +174,14 @@ private fun CarouselSection(
     onItemClick: (Int) -> Unit,
     onSeeAllClick: () -> Unit,
     posterSize: PosterSize = PosterSize.MEDIUM,
-    showRatings: Boolean = false
+    showRatings: Boolean = false,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.headerSpacing)) {
         ContentSectionHeader(
             sectionName = sectionName,
             onSeeAllClick = onSeeAllClick,
-            modifier = Modifier.padding(horizontal = Spacing.screenPadding))
+            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+        )
 
         if (items.isEmpty() && isLoading) {
             ShimmerPosterCarousel(posterSize = posterSize)
@@ -182,7 +190,8 @@ private fun CarouselSection(
                 items = items,
                 onItemClick = onItemClick,
                 posterSize = posterSize,
-                showRatings = showRatings)
+                showRatings = showRatings,
+            )
         }
     }
 }
@@ -195,11 +204,17 @@ private val previewItems =
         ContentItem(2, "/poster2.jpg", "Oppenheimer", "/backdrop2.jpg", 8.3, "2023-07-21"),
         ContentItem(3, "/poster3.jpg", "The Batman", "/backdrop3.jpg", 7.8, "2022-03-04"),
         ContentItem(4, "/poster4.jpg", "Avatar: The Way of Water", "/backdrop4.jpg", 7.6, "2022"),
-        ContentItem(5, "/poster5.jpg", "Top Gun: Maverick", "/backdrop5.jpg", 8.2, "2022-05-27"))
+        ContentItem(5, "/poster5.jpg", "Top Gun: Maverick", "/backdrop5.jpg", 8.2, "2022-05-27"),
+    )
 
 private fun previewContentUiState(category: MovieListCategory) =
     ContentUiState(
-        items = previewItems, isLoading = false, endReached = false, page = 1, category = category)
+        items = previewItems,
+        isLoading = false,
+        endReached = false,
+        page = 1,
+        category = category,
+    )
 
 @Preview(showBackground = true)
 @Composable
@@ -212,7 +227,8 @@ private fun FeedScreenPreview() {
         errorMessage = null,
         onItemClick = {},
         onSeeAllClick = {},
-        onErrorShown = {})
+        onErrorShown = {},
+    )
 }
 
 @Preview(showBackground = true)
@@ -226,7 +242,8 @@ private fun FeedScreenLoadingPreview() {
         errorMessage = null,
         onItemClick = {},
         onSeeAllClick = {},
-        onErrorShown = {})
+        onErrorShown = {},
+    )
 }
 
 // endregion

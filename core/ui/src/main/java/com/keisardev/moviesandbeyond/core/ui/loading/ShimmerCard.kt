@@ -42,7 +42,8 @@ fun shimmerBrush(): Brush {
         listOf(
             MaterialTheme.colorScheme.surfaceVariant,
             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-            MaterialTheme.colorScheme.surfaceVariant)
+            MaterialTheme.colorScheme.surfaceVariant,
+        )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by
@@ -52,13 +53,16 @@ fun shimmerBrush(): Brush {
             animationSpec =
                 infiniteRepeatable(
                     animation = tween(durationMillis = 1200, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart),
-            label = "shimmerTranslate")
+                    repeatMode = RepeatMode.Restart,
+                ),
+            label = "shimmerTranslate",
+        )
 
     return Brush.linearGradient(
         colors = shimmerColors,
         start = Offset.Zero,
-        end = Offset(x = translateAnim, y = translateAnim))
+        end = Offset(x = translateAnim, y = translateAnim),
+    )
 }
 
 /**
@@ -78,7 +82,8 @@ fun ShimmerCard(modifier: Modifier = Modifier, size: PosterSize = PosterSize.MED
                 .size(width = size.width, height = size.height)
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(12.dp))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 /**
@@ -92,7 +97,7 @@ fun ShimmerCard(modifier: Modifier = Modifier, size: PosterSize = PosterSize.MED
 fun ShimmerCard(
     modifier: Modifier = Modifier,
     width: Dp = Dimens.cardWidth,
-    height: Dp = Dimens.cardHeight
+    height: Dp = Dimens.cardHeight,
 ) {
     val brush = shimmerBrush()
 
@@ -103,7 +108,8 @@ fun ShimmerCard(
                 .height(height)
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(12.dp))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 /**
@@ -120,15 +126,16 @@ fun ShimmerRow(
     cardCount: Int = 4,
     size: PosterSize = PosterSize.MEDIUM,
     contentPadding: PaddingValues = PaddingValues(horizontal = Spacing.screenPadding),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyRow(
         contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
         userScrollEnabled = false,
-        modifier = modifier) {
-            items(cardCount) { ShimmerCard(size = size) }
-        }
+        modifier = modifier,
+    ) {
+        items(cardCount) { ShimmerCard(size = size) }
+    }
 }
 
 /**
@@ -147,7 +154,8 @@ fun ShimmerGridCard(modifier: Modifier = Modifier) {
                 .height(Dimens.cardHeight)
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(12.dp))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 /**
@@ -167,7 +175,8 @@ fun ShimmerRowCard(modifier: Modifier = Modifier, size: PosterSize = PosterSize.
                 .fillMaxHeight()
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(12.dp))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 /**
@@ -186,7 +195,8 @@ fun ShimmerBackdropCard(modifier: Modifier = Modifier) {
                 .height(Dimens.backdropCardHeight)
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(16.dp))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 /**
@@ -204,7 +214,8 @@ fun ShimmerPersonCard(modifier: Modifier = Modifier) {
                 .size(Dimens.personAvatarSize)
                 .graphicsLayer { clip = true }
                 .clip(RoundedCornerShape(50))
-                .background(brush))
+                .background(brush)
+    )
 }
 
 // region Previews

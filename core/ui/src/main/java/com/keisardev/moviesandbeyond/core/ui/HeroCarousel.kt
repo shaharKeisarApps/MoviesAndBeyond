@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,13 +48,13 @@ import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
-import java.util.Locale
 
 private val HeroGradientBrush =
     Brush.verticalGradient(
         colors = listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = 0.8f)),
         startY = 0f,
-        endY = Float.POSITIVE_INFINITY)
+        endY = Float.POSITIVE_INFINITY,
+    )
 
 private val OverlayTextColor = Color.White.copy(alpha = 0.8f)
 private val OverlaySubtleTextColor = Color.White.copy(alpha = 0.7f)
@@ -68,7 +69,7 @@ data class HeroCarouselItem(
     val backdropPath: String? = null,
     val rating: Double? = null,
     val releaseYear: String? = null,
-    val overview: String? = null
+    val overview: String? = null,
 )
 
 /**
@@ -84,7 +85,7 @@ data class HeroCarouselItem(
 fun MediaHeroCarousel(
     items: List<HeroCarouselItem>,
     onItemClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (items.isEmpty()) return
 
@@ -96,15 +97,17 @@ fun MediaHeroCarousel(
         modifier = modifier.fillMaxWidth().height(Dimens.heroMaxHeight),
         preferredItemWidth = 300.dp,
         itemSpacing = Spacing.sm,
-        contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) { index ->
-            val item = displayItems[index]
-            val itemId = item.id
-            val onClick = remember(itemId) { { onItemClick(itemId) } }
-            HeroCarouselItemContent(
-                item = item,
-                onItemClick = onClick,
-                modifier = Modifier.maskClip(MaterialTheme.shapes.extraLarge))
-        }
+        contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
+    ) { index ->
+        val item = displayItems[index]
+        val itemId = item.id
+        val onClick = remember(itemId) { { onItemClick(itemId) } }
+        HeroCarouselItemContent(
+            item = item,
+            onItemClick = onClick,
+            modifier = Modifier.maskClip(MaterialTheme.shapes.extraLarge),
+        )
+    }
 }
 
 /** Single hero carousel item content with backdrop, gradient overlay, and content info. */
@@ -113,7 +116,7 @@ fun MediaHeroCarousel(
 private fun HeroCarouselItemContent(
     item: HeroCarouselItem,
     onItemClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -123,8 +126,10 @@ private fun HeroCarouselItemContent(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "hero_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "hero_scale",
+        )
 
     Box(
         modifier =
@@ -141,80 +146,91 @@ private fun HeroCarouselItemContent(
                             tryAwaitRelease()
                             isPressed = false
                         },
-                        onTap = { onItemClick() })
-                }) {
-            // Backdrop image
-            val backdropUrl = item.backdropPath ?: item.posterPath
-            TmdbBackdropImage(
-                imageUrl = backdropUrl,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop)
+                        onTap = { onItemClick() },
+                    )
+                }
+    ) {
+        // Backdrop image
+        val backdropUrl = item.backdropPath ?: item.posterPath
+        TmdbBackdropImage(
+            imageUrl = backdropUrl,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
 
-            // Gradient overlay
-            Box(modifier = Modifier.fillMaxSize().background(HeroGradientBrush))
+        // Gradient overlay
+        Box(modifier = Modifier.fillMaxSize().background(HeroGradientBrush))
 
-            // Content overlay
-            Column(
-                modifier =
-                    Modifier.align(Alignment.BottomStart)
-                        .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                    // Rating badge
-                    item.rating?.let { rating ->
-                        if (rating > 0) {
-                            RatingBadge(rating = rating, size = RatingBadgeSize.MEDIUM)
-                        }
-                    }
+        // Content overlay
+        Column(
+            modifier =
+                Modifier.align(Alignment.BottomStart)
+                    .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+        ) {
+            // Rating badge
+            item.rating?.let { rating ->
+                if (rating > 0) {
+                    RatingBadge(rating = rating, size = RatingBadgeSize.MEDIUM)
+                }
+            }
 
-                    // Title
+            // Title
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            // Release date and overview
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                item.releaseYear?.let { year ->
                     Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis)
+                        text = year,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = OverlayTextColor,
+                    )
+                }
 
-                    // Release date and overview
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                        verticalAlignment = Alignment.CenterVertically) {
-                            item.releaseYear?.let { year ->
-                                Text(
-                                    text = year,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = OverlayTextColor)
-                            }
-
-                            item.rating?.let { rating ->
-                                if (rating > 0) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Star,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp),
-                                        tint = RatingColors.Star)
-                                    Text(
-                                        text = String.format(Locale.getDefault(), "%.1f", rating),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = OverlayTextColor)
-                                }
-                            }
-                        }
-
-                    // Overview excerpt
-                    item.overview?.let { overview ->
-                        if (overview.isNotBlank()) {
-                            Spacer(modifier = Modifier.height(Spacing.xxs))
-                            Text(
-                                text = overview,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = OverlaySubtleTextColor,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis)
-                        }
+                item.rating?.let { rating ->
+                    if (rating > 0) {
+                        Icon(
+                            imageVector = Icons.Rounded.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = RatingColors.Star,
+                        )
+                        Text(
+                            text =
+                                String.format(LocalLocale.current.platformLocale, "%.1f", rating),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = OverlayTextColor,
+                        )
                     }
                 }
+            }
+
+            // Overview excerpt
+            item.overview?.let { overview ->
+                if (overview.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(Spacing.xxs))
+                    Text(
+                        text = overview,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OverlaySubtleTextColor,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
         }
+    }
 }
 
 /**
@@ -236,7 +252,7 @@ fun MediaPosterCarousel(
     onItemClick: (Int) -> Unit,
     posterSize: PosterSize,
     modifier: Modifier = Modifier,
-    showRatings: Boolean = false
+    showRatings: Boolean = false,
 ) {
     if (items.isEmpty()) return
 
@@ -248,16 +264,18 @@ fun MediaPosterCarousel(
         modifier = modifier.fillMaxWidth().height(posterSize.height),
         preferredItemWidth = posterSize.width,
         itemSpacing = Spacing.itemSpacing,
-        contentPadding = PaddingValues(horizontal = Spacing.screenPadding)) { index ->
-            val item = displayItems[index]
-            val itemId = item.id
-            val onClick = remember(itemId) { { onItemClick(itemId) } }
-            PosterCarouselItem(
-                posterPath = item.imagePath,
-                rating = if (showRatings) item.rating else null,
-                onItemClick = onClick,
-                modifier = Modifier.maskClip(MaterialTheme.shapes.large))
-        }
+        contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
+    ) { index ->
+        val item = displayItems[index]
+        val itemId = item.id
+        val onClick = remember(itemId) { { onItemClick(itemId) } }
+        PosterCarouselItem(
+            posterPath = item.imagePath,
+            rating = if (showRatings) item.rating else null,
+            onItemClick = onClick,
+            modifier = Modifier.maskClip(MaterialTheme.shapes.large),
+        )
+    }
 }
 
 /** Single poster item inside the carousel. Renders poster image with optional rating badge. */
@@ -266,7 +284,7 @@ private fun PosterCarouselItem(
     posterPath: String,
     rating: Double?,
     onItemClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isPressed by remember { mutableStateOf(false) }
 
@@ -276,8 +294,10 @@ private fun PosterCarouselItem(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "poster_carousel_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "poster_carousel_scale",
+        )
 
     Box(
         modifier =
@@ -294,17 +314,21 @@ private fun PosterCarouselItem(
                             tryAwaitRelease()
                             isPressed = false
                         },
-                        onTap = { onItemClick() })
-                }) {
-            TmdbListImage(imageUrl = posterPath)
-
-            rating?.let {
-                if (it > 0) {
-                    CompactRatingBadge(
-                        rating = it, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp))
+                        onTap = { onItemClick() },
+                    )
                 }
+    ) {
+        TmdbListImage(imageUrl = posterPath)
+
+        rating?.let {
+            if (it > 0) {
+                CompactRatingBadge(
+                    rating = it,
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                )
             }
         }
+    }
 }
 
 /** Shimmer loading state for poster carousel. */
@@ -315,7 +339,8 @@ fun ShimmerPosterCarousel(posterSize: PosterSize, modifier: Modifier = Modifier)
             modifier
                 .fillMaxWidth()
                 .height(posterSize.height)
-                .background(MaterialTheme.colorScheme.surfaceVariant))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+    )
 }
 
 /** Shimmer loading state for hero carousel. */
@@ -326,7 +351,8 @@ fun ShimmerHeroCarousel(modifier: Modifier = Modifier) {
             modifier
                 .fillMaxWidth()
                 .height(Dimens.heroMaxHeight)
-                .background(MaterialTheme.colorScheme.surfaceVariant))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+    )
 }
 
 // region Previews
@@ -340,7 +366,8 @@ private val previewItems =
             backdropPath = "/backdrop1.jpg",
             rating = 8.5,
             releaseYear = "2024",
-            overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge."),
+            overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge.",
+        ),
         HeroCarouselItem(
             id = 2,
             title = "Oppenheimer",
@@ -348,7 +375,8 @@ private val previewItems =
             backdropPath = "/backdrop2.jpg",
             rating = 8.3,
             releaseYear = "2023",
-            overview = "The story of American scientist J. Robert Oppenheimer."),
+            overview = "The story of American scientist J. Robert Oppenheimer.",
+        ),
         HeroCarouselItem(
             id = 3,
             title = "The Batman",
@@ -356,7 +384,8 @@ private val previewItems =
             backdropPath = "/backdrop3.jpg",
             rating = 7.8,
             releaseYear = "2022",
-            overview = "Batman investigates when a serial killer targets Gotham's elite."),
+            overview = "Batman investigates when a serial killer targets Gotham's elite.",
+        ),
         HeroCarouselItem(
             id = 4,
             title = "Avatar: The Way of Water",
@@ -364,7 +393,8 @@ private val previewItems =
             backdropPath = "/backdrop4.jpg",
             rating = 7.6,
             releaseYear = "2022",
-            overview = "Jake Sully lives with his newfound family on Pandora."),
+            overview = "Jake Sully lives with his newfound family on Pandora.",
+        ),
         HeroCarouselItem(
             id = 5,
             title = "Top Gun: Maverick",
@@ -372,7 +402,9 @@ private val previewItems =
             backdropPath = "/backdrop5.jpg",
             rating = 8.2,
             releaseYear = "2022",
-            overview = "Maverick is still pushing the envelope as a top naval aviator."))
+            overview = "Maverick is still pushing the envelope as a top naval aviator.",
+        ),
+    )
 
 @Preview(showBackground = true)
 @Composable

@@ -27,7 +27,10 @@ internal object DatabaseModule {
         @ApplicationContext context: Context
     ): MoviesAndBeyondDatabase {
         return Room.databaseBuilder(
-                context, MoviesAndBeyondDatabase::class.java, "movies_and_beyond.db")
+                context,
+                MoviesAndBeyondDatabase::class.java,
+                "movies_and_beyond.db",
+            )
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }

@@ -23,22 +23,22 @@ fun NavGraphBuilder.youScreen(
         composable(route = youNavigationRoute) {
             YouRoute(
                 navigateToAuth = navigateToAuth,
-                navigateToLibraryItem = navController::navigateToLibraryItem)
+                navigateToLibraryItem = navController::navigateToLibraryItem,
+            )
         }
         composable(
             route = "$libraryItemsNavigationRoute/{$libraryItemTypeNavigationArgument}",
             arguments =
-                listOf(
-                    navArgument(libraryItemTypeNavigationArgument) {
-                        type = NavType.StringType
-                    })) { backStackEntry ->
-                val libraryItemType =
-                    backStackEntry.arguments?.getString(libraryItemTypeNavigationArgument)
-                LibraryItemsRoute(
-                    onBackClick = navController::navigateUp,
-                    navigateToDetails = navigateToDetails,
-                    libraryItemType = libraryItemType)
-            }
+                listOf(navArgument(libraryItemTypeNavigationArgument) { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val libraryItemType =
+                backStackEntry.arguments?.getString(libraryItemTypeNavigationArgument)
+            LibraryItemsRoute(
+                onBackClick = navController::navigateUp,
+                navigateToDetails = navigateToDetails,
+                libraryItemType = libraryItemType,
+            )
+        }
     }
 }
 

@@ -60,7 +60,8 @@ class DetailsViewModelTest {
 
         assertEquals(
             ContentDetailUiState.Movie(data = testMovieDetail),
-            viewModel.contentDetailsUiState.value)
+            viewModel.contentDetailsUiState.value,
+        )
 
         collectJob.cancel()
     }
@@ -74,7 +75,8 @@ class DetailsViewModelTest {
 
         assertEquals(
             ContentDetailUiState.TV(data = testTvShowDetails),
-            viewModel.contentDetailsUiState.value)
+            viewModel.contentDetailsUiState.value,
+        )
 
         collectJob.cancel()
     }
@@ -88,7 +90,8 @@ class DetailsViewModelTest {
 
         assertEquals(
             ContentDetailUiState.Person(data = testPersonDetails),
-            viewModel.contentDetailsUiState.value)
+            viewModel.contentDetailsUiState.value,
+        )
 
         collectJob.cancel()
     }
@@ -204,5 +207,6 @@ class DetailsViewModelTest {
             savedStateHandle = SavedStateHandle(mapOf(idNavigationArgument to navigationArgument)),
             detailsRepository = detailsRepository,
             libraryRepository = libraryRepository,
-            authRepository = authRepository)
+            authRepository = authRepository,
+        )
 }

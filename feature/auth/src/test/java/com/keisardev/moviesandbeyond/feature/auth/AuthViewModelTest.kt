@@ -27,10 +27,7 @@ class AuthViewModelTest {
 
     @Test
     fun `test initial state`() {
-        assertEquals(
-            AuthUiState(),
-            viewModel.uiState.value,
-        )
+        assertEquals(AuthUiState(), viewModel.uiState.value)
     }
 
     @Test

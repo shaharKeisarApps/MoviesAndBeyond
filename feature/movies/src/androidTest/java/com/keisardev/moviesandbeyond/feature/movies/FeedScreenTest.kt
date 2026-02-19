@@ -28,7 +28,8 @@ class FeedScreenTest {
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(nowPlayingText).assertIsDisplayed()
@@ -48,14 +49,16 @@ class FeedScreenTest {
                         isLoading = false,
                         endReached = false,
                         page = 1,
-                        category = MovieListCategory.POPULAR),
+                        category = MovieListCategory.POPULAR,
+                    ),
                 topRatedMovies = ContentUiState(category = MovieListCategory.TOP_RATED),
                 upcomingMovies = ContentUiState(category = MovieListCategory.UPCOMING),
                 errorMessage = null,
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText("Test Movie").assertIsDisplayed()
@@ -75,7 +78,8 @@ class FeedScreenTest {
                 appendItems = {},
                 onItemClick = {},
                 onSeeAllClick = {},
-                onErrorShown = {})
+                onErrorShown = {},
+            )
         }
 
         composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()

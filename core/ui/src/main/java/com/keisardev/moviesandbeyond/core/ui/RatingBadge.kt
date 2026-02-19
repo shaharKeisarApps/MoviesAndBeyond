@@ -25,13 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
-import java.util.Locale
 
 /**
  * Color-coded rating colors for visual quality indicators. These should match the theme's rating
@@ -92,7 +92,7 @@ fun RatingBadge(
     rating: Double,
     modifier: Modifier = Modifier,
     size: RatingBadgeSize = RatingBadgeSize.SMALL,
-    showAnimation: Boolean = true
+    showAnimation: Boolean = true,
 ) {
     val backgroundColor = remember(rating) { getRatingColor(rating) }
     val contentColor = remember(rating) { getRatingContentColor(rating) }
@@ -103,8 +103,10 @@ fun RatingBadge(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium),
-            label = "rating_scale")
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            label = "rating_scale",
+        )
 
     val (iconSize, fontSize, horizontalPadding) =
         when (size) {
@@ -127,19 +129,22 @@ fun RatingBadge(
                 .background(backgroundColor)
                 .padding(horizontal = horizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            Icon(
-                imageVector = Icons.Rounded.Star,
-                contentDescription = null,
-                modifier = Modifier.size(iconSize),
-                tint = contentColor)
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Star,
+            contentDescription = null,
+            modifier = Modifier.size(iconSize),
+            tint = contentColor,
+        )
 
-            Text(
-                text = String.format(Locale.getDefault(), "%.1f", rating),
-                fontSize = fontSize,
-                fontWeight = FontWeight.Bold,
-                color = contentColor)
-        }
+        Text(
+            text = String.format(LocalLocale.current.platformLocale, "%.1f", rating),
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold,
+            color = contentColor,
+        )
+    }
 }
 
 /**
@@ -158,19 +163,22 @@ fun CompactRatingBadge(rating: Double, modifier: Modifier = Modifier) {
                 .background(backgroundColor.copy(alpha = 0.9f))
                 .padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            Icon(
-                imageVector = Icons.Rounded.Star,
-                contentDescription = null,
-                modifier = Modifier.size(10.dp),
-                tint = contentColor)
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Star,
+            contentDescription = null,
+            modifier = Modifier.size(10.dp),
+            tint = contentColor,
+        )
 
-            Text(
-                text = String.format(Locale.getDefault(), "%.1f", rating),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = contentColor)
-        }
+        Text(
+            text = String.format(LocalLocale.current.platformLocale, "%.1f", rating),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = contentColor,
+        )
+    }
 }
 
 /** Star rating display with filled/empty stars. Converts 10-point scale to 5-star display. */
@@ -193,7 +201,8 @@ fun StarRating(rating: Double, modifier: Modifier = Modifier, maxStars: Int = 5)
                 imageVector = Icons.Rounded.Star,
                 contentDescription = null,
                 modifier = Modifier.size(Dimens.iconSizeSmall),
-                tint = tint)
+                tint = tint,
+            )
         }
     }
 }

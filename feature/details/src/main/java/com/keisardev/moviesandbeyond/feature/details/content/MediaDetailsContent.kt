@@ -110,7 +110,7 @@ internal fun MediaDetailsContent(
     onCastClick: (String) -> Unit,
     onRecommendationClick: (String) -> Unit,
     onBackdropCollapse: (Boolean) -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val heightToCollapsePx = with(LocalDensity.current) { heightToCollapse.toPx() }
 
@@ -145,49 +145,55 @@ internal fun MediaDetailsContent(
         BackdropImageSection(
             path = backdropPath,
             scrollValue = scrollValue,
-            modifier = Modifier.height(backdropHeight))
+            modifier = Modifier.height(backdropHeight),
+        )
         LazyColumn(
             contentPadding =
                 PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm),
             verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
-            modifier = Modifier.fillMaxWidth()) {
-                item(key = "info") {
-                    InfoSection(
-                        voteCount = voteCount,
-                        name = name,
-                        rating = rating,
-                        releaseYear = releaseYear,
-                        runtime = runtime,
-                        tagline = tagline)
-                }
-
-                item(key = "genres") { GenreSection(genres) }
-
-                item(key = "library_actions") {
-                    LibraryActions(
-                        isFavorite = isFavorite,
-                        isAddedToWatchList = isAddedToWatchList,
-                        onFavoriteClick = onFavoriteClick,
-                        onWatchlistClick = onWatchlistClick)
-                }
-
-                item(key = "cast") {
-                    TopBilledCast(
-                        cast = cast,
-                        onCastClick = onCastClick,
-                        onSeeAllCastClick = onSeeAllCastClick)
-                }
-
-                item(key = "overview") { OverviewSection(overview) }
-
-                item(key = "details") { content() }
-
-                item(key = "recommendations") {
-                    Recommendations(
-                        recommendations = recommendations,
-                        onRecommendationClick = onRecommendationClick)
-                }
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            item(key = "info") {
+                InfoSection(
+                    voteCount = voteCount,
+                    name = name,
+                    rating = rating,
+                    releaseYear = releaseYear,
+                    runtime = runtime,
+                    tagline = tagline,
+                )
             }
+
+            item(key = "genres") { GenreSection(genres) }
+
+            item(key = "library_actions") {
+                LibraryActions(
+                    isFavorite = isFavorite,
+                    isAddedToWatchList = isAddedToWatchList,
+                    onFavoriteClick = onFavoriteClick,
+                    onWatchlistClick = onWatchlistClick,
+                )
+            }
+
+            item(key = "cast") {
+                TopBilledCast(
+                    cast = cast,
+                    onCastClick = onCastClick,
+                    onSeeAllCastClick = onSeeAllCastClick,
+                )
+            }
+
+            item(key = "overview") { OverviewSection(overview) }
+
+            item(key = "details") { content() }
+
+            item(key = "recommendations") {
+                Recommendations(
+                    recommendations = recommendations,
+                    onRecommendationClick = onRecommendationClick,
+                )
+            }
+        }
     }
 }
 
@@ -215,7 +221,7 @@ private class ExitOnlyCollapseNestedConnection(private val heightToCollapse: Flo
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
-        source: NestedScrollSource
+        source: NestedScrollSource,
     ): Offset {
         // change height of top app bar when scrolling all the way down and
         // child has finished scrolling
@@ -237,11 +243,13 @@ internal fun DetailItem(fieldName: String, value: String) {
             text = fieldName,
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface)
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
@@ -280,9 +288,14 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
             Brush.verticalGradient(
                 colors =
                     listOf(
-                        Color.Transparent, Color.Transparent, bgColor.copy(alpha = 0.7f), bgColor),
+                        Color.Transparent,
+                        Color.Transparent,
+                        bgColor.copy(alpha = 0.7f),
+                        bgColor,
+                    ),
                 startY = 0f,
-                endY = Float.POSITIVE_INFINITY)
+                endY = Float.POSITIVE_INFINITY,
+            )
         }
 
     Box(modifier.fillMaxWidth().clipToBounds()) {
@@ -296,7 +309,8 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
                     // Fade out as it collapses (min 30% opacity for smooth transition)
                     alpha = scrollValue.coerceIn(0.3f, 1f)
                 },
-            contentScale = ContentScale.Crop)
+            contentScale = ContentScale.Crop,
+        )
 
         // Status bar scrim — uses drawBehind to defer scrollValue read to draw phase
         Box(
@@ -307,9 +321,11 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
                         brush =
                             Brush.verticalGradient(
                                 colors =
-                                    listOf(
-                                        Color.Black.copy(alpha = scrimAlpha), Color.Transparent)))
-                })
+                                    listOf(Color.Black.copy(alpha = scrimAlpha), Color.Transparent)
+                            )
+                    )
+                }
+        )
 
         // Content gradient overlay - ensures text readability over dynamic images
         Box(modifier = Modifier.fillMaxSize().background(contentGradient))
@@ -337,73 +353,82 @@ private fun InfoSection(
     rating: Double,
     releaseYear: Int,
     tagline: String,
-    runtime: String
+    runtime: String,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-        modifier = Modifier.fillMaxWidth()) {
-            // Title - M3 Display style for maximum prominence and visual hierarchy
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface)
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Title - M3 Display style for maximum prominence and visual hierarchy
+        Text(
+            text = name,
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
 
-            // Meta info row - year, runtime with M3 onSurfaceVariant for secondary emphasis
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                verticalAlignment = Alignment.CenterVertically) {
-                    if (releaseYear > 0) {
-                        Text(
-                            text = "$releaseYear",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    if (runtime.isNotEmpty() && releaseYear > 0) {
-                        Text(
-                            text = "•",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    if (runtime.isNotEmpty()) {
-                        Text(
-                            text = runtime,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-
-            // Color-coded rating badge with vote count - uses M3 RatingBadge component
-            if (rating > 0) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                    verticalAlignment = Alignment.CenterVertically) {
-                        RatingBadge(rating = rating, size = RatingBadgeSize.MEDIUM)
-                        if (voteCount > 0) {
-                            Text(
-                                text = "($voteCount votes)",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-            }
-
-            // Tagline - italic style for distinction
-            // Uses onSurfaceVariant for subtle emphasis per M3 guidelines
-            if (tagline.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(Spacing.xxs))
+        // Meta info row - year, runtime with M3 onSurfaceVariant for secondary emphasis
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (releaseYear > 0) {
                 Text(
-                    text = tagline,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    fontStyle = FontStyle.Italic,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    text = "$releaseYear",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (runtime.isNotEmpty() && releaseYear > 0) {
+                Text(
+                    text = "•",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (runtime.isNotEmpty()) {
+                Text(
+                    text = runtime,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
+
+        // Color-coded rating badge with vote count - uses M3 RatingBadge component
+        if (rating > 0) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RatingBadge(rating = rating, size = RatingBadgeSize.MEDIUM)
+                if (voteCount > 0) {
+                    Text(
+                        text = "($voteCount votes)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        // Tagline - italic style for distinction
+        // Uses onSurfaceVariant for subtle emphasis per M3 guidelines
+        if (tagline.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(Spacing.xxs))
+            Text(
+                text = tagline,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                fontStyle = FontStyle.Italic,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 /** Genre section using styled chips with flow layout. */
@@ -435,60 +460,67 @@ private fun TopBilledCast(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-        modifier = Modifier.fillMaxWidth()) {
-            ContentSectionHeader(
-                sectionName = stringResource(id = R.string.top_billed_cast),
-                onSeeAllClick = onSeeAllCastClick)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                modifier =
-                    Modifier.horizontalScroll(rememberScrollState())
-                        .padding(bottom = Spacing.xxs)) {
-                    cast.forEach {
-                        CastItemCard(
-                            id = it.id,
-                            imagePath = it.profilePath,
-                            name = it.name,
-                            characterName = it.character,
-                            onItemClick = onCastClick)
-                    }
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        ContentSectionHeader(
+            sectionName = stringResource(id = R.string.top_billed_cast),
+            onSeeAllClick = onSeeAllCastClick,
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            modifier =
+                Modifier.horizontalScroll(rememberScrollState()).padding(bottom = Spacing.xxs),
+        ) {
+            cast.forEach {
+                CastItemCard(
+                    id = it.id,
+                    imagePath = it.profilePath,
+                    name = it.name,
+                    characterName = it.character,
+                    onItemClick = onCastClick,
+                )
+            }
 
-                    // View all button - M3 tonal surface with primary accent
-                    Column(
-                        modifier =
-                            Modifier.width(Dimens.personCardWidth).noRippleClickable {
-                                onSeeAllCastClick()
-                            },
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center) {
-                            // Circular container with surface variant background
-                            Box(
-                                modifier =
-                                    Modifier.size(Dimens.personAvatarSize)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                                contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = "→",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                            Spacer(modifier = Modifier.height(Spacing.xxs))
-                            // Primary color for action emphasis
-                            Text(
-                                text = stringResource(id = R.string.view_all),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.Center)
-                        }
+            // View all button - M3 tonal surface with primary accent
+            Column(
+                modifier =
+                    Modifier.width(Dimens.personCardWidth).noRippleClickable {
+                        onSeeAllCastClick()
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                // Circular container with surface variant background
+                Box(
+                    modifier =
+                        Modifier.size(Dimens.personAvatarSize)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "→",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
+                Spacer(modifier = Modifier.height(Spacing.xxs))
+                // Primary color for action emphasis
+                Text(
+                    text = stringResource(id = R.string.view_all),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
+    }
 }
 
 @Composable
 private fun Recommendations(
     recommendations: List<ContentItem>,
-    onRecommendationClick: (String) -> Unit
+    onRecommendationClick: (String) -> Unit,
 ) {
     LazyRowContentSection(
         pagingEnabled = false,
@@ -496,7 +528,8 @@ private fun Recommendations(
             Text(
                 text = stringResource(id = R.string.recommendations),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold)
+                fontWeight = FontWeight.SemiBold,
+            )
         },
         rowContent = {
             if (recommendations.isEmpty()) {
@@ -506,7 +539,8 @@ private fun Recommendations(
                             text = stringResource(id = R.string.not_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.Center))
+                            modifier = Modifier.align(Alignment.Center),
+                        )
                     }
                 }
             } else {
@@ -515,11 +549,13 @@ private fun Recommendations(
                     // since these navigate to a new detail screen, not back to a list)
                     SimpleMediaItemCard(
                         posterPath = item.imagePath,
-                        onItemClick = { onRecommendationClick("${item.id}") })
+                        onItemClick = { onRecommendationClick("${item.id}") },
+                    )
                 }
             }
         },
-        modifier = Modifier.padding(bottom = Spacing.xxs))
+        modifier = Modifier.padding(bottom = Spacing.xxs),
+    )
 }
 
 /**
@@ -547,7 +583,7 @@ private fun CastItemCard(
     name: String,
     characterName: String,
     onItemClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier =
@@ -555,47 +591,53 @@ private fun CastItemCard(
                 onItemClick("$id,${MediaType.PERSON}")
             },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.xxs)) {
-            // Circular avatar - M3 standard size for person representation
-            if (imagePath.isNotEmpty()) {
-                TmdbProfileImage(
-                    imageUrl = imagePath,
-                    modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape))
-            } else {
-                // M3 fallback avatar with initial letter
-                // Uses surface variant for subtle contrast
-                Box(
-                    modifier =
-                        Modifier.size(Dimens.personAvatarSize)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center) {
-                        Text(
-                            text = name.take(1).uppercase(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxs),
+    ) {
+        // Circular avatar - M3 standard size for person representation
+        if (imagePath.isNotEmpty()) {
+            TmdbProfileImage(
+                imageUrl = imagePath,
+                modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape),
+            )
+        } else {
+            // M3 fallback avatar with initial letter
+            // Uses surface variant for subtle contrast
+            Box(
+                modifier =
+                    Modifier.size(Dimens.personAvatarSize)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = name.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-
-            // Actor name - Primary text with medium weight for emphasis
-            Text(
-                text = name,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center)
-
-            // Character name - Secondary text with variant color for hierarchy
-            Text(
-                text = characterName,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center)
         }
+
+        // Actor name - Primary text with medium weight for emphasis
+        Text(
+            text = name,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+
+        // Character name - Secondary text with variant color for hierarchy
+        Text(
+            text = characterName,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 /**
@@ -616,54 +658,58 @@ private fun LibraryActions(
     isFavorite: Boolean,
     isAddedToWatchList: Boolean,
     onFavoriteClick: () -> Unit,
-    onWatchlistClick: () -> Unit
+    onWatchlistClick: () -> Unit,
 ) {
     Row(
         modifier =
             Modifier.fillMaxWidth()
                 .height(IntrinsicSize.Max)
                 .padding(top = Spacing.sm, bottom = Spacing.xs),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            // Favorite button - Filled button (high emphasis action)
-            // Uses semantic red color when favorited for clear visual feedback
-            LibraryActionButton(
-                name =
-                    if (isFavorite) {
-                        stringResource(id = R.string.remove_from_favorites)
-                    } else {
-                        stringResource(id = R.string.add_to_favorites)
-                    },
-                icon = Icons.Rounded.Favorite,
-                iconTint =
-                    if (isFavorite) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    },
-                onClick = onFavoriteClick,
-                modifier = Modifier.fillMaxHeight().weight(1f))
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        // Favorite button - Filled button (high emphasis action)
+        // Uses semantic red color when favorited for clear visual feedback
+        LibraryActionButton(
+            name =
+                if (isFavorite) {
+                    stringResource(id = R.string.remove_from_favorites)
+                } else {
+                    stringResource(id = R.string.add_to_favorites)
+                },
+            icon = Icons.Rounded.Favorite,
+            iconTint =
+                if (isFavorite) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                },
+            onClick = onFavoriteClick,
+            modifier = Modifier.fillMaxHeight().weight(1f),
+        )
 
-            // Watchlist button - Tonal button (medium emphasis action)
-            // Uses surface variant container for subtle distinction from favorite
-            LibraryActionButton(
-                name =
-                    if (isAddedToWatchList) {
-                        stringResource(id = R.string.remove_from_watchlist)
-                    } else {
-                        stringResource(id = R.string.add_to_watchlist)
-                    },
-                icon =
-                    if (isAddedToWatchList) {
-                        Icons.Rounded.Bookmark // Filled icon when in watchlist
-                    } else {
-                        Icons.Outlined.BookmarkBorder // Outlined icon when not in watchlist
-                    },
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
-                onClick = onWatchlistClick,
-                modifier = Modifier.fillMaxHeight().weight(1f))
-        }
+        // Watchlist button - Tonal button (medium emphasis action)
+        // Uses surface variant container for subtle distinction from favorite
+        LibraryActionButton(
+            name =
+                if (isAddedToWatchList) {
+                    stringResource(id = R.string.remove_from_watchlist)
+                } else {
+                    stringResource(id = R.string.add_to_watchlist)
+                },
+            icon =
+                if (isAddedToWatchList) {
+                    Icons.Rounded.Bookmark // Filled icon when in watchlist
+                } else {
+                    Icons.Outlined.BookmarkBorder // Outlined icon when not in watchlist
+                },
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+            onClick = onWatchlistClick,
+            modifier = Modifier.fillMaxHeight().weight(1f),
+        )
+    }
 }

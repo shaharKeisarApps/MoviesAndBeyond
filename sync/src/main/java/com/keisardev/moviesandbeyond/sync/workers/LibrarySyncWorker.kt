@@ -23,7 +23,7 @@ constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val libraryRepository: LibraryRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(SYNC_NOTIFICATION_ID, appContext.workNotification())

@@ -23,7 +23,7 @@ class MainActivityViewModel
 constructor(
     userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
     val uiState: StateFlow<MainActivityUiState> =
         userRepository.userData
@@ -33,12 +33,10 @@ constructor(
                     darkMode = it.darkMode,
                     hideOnboarding = it.hideOnboarding,
                     seedColor = it.seedColor,
-                    customColorArgb = it.customColorArgb)
+                    customColorArgb = it.customColorArgb,
+                )
             }
-            .stateInWhileSubscribed(
-                scope = viewModelScope,
-                initialValue = Loading,
-            )
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = Loading)
 
     init {
         executeLibrarySyncWork()
@@ -62,6 +60,6 @@ sealed interface MainActivityUiState {
         val darkMode: SelectedDarkMode,
         val hideOnboarding: Boolean,
         val seedColor: SeedColor,
-        val customColorArgb: Long
+        val customColorArgb: Long,
     ) : MainActivityUiState
 }

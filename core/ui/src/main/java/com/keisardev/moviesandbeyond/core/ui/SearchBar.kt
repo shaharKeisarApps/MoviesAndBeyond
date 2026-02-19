@@ -39,10 +39,7 @@ import androidx.compose.ui.unit.dp
  */
 @Suppress("LongMethod") // Compose UI component with animation state - naturally longer
 @Composable
-fun MoviesAndBeyondSearchBar(
-    value: String,
-    onQueryChange: (String) -> Unit,
-) {
+fun MoviesAndBeyondSearchBar(value: String, onQueryChange: (String) -> Unit) {
     // Expressive press state for clear button
     var isClearPressed by remember { mutableStateOf(false) }
 
@@ -52,8 +49,10 @@ fun MoviesAndBeyondSearchBar(
             animationSpec =
                 spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessHigh),
-            label = "clear_scale")
+                    stiffness = Spring.StiffnessHigh,
+                ),
+            label = "clear_scale",
+        )
 
     TextField(
         value = value,
@@ -75,40 +74,49 @@ fun MoviesAndBeyondSearchBar(
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium)) + fadeIn(),
+                                stiffness = Spring.StiffnessMedium,
+                            )
+                    ) + fadeIn(),
                 exit =
                     scaleOut(
                         animationSpec =
                             spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessHigh)) + fadeOut()) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(id = R.string.clear),
-                        modifier =
-                            Modifier.graphicsLayer {
-                                    scaleX = clearScale
-                                    scaleY = clearScale
-                                }
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            isClearPressed = true
-                                            tryAwaitRelease()
-                                            isClearPressed = false
-                                        },
-                                        onTap = { onQueryChange("") })
-                                })
-                }
+                                stiffness = Spring.StiffnessHigh,
+                            )
+                    ) + fadeOut(),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(id = R.string.clear),
+                    modifier =
+                        Modifier.graphicsLayer {
+                                scaleX = clearScale
+                                scaleY = clearScale
+                            }
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onPress = {
+                                        isClearPressed = true
+                                        tryAwaitRelease()
+                                        isClearPressed = false
+                                    },
+                                    onTap = { onQueryChange("") },
+                                )
+                            },
+                )
+            }
         },
         placeholder = {
             Text(
                 text = stringResource(id = R.string.search_placeholder),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
+                overflow = TextOverflow.Ellipsis,
+            )
         },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth().padding(10.dp))
+        modifier = Modifier.fillMaxWidth().padding(10.dp),
+    )
 }
 
 @Composable

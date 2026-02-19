@@ -30,7 +30,7 @@ data class NetworkMovieDetails(
     val tagline: String,
     val title: String,
     @Json(name = "vote_average") val voteAverage: Double,
-    @Json(name = "vote_count") val voteCount: Int
+    @Json(name = "vote_count") val voteCount: Int,
 ) {
     fun asModel() =
         MovieDetails(
@@ -53,7 +53,8 @@ data class NetworkMovieDetails(
             runtime = getFormattedRuntime(),
             tagline = tagline,
             title = title,
-            voteCount = voteCount)
+            voteCount = voteCount,
+        )
 
     private fun getFormattedRuntime(): String {
         val hours = runtime.div(60)

@@ -70,7 +70,8 @@ fun LazyRowContentSection(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
                 state = lazyRowState,
                 modifier = modifier.fillMaxWidth(),
-                content = rowContent)
+                content = rowContent,
+            )
         }
     }
 }

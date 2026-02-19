@@ -9,7 +9,8 @@ import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
 
 @Entity(
     tableName = "watchlist_content",
-    indices = [Index(value = ["media_id", "media_type"], unique = true)])
+    indices = [Index(value = ["media_id", "media_type"], unique = true)],
+)
 data class WatchlistContentEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "media_id") val mediaId: Int,
@@ -19,7 +20,7 @@ data class WatchlistContentEntity(
     @ColumnInfo(name = "sync_status", defaultValue = "SYNCED")
     val syncStatus: SyncStatus = SyncStatus.SYNCED,
     @ColumnInfo(name = "added_at", defaultValue = "0")
-    val addedAt: Long = System.currentTimeMillis()
+    val addedAt: Long = System.currentTimeMillis(),
 ) {
     fun asLibraryItem() =
         LibraryItem(id = mediaId, mediaType = mediaType, imagePath = imagePath, name = name)
@@ -32,4 +33,5 @@ fun LibraryItem.asWatchlistContentEntity(syncStatus: SyncStatus = SyncStatus.SYN
         imagePath = imagePath,
         name = name,
         syncStatus = syncStatus,
-        addedAt = System.currentTimeMillis())
+        addedAt = System.currentTimeMillis(),
+    )

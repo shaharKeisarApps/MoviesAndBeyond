@@ -25,5 +25,6 @@ data class AccountDetailsEntity(
             iso31661 = iso31661,
             name = name,
             avatar = tmdbAvatarPath,
-            username = username)
+            username = username,
+        )
 }

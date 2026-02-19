@@ -39,7 +39,7 @@ fun CreditsRoute(
     onItemClick: (String) -> Unit,
     onBackClick: () -> Unit,
     viewModel: DetailsViewModel,
-    detailsId: String? = null
+    detailsId: String? = null,
 ) {
     // For Navigation 3: Set the ID from the route key
     detailsId?.let { viewModel.setDetailsId(it) }
@@ -54,7 +54,7 @@ fun CreditsRoute(
 private fun CreditsScreen(
     details: ContentDetailUiState,
     onItemClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -62,9 +62,11 @@ private fun CreditsScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.credits),
-                        fontWeight = FontWeight.SemiBold)
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
-                onBackClick = onBackClick)
+                onBackClick = onBackClick,
+            )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
@@ -96,7 +98,8 @@ private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
                 name = castMember.name,
                 role = castMember.character,
                 imagePath = castMember.profilePath,
-                onItemClick = stableClick)
+                onItemClick = stableClick,
+            )
         }
 
         if (credits.crew.isNotEmpty()) {
@@ -114,7 +117,8 @@ private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
                         name = crewMember.name,
                         role = crewMember.job,
                         imagePath = crewMember.profilePath,
-                        onItemClick = stableClick)
+                        onItemClick = stableClick,
+                    )
                 }
             }
         }
@@ -127,7 +131,7 @@ private fun CreditsItem(
     role: String,
     imagePath: String,
     onItemClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -135,23 +139,26 @@ private fun CreditsItem(
             modifier
                 .fillMaxWidth()
                 .noRippleClickable { onItemClick() }
-                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.sm)) {
-            PersonImage(imageUrl = imagePath, modifier = Modifier.size(Dimens.personAvatarSize))
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.sm),
+    ) {
+        PersonImage(imageUrl = imagePath, modifier = Modifier.size(Dimens.personAvatarSize))
 
-            Spacer(Modifier.width(Spacing.sm))
+        Spacer(Modifier.width(Spacing.sm))
 
-            Column {
-                Text(
-                    text = name,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(Spacing.xxxs))
-                Text(
-                    text = role,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+        Column {
+            Text(
+                text = name,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Spacer(Modifier.height(Spacing.xxxs))
+            Text(
+                text = role,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
+    }
 }
 
 @Composable
@@ -165,5 +172,6 @@ private fun CategoryHeader(text: String, modifier: Modifier = Modifier) {
             modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(Spacing.sm))
+                .padding(Spacing.sm),
+    )
 }

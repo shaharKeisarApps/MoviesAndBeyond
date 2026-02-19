@@ -91,7 +91,7 @@ import com.skydoves.landscapist.image.LandscapistImage
 fun YouRoute(
     navigateToAuth: () -> Unit,
     navigateToLibraryItem: (String) -> Unit,
-    viewModel: YouViewModel = hiltViewModel()
+    viewModel: YouViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userSettings by viewModel.userSettings.collectAsStateWithLifecycle()
@@ -110,13 +110,15 @@ fun YouRoute(
             onReloadAccountDetailsClick = viewModel::getAccountDetails,
             onRefresh = viewModel::onRefresh,
             onLogOutClick = viewModel::logOut,
-            onErrorShown = viewModel::onErrorShown)
+            onErrorShown = viewModel::onErrorShown,
+        )
     YouScreen(
         uiState = uiState,
         isLoggedIn = isLoggedIn,
         userSettings = userSettings,
         libraryItemCounts = libraryItemCounts,
-        callbacks = callbacks)
+        callbacks = callbacks,
+    )
 }
 
 @Suppress("LongParameterList")
@@ -164,13 +166,15 @@ internal fun YouScreen(
             onChangeCustomColorArgb = callbacks.onChangeCustomColorArgb,
             onChangeIncludeAdult = callbacks.onChangeIncludeAdult,
             onChangeUseLocalOnly = callbacks.onChangeUseLocalOnly,
-            onDismissRequest = { showSettingsDialog = !showSettingsDialog })
+            onDismissRequest = { showSettingsDialog = !showSettingsDialog },
+        )
     }
 
     var showAttributionInfoDialog by rememberSaveable { mutableStateOf(false) }
     if (showAttributionInfoDialog) {
         AttributionInfoDialog(
-            onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog })
+            onDismissRequest = { showAttributionInfoDialog = !showAttributionInfoDialog }
+        )
     }
 
     Scaffold(
@@ -183,19 +187,23 @@ internal fun YouScreen(
                     .pullToRefresh(
                         isRefreshing = uiState.isRefreshing,
                         state = pullToRefreshState,
-                        onRefresh = callbacks.onRefresh)) {
-                YouScreenContent(
-                    uiState = uiState,
-                    isLoggedIn = isLoggedIn,
-                    libraryItemCounts = libraryItemCounts,
-                    callbacks = callbacks)
+                        onRefresh = callbacks.onRefresh,
+                    )
+        ) {
+            YouScreenContent(
+                uiState = uiState,
+                isLoggedIn = isLoggedIn,
+                libraryItemCounts = libraryItemCounts,
+                callbacks = callbacks,
+            )
 
-                YouScreenActionButtons(
-                    userSettings = userSettings,
-                    onShowAttribution = { showAttributionInfoDialog = true },
-                    onShowSettings = { showSettingsDialog = true },
-                    modifier = Modifier.align(Alignment.TopEnd))
-            }
+            YouScreenActionButtons(
+                userSettings = userSettings,
+                onShowAttribution = { showAttributionInfoDialog = true },
+                onShowSettings = { showSettingsDialog = true },
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
     }
 }
 
@@ -215,16 +223,19 @@ private fun YouScreenContent(
                         isLoggingOut = uiState.isLoggingOut,
                         libraryItemCounts = libraryItemCounts,
                         onLibraryItemClick = callbacks.onLibraryItemClick,
-                        onLogOutClick = callbacks.onLogOutClick)
+                        onLogOutClick = callbacks.onLogOutClick,
+                    )
                 }
                     ?: LoadAccountDetails(
                         isLoading = uiState.isLoading,
-                        onReloadAccountDetailsClick = callbacks.onReloadAccountDetailsClick)
+                        onReloadAccountDetailsClick = callbacks.onReloadAccountDetailsClick,
+                    )
             } else {
                 LoggedOutView(
                     libraryItemCounts = libraryItemCounts,
                     onNavigateToAuth = callbacks.onNavigateToAuth,
-                    onLibraryItemClick = callbacks.onLibraryItemClick)
+                    onLibraryItemClick = callbacks.onLibraryItemClick,
+                )
             }
         }
     }
@@ -241,14 +252,16 @@ private fun YouScreenActionButtons(
         IconButton(onClick = onShowAttribution) {
             Icon(
                 imageVector = Icons.Rounded.Info,
-                contentDescription = stringResource(id = R.string.attribution_info))
+                contentDescription = stringResource(id = R.string.attribution_info),
+            )
         }
 
         userSettings?.let {
             IconButton(onClick = onShowSettings) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
-                    contentDescription = stringResource(id = R.string.settings_dialog_title))
+                    contentDescription = stringResource(id = R.string.settings_dialog_title),
+                )
             }
         }
     }
@@ -260,7 +273,7 @@ private fun LoggedInView(
     isLoggingOut: Boolean,
     libraryItemCounts: LibraryItemCounts,
     onLibraryItemClick: (String) -> Unit,
-    onLogOutClick: () -> Unit
+    onLogOutClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -268,68 +281,81 @@ private fun LoggedInView(
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg)) {
-            // Profile header section with premium surface
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = MaterialTheme.shapes.extraLarge)
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceContainerLow,
-                            shape = MaterialTheme.shapes.extraLarge)
-                        .padding(Spacing.lg)) {
-                    PersonImage(
-                        imageUrl = accountDetails.avatar ?: "",
-                        modifier = Modifier.size(Dimens.profileLargeSize))
-                    Text(
-                        text = accountDetails.username,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface)
-                    Text(
-                        text = accountDetails.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
+    ) {
+        // Profile header section with premium surface
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = MaterialTheme.shapes.extraLarge,
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        shape = MaterialTheme.shapes.extraLarge,
+                    )
+                    .padding(Spacing.lg),
+        ) {
+            PersonImage(
+                imageUrl = accountDetails.avatar ?: "",
+                modifier = Modifier.size(Dimens.profileLargeSize),
+            )
+            Text(
+                text = accountDetails.username,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = accountDetails.name,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
-            // Library section
-            LibrarySection(
-                libraryItemCounts = libraryItemCounts, onLibraryItemClick = onLibraryItemClick)
+        // Library section
+        LibrarySection(
+            libraryItemCounts = libraryItemCounts,
+            onLibraryItemClick = onLibraryItemClick,
+        )
 
-            // Logout section
-            if (isLoggingOut) {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(vertical = Spacing.md),
-                    color = MaterialTheme.colorScheme.primary)
-            } else {
-                OutlinedButton(
-                    onClick = onLogOutClick,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                    shape = MaterialTheme.shapes.large) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error)
-                        Spacer(Modifier.width(Spacing.xs))
-                        Text(
-                            text = stringResource(id = R.string.log_out),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.error)
-                    }
+        // Logout section
+        if (isLoggingOut) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(vertical = Spacing.md),
+                color = MaterialTheme.colorScheme.primary,
+            )
+        } else {
+            OutlinedButton(
+                onClick = onLogOutClick,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                shape = MaterialTheme.shapes.large,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+                Spacer(Modifier.width(Spacing.xs))
+                Text(
+                    text = stringResource(id = R.string.log_out),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         }
+    }
 }
 
 @Composable
 private fun LoggedOutView(
     libraryItemCounts: LibraryItemCounts,
     onNavigateToAuth: () -> Unit,
-    onLibraryItemClick: (String) -> Unit
+    onLibraryItemClick: (String) -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -337,8 +363,72 @@ private fun LoggedOutView(
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg)) {
-            // Welcome card with premium surface
+                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
+    ) {
+        // Welcome card with premium surface
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        shape = MaterialTheme.shapes.extraLarge,
+                    )
+                    .padding(Spacing.xl),
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.iconSizeLarge),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(id = R.string.log_in_welcome),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = stringResource(id = R.string.log_in_description),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(
+                onClick = onNavigateToAuth,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.log_in),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = Spacing.sm),
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+
+        // Guest mode library section
+        LibrarySection(
+            libraryItemCounts = libraryItemCounts,
+            onLibraryItemClick = onLibraryItemClick,
+        )
+    }
+}
+
+@Composable
+private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize().padding(Spacing.screenPadding),
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        } else {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -346,101 +436,58 @@ private fun LoggedOutView(
                     Modifier.fillMaxWidth()
                         .background(
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
-                            shape = MaterialTheme.shapes.extraLarge)
-                        .padding(Spacing.xl)) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(Dimens.iconSizeLarge),
-                        tint = MaterialTheme.colorScheme.primary)
+                            shape = MaterialTheme.shapes.extraLarge,
+                        )
+                        .padding(Spacing.xl),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.reload_account_details),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Button(
+                    onClick = onReloadAccountDetailsClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                ) {
                     Text(
-                        text = stringResource(id = R.string.log_in_welcome),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface)
-                    Text(
-                        text = stringResource(id = R.string.log_in_description),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Button(
-                        onClick = onNavigateToAuth,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large) {
-                            Text(
-                                text = stringResource(id = R.string.log_in),
-                                style = MaterialTheme.typography.labelLarge)
-                        }
+                        text = stringResource(id = R.string.reload_account_details),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = Spacing.sm),
-                color = MaterialTheme.colorScheme.outlineVariant)
-
-            // Guest mode library section
-            LibrarySection(
-                libraryItemCounts = libraryItemCounts, onLibraryItemClick = onLibraryItemClick)
-        }
-}
-
-@Composable
-private fun LoadAccountDetails(isLoading: Boolean, onReloadAccountDetailsClick: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize().padding(Spacing.screenPadding)) {
-            if (isLoading) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            } else {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                                shape = MaterialTheme.shapes.extraLarge)
-                            .padding(Spacing.xl)) {
-                        Text(
-                            text = stringResource(id = R.string.reload_account_details),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center)
-                        Button(
-                            onClick = onReloadAccountDetailsClick,
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.large) {
-                                Text(
-                                    text = stringResource(id = R.string.reload_account_details),
-                                    style = MaterialTheme.typography.labelLarge)
-                            }
-                    }
             }
         }
+    }
 }
 
 @Composable
 private fun LibrarySection(
     libraryItemCounts: LibraryItemCounts,
-    onLibraryItemClick: (String) -> Unit
+    onLibraryItemClick: (String) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-        modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(id = R.string.your_library),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = Spacing.xs))
-            LibraryItemOption(
-                optionName = stringResource(id = R.string.favorites),
-                itemCount = libraryItemCounts.favoritesCount,
-                onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) })
-            LibraryItemOption(
-                optionName = stringResource(id = R.string.watchlist),
-                itemCount = libraryItemCounts.watchlistCount,
-                onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) })
-        }
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(id = R.string.your_library),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = Spacing.xs),
+        )
+        LibraryItemOption(
+            optionName = stringResource(id = R.string.favorites),
+            itemCount = libraryItemCounts.favoritesCount,
+            onClick = { onLibraryItemClick(LibraryItemType.FAVORITE.name) },
+        )
+        LibraryItemOption(
+            optionName = stringResource(id = R.string.watchlist),
+            itemCount = libraryItemCounts.watchlistCount,
+            onClick = { onLibraryItemClick(LibraryItemType.WATCHLIST.name) },
+        )
+    }
 }
 
 @Composable
@@ -452,35 +499,42 @@ private fun LibraryItemOption(optionName: String, itemCount: Int, onClick: () ->
             Modifier.fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    shape = MaterialTheme.shapes.large)
+                    shape = MaterialTheme.shapes.large,
+                )
                 .clickable(onClick = onClick)
-                .padding(horizontal = Spacing.md, vertical = Spacing.sm)) {
-            Text(
-                text = optionName,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                    if (itemCount > 0) {
-                        Text(
-                            text = itemCount.toString(),
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier =
-                                Modifier.background(
-                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                        shape = CircleShape)
-                                    .padding(horizontal = Spacing.sm, vertical = Spacing.xxs))
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(Dimens.iconSizeSmall))
-                }
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+    ) {
+        Text(
+            text = optionName,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+        ) {
+            if (itemCount > 0) {
+                Text(
+                    text = itemCount.toString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier =
+                        Modifier.background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = CircleShape,
+                            )
+                            .padding(horizontal = Spacing.sm, vertical = Spacing.xxs),
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(Dimens.iconSizeSmall),
+            )
         }
+    }
 }
 
 @Composable
@@ -491,32 +545,37 @@ private fun AttributionInfoDialog(onDismissRequest: () -> Unit) {
             TextButton(onClick = onDismissRequest, shape = MaterialTheme.shapes.medium) {
                 Text(
                     text = stringResource(R.string.settings_dialog_dismiss_text),
-                    style = MaterialTheme.typography.labelLarge)
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                modifier = Modifier.fillMaxWidth()) {
-                    LandscapistImage(
-                        imageModel = { R.drawable.tmdb_logo },
-                        imageOptions =
-                            ImageOptions(
-                                contentScale = ContentScale.Fit,
-                                contentDescription =
-                                    stringResource(id = R.string.tmdb_logo_description)),
-                        modifier = Modifier.size(100.dp))
-                    Text(
-                        text = stringResource(id = R.string.attribution_text),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                LandscapistImage(
+                    imageModel = { R.drawable.tmdb_logo },
+                    imageOptions =
+                        ImageOptions(
+                            contentScale = ContentScale.Fit,
+                            contentDescription = stringResource(id = R.string.tmdb_logo_description),
+                        ),
+                    modifier = Modifier.size(100.dp),
+                )
+                Text(
+                    text = stringResource(id = R.string.attribution_text),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         },
         shape = MaterialTheme.shapes.extraLarge,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        tonalElevation = 0.dp)
+        tonalElevation = 0.dp,
+    )
 }
 
 @Composable
@@ -528,7 +587,7 @@ private fun SettingsDialog(
     onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
     onChangeUseLocalOnly: (Boolean) -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     userSettings?.let {
         AlertDialog(
@@ -537,7 +596,8 @@ private fun SettingsDialog(
                 Text(
                     text = stringResource(R.string.settings_dialog_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface)
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -550,19 +610,22 @@ private fun SettingsDialog(
                         onChangeSeedColor = onChangeSeedColor,
                         onChangeCustomColorArgb = onChangeCustomColorArgb,
                         onChangeIncludeAdult = onChangeIncludeAdult,
-                        onChangeUseLocalOnly = onChangeUseLocalOnly)
+                        onChangeUseLocalOnly = onChangeUseLocalOnly,
+                    )
                 }
             },
             confirmButton = {
                 TextButton(onClick = onDismissRequest, shape = MaterialTheme.shapes.medium) {
                     Text(
                         text = stringResource(R.string.settings_dialog_dismiss_text),
-                        style = MaterialTheme.typography.labelLarge)
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             },
             shape = MaterialTheme.shapes.extraLarge,
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            tonalElevation = 0.dp)
+            tonalElevation = 0.dp,
+        )
     }
 }
 
@@ -582,11 +645,13 @@ private fun SettingsPanel(
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_default),
                 selected = !settings.useDynamicColor,
-                onClick = { onChangeTheme(false) })
+                onClick = { onChangeTheme(false) },
+            )
             SettingsDialogChooserRow(
                 text = stringResource(id = R.string.settings_dialog_theme_dynamic),
                 selected = settings.useDynamicColor,
-                onClick = { onChangeTheme(true) })
+                onClick = { onChangeTheme(true) },
+            )
         }
         Spacer(modifier = Modifier.height(Spacing.sm))
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -600,7 +665,8 @@ private fun SettingsPanel(
             customColorArgb = settings.customColorArgb,
             onColorSelected = onChangeSeedColor,
             onCustomColorChanged = onChangeCustomColorArgb,
-            modifier = Modifier.padding(vertical = 8.dp))
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 
@@ -609,15 +675,18 @@ private fun SettingsPanel(
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_default),
             selected = settings.darkMode == SYSTEM,
-            onClick = { onChangeDarkMode(SYSTEM) })
+            onClick = { onChangeDarkMode(SYSTEM) },
+        )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_yes),
             selected = settings.darkMode == DARK,
-            onClick = { onChangeDarkMode(DARK) })
+            onClick = { onChangeDarkMode(DARK) },
+        )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_no),
             selected = settings.darkMode == LIGHT,
-            onClick = { onChangeDarkMode(LIGHT) })
+            onClick = { onChangeDarkMode(LIGHT) },
+        )
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     Spacer(modifier = Modifier.height(Spacing.sm))
@@ -629,12 +698,11 @@ private fun SettingsPanel(
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(horizontal = Spacing.md, vertical = Spacing.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-                SettingsDialogSectionTitle(
-                    text = stringResource(id = R.string.settings_dialog_adult))
-                Switch(
-                    checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
-            }
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
+            Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
+        }
         Row(
             modifier =
                 Modifier.fillMaxWidth()
@@ -642,17 +710,20 @@ private fun SettingsPanel(
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(horizontal = Spacing.md, vertical = Spacing.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    SettingsDialogSectionTitle(
-                        text = stringResource(id = R.string.settings_dialog_local_only))
-                    Text(
-                        text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                SettingsDialogSectionTitle(
+                    text = stringResource(id = R.string.settings_dialog_local_only)
+                )
+                Text(
+                    text = stringResource(id = R.string.settings_dialog_local_only_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+            Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+        }
     }
 }
 
@@ -678,7 +749,7 @@ fun SeedColorPicker(
     customColorArgb: Long,
     onColorSelected: (SeedColor) -> Unit,
     onCustomColorChanged: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
     val colorPickerController = rememberColorPickerController()
@@ -690,42 +761,47 @@ fun SeedColorPicker(
         // Preset colors row (excluding CUSTOM)
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)) {
-                items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
-                    val isSelected = seedColor == selectedColor
-                    Box(
-                        modifier =
-                            Modifier.size(48.dp)
-                                .clip(CircleShape)
-                                .background(Color(seedColor.argb))
-                                .then(
-                                    if (isSelected) {
-                                        Modifier.border(
-                                            width = 3.dp,
-                                            color = MaterialTheme.colorScheme.outline,
-                                            shape = CircleShape)
-                                    } else {
-                                        Modifier.border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.outlineVariant,
-                                            shape = CircleShape)
-                                    })
-                                .clickable {
-                                    showColorPicker = false
-                                    onColorSelected(seedColor)
-                                },
-                        contentAlignment = Alignment.Center) {
-                            if (isSelected) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription =
-                                        stringResource(id = R.string.seed_color_selected),
-                                    tint = getContrastColor(Color(seedColor.argb)),
-                                    modifier = Modifier.size(24.dp))
-                            }
-                        }
+            contentPadding = PaddingValues(horizontal = 4.dp),
+        ) {
+            items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
+                val isSelected = seedColor == selectedColor
+                Box(
+                    modifier =
+                        Modifier.size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color(seedColor.argb))
+                            .then(
+                                if (isSelected) {
+                                    Modifier.border(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = CircleShape,
+                                    )
+                                } else {
+                                    Modifier.border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outlineVariant,
+                                        shape = CircleShape,
+                                    )
+                                }
+                            )
+                            .clickable {
+                                showColorPicker = false
+                                onColorSelected(seedColor)
+                            },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(id = R.string.seed_color_selected),
+                            tint = getContrastColor(Color(seedColor.argb)),
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
                 }
             }
+        }
 
         // Custom color radio button row (NoteNest pattern)
         Row(
@@ -736,40 +812,46 @@ fun SeedColorPicker(
                         color =
                             if (isCustomSelected)
                                 MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                            else Color.Transparent)
+                            else Color.Transparent
+                    )
                     .selectable(
                         selected = isCustomSelected,
                         role = Role.RadioButton,
                         onClick = {
                             onColorSelected(SeedColor.CUSTOM)
                             showColorPicker = true
-                        })
+                        },
+                    )
                     .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
-            verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = isCustomSelected, onClick = null)
-                Spacer(Modifier.size(Spacing.xs))
-                Text(
-                    text = stringResource(id = R.string.custom_color_picker),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color =
-                        if (isCustomSelected) MaterialTheme.colorScheme.onSecondaryContainer
-                        else MaterialTheme.colorScheme.onSurface)
-                Spacer(modifier = Modifier.weight(1f))
-                // Color box preview with rounded corners
-                Box(
-                    modifier =
-                        Modifier.size(32.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(color = Color(customColorArgb))
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.outline,
-                                shape = MaterialTheme.shapes.small)
-                            .clickable {
-                                onColorSelected(SeedColor.CUSTOM)
-                                showColorPicker = true
-                            })
-            }
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RadioButton(selected = isCustomSelected, onClick = null)
+            Spacer(Modifier.size(Spacing.xs))
+            Text(
+                text = stringResource(id = R.string.custom_color_picker),
+                style = MaterialTheme.typography.bodyLarge,
+                color =
+                    if (isCustomSelected) MaterialTheme.colorScheme.onSecondaryContainer
+                    else MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Color box preview with rounded corners
+            Box(
+                modifier =
+                    Modifier.size(32.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(color = Color(customColorArgb))
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .clickable {
+                            onColorSelected(SeedColor.CUSTOM)
+                            showColorPicker = true
+                        }
+            )
+        }
 
         // Inline color picker (NoteNest style - appears below when Custom is selected)
         AnimatedVisibility(visible = showColorPicker && isCustomSelected) {
@@ -779,50 +861,59 @@ fun SeedColorPicker(
                     Modifier.fillMaxWidth()
                         .background(
                             color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                            shape = MaterialTheme.shapes.large)
-                        .padding(Spacing.md)) {
-                    Text(
-                        text = stringResource(id = R.string.pick_a_color),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface)
+                            shape = MaterialTheme.shapes.large,
+                        )
+                        .padding(Spacing.md),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.pick_a_color),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
 
-                    HsvColorPicker(
-                        modifier =
-                            Modifier.fillMaxWidth().height(240.dp).padding(horizontal = Spacing.xs),
-                        controller = colorPickerController,
-                        onColorChanged = { colorEnvelope ->
-                            // Live preview: update theme in real-time as user picks
-                            onCustomColorChanged(colorEnvelope.color.value.toLong())
+                HsvColorPicker(
+                    modifier =
+                        Modifier.fillMaxWidth().height(240.dp).padding(horizontal = Spacing.xs),
+                    controller = colorPickerController,
+                    onColorChanged = { colorEnvelope ->
+                        // Live preview: update theme in real-time as user picks
+                        onCustomColorChanged(colorEnvelope.color.value.toLong())
+                    },
+                    initialColor = Color(customColorArgb),
+                )
+
+                // Submit and Cancel buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                ) {
+                    Button(
+                        onClick = { showColorPicker = false },
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.submit),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                            // Restore original color on cancel
+                            onCustomColorChanged(originalColorArgb)
+                            showColorPicker = false
                         },
-                        initialColor = Color(customColorArgb))
-
-                    // Submit and Cancel buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                            Button(
-                                onClick = { showColorPicker = false },
-                                modifier = Modifier.weight(1f),
-                                shape = MaterialTheme.shapes.medium) {
-                                    Text(
-                                        text = stringResource(id = R.string.submit),
-                                        style = MaterialTheme.typography.labelLarge)
-                                }
-                            TextButton(
-                                onClick = {
-                                    // Restore original color on cancel
-                                    onCustomColorChanged(originalColorArgb)
-                                    showColorPicker = false
-                                },
-                                modifier = Modifier.weight(1f),
-                                shape = MaterialTheme.shapes.medium) {
-                                    Text(
-                                        text = stringResource(id = R.string.cancel),
-                                        style = MaterialTheme.typography.labelLarge)
-                                }
-                        }
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cancel),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
                 }
+            }
         }
     }
 }
@@ -840,15 +931,12 @@ private fun SettingsDialogSectionTitle(text: String) {
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.padding(top = Spacing.md, bottom = Spacing.xs))
+        modifier = Modifier.padding(top = Spacing.md, bottom = Spacing.xs),
+    )
 }
 
 @Composable
-private fun SettingsDialogChooserRow(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
+private fun SettingsDialogChooserRow(text: String, selected: Boolean, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
@@ -856,18 +944,21 @@ private fun SettingsDialogChooserRow(
             .background(
                 color =
                     if (selected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                    else Color.Transparent)
+                    else Color.Transparent
+            )
             .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            RadioButton(selected = selected, onClick = null)
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyLarge,
-                color =
-                    if (selected) MaterialTheme.colorScheme.onSecondaryContainer
-                    else MaterialTheme.colorScheme.onSurface)
-        }
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color =
+                if (selected) MaterialTheme.colorScheme.onSecondaryContainer
+                else MaterialTheme.colorScheme.onSurface,
+        )
+    }
 }
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
@@ -893,7 +984,8 @@ private fun YouScreenPreview() {
                 isLoading = false,
                 isRefreshing = false,
                 isLoggingOut = false,
-                errorMessage = null),
+                errorMessage = null,
+            ),
         isLoggedIn = true,
         userSettings =
             UserSettings(
@@ -902,7 +994,8 @@ private fun YouScreenPreview() {
                 darkMode = SYSTEM,
                 seedColor = SeedColor.DEFAULT,
                 useLocalOnly = false,
-                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
+                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+            ),
         libraryItemCounts = LibraryItemCounts(favoritesCount = 5, watchlistCount = 3),
         callbacks =
             YouScreenCallbacks(
@@ -917,7 +1010,9 @@ private fun YouScreenPreview() {
                 onReloadAccountDetailsClick = {},
                 onRefresh = {},
                 onLogOutClick = {},
-                onErrorShown = {}))
+                onErrorShown = {},
+            ),
+    )
 }
 
 @Preview(showBackground = true)
@@ -931,13 +1026,15 @@ private fun SettingsDialogPreview() {
                 darkMode = SYSTEM,
                 seedColor = SeedColor.BLUE,
                 useLocalOnly = false,
-                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB),
+                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+            ),
         onChangeTheme = {},
         onChangeDarkMode = {},
         onChangeSeedColor = {},
         onChangeCustomColorArgb = {},
         onChangeIncludeAdult = {},
-        onChangeUseLocalOnly = {}) {}
+        onChangeUseLocalOnly = {},
+    ) {}
 }
 
 @Preview(showBackground = true)
@@ -947,5 +1044,6 @@ private fun SeedColorPickerPreview() {
         selectedColor = SeedColor.BLUE,
         customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
         onColorSelected = {},
-        onCustomColorChanged = {})
+        onCustomColorChanged = {},
+    )
 }

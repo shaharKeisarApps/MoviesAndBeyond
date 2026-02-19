@@ -34,7 +34,7 @@ constructor(
     private val savedStateHandle: SavedStateHandle,
     private val detailsRepository: DetailsRepository,
     private val libraryRepository: LibraryRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val idDetailsString =
         savedStateHandle.getStateFlow(key = idNavigationArgument, initialValue = "")
@@ -82,7 +82,9 @@ constructor(
                     } ?: ContentDetailUiState.Empty
             }
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentDetailUiState.Loading)
+                scope = viewModelScope,
+                initialValue = ContentDetailUiState.Loading,
+            )
 
     fun addOrRemoveFavorite(libraryItem: LibraryItem) {
         viewModelScope.launch {
@@ -94,7 +96,9 @@ constructor(
             } catch (e: IOException) {
                 _uiState.update {
                     it.copy(
-                        markedFavorite = !(it.markedFavorite), errorMessage = "An error occurred")
+                        markedFavorite = !(it.markedFavorite),
+                        errorMessage = "An error occurred",
+                    )
                 }
             }
         }
@@ -111,7 +115,8 @@ constructor(
                 _uiState.update {
                     it.copy(
                         savedInWatchlist = !(it.savedInWatchlist),
-                        errorMessage = "An error occurred")
+                        errorMessage = "An error occurred",
+                    )
                 }
             }
         }
@@ -142,10 +147,15 @@ constructor(
                     it.copy(
                         markedFavorite =
                             libraryRepository.itemInFavoritesExists(
-                                mediaId = data.id, mediaType = MediaType.MOVIE),
+                                mediaId = data.id,
+                                mediaType = MediaType.MOVIE,
+                            ),
                         savedInWatchlist =
                             libraryRepository.itemInWatchlistExists(
-                                mediaId = data.id, mediaType = MediaType.MOVIE))
+                                mediaId = data.id,
+                                mediaType = MediaType.MOVIE,
+                            ),
+                    )
                 }
                 ContentDetailUiState.Movie(data = data)
             }
@@ -167,10 +177,15 @@ constructor(
                     it.copy(
                         markedFavorite =
                             libraryRepository.itemInFavoritesExists(
-                                mediaId = data.id, mediaType = MediaType.TV),
+                                mediaId = data.id,
+                                mediaType = MediaType.TV,
+                            ),
                         savedInWatchlist =
                             libraryRepository.itemInWatchlistExists(
-                                mediaId = data.id, mediaType = MediaType.TV))
+                                mediaId = data.id,
+                                mediaType = MediaType.TV,
+                            ),
+                    )
                 }
                 ContentDetailUiState.TV(data = data)
             }
@@ -203,7 +218,7 @@ data class DetailsUiState(
     val markedFavorite: Boolean = false,
     val savedInWatchlist: Boolean = false,
     val showSignInSheet: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )
 
 @Immutable

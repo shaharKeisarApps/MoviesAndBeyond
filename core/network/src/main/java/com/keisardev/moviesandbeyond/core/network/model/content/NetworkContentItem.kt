@@ -14,7 +14,7 @@ data class NetworkContentItem(
     @Json(name = "vote_average") val voteAverage: Double?,
     @Json(name = "release_date") val releaseDate: String?,
     @Json(name = "first_air_date") val firstAirDate: String?,
-    val overview: String?
+    val overview: String?,
 ) {
     fun asModel() =
         ContentItem(
@@ -24,5 +24,6 @@ data class NetworkContentItem(
             backdropPath = backdropPath,
             rating = voteAverage,
             releaseDate = releaseDate ?: firstAirDate,
-            overview = overview)
+            overview = overview,
+        )
 }

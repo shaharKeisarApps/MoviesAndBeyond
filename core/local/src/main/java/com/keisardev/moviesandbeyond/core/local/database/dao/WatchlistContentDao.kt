@@ -14,13 +14,15 @@ interface WatchlistContentDao {
     @Query(
         "SELECT * FROM watchlist_content " +
             "WHERE LOWER(media_type) = 'movie' AND sync_status != 'PENDING_DELETE' " +
-            "ORDER BY id DESC")
+            "ORDER BY id DESC"
+    )
     fun getMoviesWatchlist(): Flow<List<WatchlistContentEntity>>
 
     @Query(
         "SELECT * FROM watchlist_content " +
             "WHERE LOWER(media_type) = 'tv' AND sync_status != 'PENDING_DELETE' " +
-            "ORDER BY id DESC")
+            "ORDER BY id DESC"
+    )
     fun getTvShowsWatchlist(): Flow<List<WatchlistContentEntity>>
 
     @Query("SELECT * FROM watchlist_content WHERE sync_status != 'PENDING_DELETE' ORDER BY id DESC")
@@ -29,7 +31,8 @@ interface WatchlistContentDao {
     @Query(
         "SELECT * FROM watchlist_content " +
             "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType) " +
-            "AND sync_status != 'PENDING_DELETE'")
+            "AND sync_status != 'PENDING_DELETE'"
+    )
     suspend fun getWatchlistItem(mediaId: Int, mediaType: String): WatchlistContentEntity?
 
     @Upsert suspend fun insertWatchlistItem(watchlistContentEntity: WatchlistContentEntity)
@@ -37,11 +40,13 @@ interface WatchlistContentDao {
     @Query(
         "SELECT EXISTS(SELECT 1 FROM watchlist_content " +
             "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType) " +
-            "AND sync_status != 'PENDING_DELETE')")
+            "AND sync_status != 'PENDING_DELETE')"
+    )
     suspend fun checkWatchlistItemExists(mediaId: Int, mediaType: String): Boolean
 
     @Query(
-        "DELETE FROM watchlist_content WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+        "DELETE FROM watchlist_content WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun deleteWatchlistItem(mediaId: Int, mediaType: String)
 
     @Query("DELETE FROM watchlist_content") suspend fun deleteAllWatchlistItems()
@@ -54,7 +59,7 @@ interface WatchlistContentDao {
     @Transaction
     suspend fun syncWatchlistItems(
         upsertItems: List<WatchlistContentEntity>,
-        deleteItems: List<Pair<Int, String>>
+        deleteItems: List<Pair<Int, String>>,
     ) {
         upsertWatchlistItems(upsertItems)
         deleteItems.forEach { deleteWatchlistItem(mediaId = it.first, mediaType = it.second) }
@@ -73,7 +78,8 @@ interface WatchlistContentDao {
 
     @Query(
         "UPDATE watchlist_content SET sync_status = :status " +
-            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun updateSyncStatus(mediaId: Int, mediaType: String, status: SyncStatus)
 
     @Query("UPDATE watchlist_content SET sync_status = 'SYNCED' WHERE media_id IN (:mediaIds)")
@@ -81,6 +87,7 @@ interface WatchlistContentDao {
 
     @Query(
         "UPDATE watchlist_content SET sync_status = 'PENDING_DELETE' " +
-            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)")
+            "WHERE media_id = :mediaId AND LOWER(media_type) = LOWER(:mediaType)"
+    )
     suspend fun markForDeletion(mediaId: Int, mediaType: String)
 }

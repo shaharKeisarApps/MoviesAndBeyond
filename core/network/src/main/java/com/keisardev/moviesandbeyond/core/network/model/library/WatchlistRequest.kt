@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 data class WatchlistRequest(
     @Json(name = "media_type") val mediaType: String,
     @Json(name = "media_id") val mediaId: Int,
-    val watchlist: Boolean
+    val watchlist: Boolean,
 )

@@ -57,7 +57,7 @@ fun DetailsRoute(
     navigateToAuth: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: DetailsViewModel,
-    detailsId: String? = null
+    detailsId: String? = null,
 ) {
     // For Navigation 3: Set the ID from the route key
     detailsId?.let { viewModel.setDetailsId(it) }
@@ -75,7 +75,8 @@ fun DetailsRoute(
         onItemClick = onItemClick,
         onSeeAllCastClick = onSeeAllCastClick,
         onSignInClick = navigateToAuth,
-        onBackClick = onBackClick)
+        onBackClick = onBackClick,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +91,7 @@ internal fun DetailsScreen(
     onItemClick: (String) -> Unit,
     onSeeAllCastClick: () -> Unit,
     onSignInClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -117,105 +118,114 @@ internal fun DetailsScreen(
                     sheetState = bottomSheetState,
                     //                    windowInsets = WindowInsets.navigationBars,
                     modifier =
-                        Modifier.semantics { contentDescription = signInSheetContentDescription }) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier =
-                                Modifier.fillMaxWidth()
-                                    .padding(
-                                        horizontal = Spacing.screenPadding,
-                                        vertical = Spacing.xs)) {
-                                Text(
-                                    text = stringResource(id = R.string.sign_in_sheet_text),
-                                    style = MaterialTheme.typography.bodyLarge)
+                        Modifier.semantics { contentDescription = signInSheetContentDescription },
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.xs),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.sign_in_sheet_text),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
 
-                                Spacer(Modifier.height(Spacing.xxl))
+                        Spacer(Modifier.height(Spacing.xxl))
 
-                                Button(
-                                    onClick = {
-                                        scope
-                                            .launch { scaffoldState.bottomSheetState.hide() }
-                                            .invokeOnCompletion { onHideBottomSheet() }
-                                        onSignInClick()
-                                    },
-                                    modifier = Modifier.fillMaxWidth().height(56.dp)) {
-                                        Text(text = stringResource(id = R.string.sign_in))
-                                    }
-                            }
-                    }
-            }
-        },
-        sheetPeekHeight = 0.dp) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-                when (contentDetailsUiState) {
-                    ContentDetailUiState.Loading -> {
-                        val loadingContentDescription =
-                            stringResource(id = R.string.details_loading)
-                        CircularProgressIndicator(
-                            modifier =
-                                Modifier.align(Alignment.Center).semantics {
-                                    contentDescription = loadingContentDescription
-                                })
-                    }
-
-                    ContentDetailUiState.Empty -> {
-                        LaunchedEffect(uiState.errorMessage) {
-                            uiState.errorMessage?.let {
-                                snackbarHostState.showSnackbar(it)
-                                onErrorShown()
-                            }
+                        Button(
+                            onClick = {
+                                scope
+                                    .launch { scaffoldState.bottomSheetState.hide() }
+                                    .invokeOnCompletion { onHideBottomSheet() }
+                                onSignInClick()
+                            },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                        ) {
+                            Text(text = stringResource(id = R.string.sign_in))
                         }
                     }
-
-                    is ContentDetailUiState.Movie -> {
-                        MovieDetailsContent(
-                            movieDetails = contentDetailsUiState.data,
-                            isFavorite = uiState.markedFavorite,
-                            isAddedToWatchList = uiState.savedInWatchlist,
-                            onFavoriteClick = onFavoriteClick,
-                            onWatchlistClick = onWatchlistClick,
-                            onSeeAllCastClick = onSeeAllCastClick,
-                            onCastClick = onItemClick,
-                            onRecommendationClick = onItemClick,
-                            onBackdropCollapse = { isBackdropImageCollapsed = it })
-                    }
-
-                    is ContentDetailUiState.TV -> {
-                        TvShowDetailsContent(
-                            tvDetails = contentDetailsUiState.data,
-                            isFavorite = uiState.markedFavorite,
-                            isAddedToWatchList = uiState.savedInWatchlist,
-                            onFavoriteClick = onFavoriteClick,
-                            onWatchlistClick = onWatchlistClick,
-                            onSeeAllCastClick = onSeeAllCastClick,
-                            onCastClick = onItemClick,
-                            onRecommendationClick = onItemClick,
-                            onBackdropCollapse = { isBackdropImageCollapsed = it })
-                    }
-
-                    is ContentDetailUiState.Person -> {
-                        PersonDetailsContent(
-                            personDetails = contentDetailsUiState.data,
-                            onBackClick = onBackClick,
-                            modifier =
-                                Modifier.padding(
-                                    horizontal = Spacing.screenPadding, vertical = Spacing.sm))
-                    }
-                }
-
-                if (contentDetailsUiState !is ContentDetailUiState.Person) {
-                    DetailsTopAppBar(
-                        showTitle = isBackdropImageCollapsed,
-                        title =
-                            when (contentDetailsUiState) {
-                                is ContentDetailUiState.Movie -> contentDetailsUiState.data.title
-                                is ContentDetailUiState.TV -> contentDetailsUiState.data.name
-                                else -> ""
-                            },
-                        onBackClick = onBackClick)
                 }
             }
+        },
+        sheetPeekHeight = 0.dp,
+    ) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            when (contentDetailsUiState) {
+                ContentDetailUiState.Loading -> {
+                    val loadingContentDescription = stringResource(id = R.string.details_loading)
+                    CircularProgressIndicator(
+                        modifier =
+                            Modifier.align(Alignment.Center).semantics {
+                                contentDescription = loadingContentDescription
+                            }
+                    )
+                }
+
+                ContentDetailUiState.Empty -> {
+                    LaunchedEffect(uiState.errorMessage) {
+                        uiState.errorMessage?.let {
+                            snackbarHostState.showSnackbar(it)
+                            onErrorShown()
+                        }
+                    }
+                }
+
+                is ContentDetailUiState.Movie -> {
+                    MovieDetailsContent(
+                        movieDetails = contentDetailsUiState.data,
+                        isFavorite = uiState.markedFavorite,
+                        isAddedToWatchList = uiState.savedInWatchlist,
+                        onFavoriteClick = onFavoriteClick,
+                        onWatchlistClick = onWatchlistClick,
+                        onSeeAllCastClick = onSeeAllCastClick,
+                        onCastClick = onItemClick,
+                        onRecommendationClick = onItemClick,
+                        onBackdropCollapse = { isBackdropImageCollapsed = it },
+                    )
+                }
+
+                is ContentDetailUiState.TV -> {
+                    TvShowDetailsContent(
+                        tvDetails = contentDetailsUiState.data,
+                        isFavorite = uiState.markedFavorite,
+                        isAddedToWatchList = uiState.savedInWatchlist,
+                        onFavoriteClick = onFavoriteClick,
+                        onWatchlistClick = onWatchlistClick,
+                        onSeeAllCastClick = onSeeAllCastClick,
+                        onCastClick = onItemClick,
+                        onRecommendationClick = onItemClick,
+                        onBackdropCollapse = { isBackdropImageCollapsed = it },
+                    )
+                }
+
+                is ContentDetailUiState.Person -> {
+                    PersonDetailsContent(
+                        personDetails = contentDetailsUiState.data,
+                        onBackClick = onBackClick,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = Spacing.screenPadding,
+                                vertical = Spacing.sm,
+                            ),
+                    )
+                }
+            }
+
+            if (contentDetailsUiState !is ContentDetailUiState.Person) {
+                DetailsTopAppBar(
+                    showTitle = isBackdropImageCollapsed,
+                    title =
+                        when (contentDetailsUiState) {
+                            is ContentDetailUiState.Movie -> contentDetailsUiState.data.title
+                            is ContentDetailUiState.TV -> contentDetailsUiState.data.name
+                            else -> ""
+                        },
+                    onBackClick = onBackClick,
+                )
+            }
         }
+    }
 }
 
 /**
@@ -238,13 +248,16 @@ private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () 
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     val iconColors =
         IconButtonDefaults.iconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.5f), contentColor = Color.White)
+            containerColor = Color.Black.copy(alpha = 0.5f),
+            contentColor = Color.White,
+        )
     TopAppBarWithBackButton(
         title = { AnimatedText(text = title, visible = showTitle) },
         topAppBarColors = topAppBarColors,
         iconButtonColors = iconColors,
         windowInsets = WindowInsets.statusBars,
-        onBackClick = onBackClick)
+        onBackClick = onBackClick,
+    )
 }
 
 @Composable
@@ -253,7 +266,8 @@ internal fun OverviewSection(overview: String) {
         Text(
             text = stringResource(id = R.string.overview),
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold)
+            fontWeight = FontWeight.SemiBold,
+        )
         if (overview.isEmpty()) {
             Text(text = stringResource(id = R.string.not_available))
         } else {
@@ -261,7 +275,8 @@ internal fun OverviewSection(overview: String) {
                 text = overview,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Start)
+                textAlign = TextAlign.Start,
+            )
         }
     }
 }

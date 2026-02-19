@@ -58,20 +58,22 @@ internal fun TvShowDetailsContent(
         onSeeAllCastClick = onSeeAllCastClick,
         onCastClick = onCastClick,
         onRecommendationClick = stableRecommendationClick,
-        onBackdropCollapse = onBackdropCollapse) {
-            TvDetailsSection(
-                originalLanguage = tvDetails.originalLanguage,
-                firstAirDate = tvDetails.firstAirDate,
-                lastAirDate = tvDetails.lastAirDate,
-                inProduction = tvDetails.inProduction,
-                status = tvDetails.status,
-                nextAirDate = tvDetails.nextEpisodeToAir?.airDate,
-                numberOfEpisodes = tvDetails.numberOfEpisodes,
-                numberOfSeasons = tvDetails.numberOfSeasons,
-                networks = tvDetails.networks,
-                productionCompanies = tvDetails.productionCompanies,
-                productionCountries = tvDetails.productionCountries)
-        }
+        onBackdropCollapse = onBackdropCollapse,
+    ) {
+        TvDetailsSection(
+            originalLanguage = tvDetails.originalLanguage,
+            firstAirDate = tvDetails.firstAirDate,
+            lastAirDate = tvDetails.lastAirDate,
+            inProduction = tvDetails.inProduction,
+            status = tvDetails.status,
+            nextAirDate = tvDetails.nextEpisodeToAir?.airDate,
+            numberOfEpisodes = tvDetails.numberOfEpisodes,
+            numberOfSeasons = tvDetails.numberOfSeasons,
+            networks = tvDetails.networks,
+            productionCompanies = tvDetails.productionCompanies,
+            productionCountries = tvDetails.productionCountries,
+        )
+    }
 }
 
 @Composable
@@ -86,7 +88,7 @@ private fun TvDetailsSection(
     numberOfSeasons: Int,
     networks: String,
     productionCompanies: String,
-    productionCountries: String
+    productionCountries: String,
 ) {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
     Column(
@@ -95,61 +97,66 @@ private fun TvDetailsSection(
             Modifier.fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    shape = MaterialTheme.shapes.large)
-                .padding(Spacing.md)) {
-            DetailItem(
-                fieldName = stringResource(id = R.string.original_language),
-                value = originalLanguage)
+                    shape = MaterialTheme.shapes.large,
+                )
+                .padding(Spacing.md),
+    ) {
+        DetailItem(
+            fieldName = stringResource(id = R.string.original_language),
+            value = originalLanguage,
+        )
 
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(fieldName = stringResource(id = R.string.first_air_date), value = firstAirDate)
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(fieldName = stringResource(id = R.string.last_air_date), value = lastAirDate)
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(fieldName = stringResource(id = R.string.in_production), value = inProduction)
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(fieldName = stringResource(id = R.string.status), value = status)
+
+        nextAirDate?.let {
             HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.first_air_date), value = firstAirDate)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(fieldName = stringResource(id = R.string.last_air_date), value = lastAirDate)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.in_production), value = inProduction)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(fieldName = stringResource(id = R.string.status), value = status)
-
-            nextAirDate?.let {
-                HorizontalDivider(color = dividerColor)
-                DetailItem(fieldName = stringResource(id = R.string.next_air_date), value = it)
-            }
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.number_episodes),
-                value = "$numberOfEpisodes")
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.number_seasons),
-                value = "$numberOfSeasons")
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(fieldName = stringResource(id = R.string.networks), value = networks)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.production_companies),
-                value = productionCompanies)
-
-            HorizontalDivider(color = dividerColor)
-
-            DetailItem(
-                fieldName = stringResource(id = R.string.production_countries),
-                value = productionCountries)
+            DetailItem(fieldName = stringResource(id = R.string.next_air_date), value = it)
         }
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.number_episodes),
+            value = "$numberOfEpisodes",
+        )
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.number_seasons),
+            value = "$numberOfSeasons",
+        )
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(fieldName = stringResource(id = R.string.networks), value = networks)
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.production_companies),
+            value = productionCompanies,
+        )
+
+        HorizontalDivider(color = dividerColor)
+
+        DetailItem(
+            fieldName = stringResource(id = R.string.production_countries),
+            value = productionCountries,
+        )
+    }
 }

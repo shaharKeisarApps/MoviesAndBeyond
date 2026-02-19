@@ -30,8 +30,9 @@ class MoviesAndBeyondApplication : Application(), Configuration.Provider {
             .config(
                 LandscapistConfig(
                     memoryCacheSize = 128 * 1024 * 1024L, // 128 MB
-                    diskCacheSize = 256 * 1024 * 1024L // 256 MB
-                    ))
+                    diskCacheSize = 256 * 1024 * 1024L, // 256 MB
+                )
+            )
             .build()
     }
 

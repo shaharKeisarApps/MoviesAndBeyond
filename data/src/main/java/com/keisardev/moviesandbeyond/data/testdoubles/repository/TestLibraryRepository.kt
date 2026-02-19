@@ -75,7 +75,7 @@ class TestLibraryRepository : LibraryRepository {
 
     override suspend fun addOrRemoveFromWatchlist(
         libraryItem: LibraryItem,
-        isAuthenticated: Boolean
+        isAuthenticated: Boolean,
     ) {
         return if (generateError) {
             throw IOException()
@@ -119,7 +119,7 @@ class TestLibraryRepository : LibraryRepository {
         id: Int,
         mediaType: MediaType,
         libraryItemType: LibraryItemType,
-        itemExistsLocally: Boolean
+        itemExistsLocally: Boolean,
     ): Boolean = true
 
     override suspend fun syncFavorites(): Boolean {

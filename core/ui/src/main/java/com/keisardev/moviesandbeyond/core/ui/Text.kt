@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 fun AnnotatedClickableText(
     attributionString: AnnotatedString,
     onClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     val pressIndicator =
@@ -38,7 +38,8 @@ fun AnnotatedClickableText(
     Text(
         text = attributionString,
         onTextLayout = { layoutResult.value = it },
-        modifier = modifier.then(pressIndicator))
+        modifier = modifier.then(pressIndicator),
+    )
 }
 
 @Composable
@@ -54,6 +55,7 @@ fun AnimatedText(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(end = 8.dp))
+            modifier = Modifier.padding(end = 8.dp),
+        )
     }
 }

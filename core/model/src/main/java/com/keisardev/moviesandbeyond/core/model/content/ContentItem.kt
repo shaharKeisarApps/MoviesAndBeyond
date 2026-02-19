@@ -19,5 +19,5 @@ data class ContentItem(
     val backdropPath: String? = null,
     val rating: Double? = null,
     val releaseDate: String? = null,
-    val overview: String? = null
+    val overview: String? = null,
 )

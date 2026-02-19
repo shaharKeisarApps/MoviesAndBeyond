@@ -30,7 +30,7 @@ class LibraryItemsViewModel
 constructor(
     private val savedStateHandle: SavedStateHandle,
     private val libraryRepository: LibraryRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _errorMessage = MutableStateFlow<String?>(null)

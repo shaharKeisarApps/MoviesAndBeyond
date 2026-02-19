@@ -25,7 +25,8 @@ private val previewItems =
             backdropPath = "/backdrop1.jpg",
             rating = 8.5,
             releaseDate = "2024-03-01",
-            overview = "Paul Atreides unites with Chani and the Fremen."),
+            overview = "Paul Atreides unites with Chani and the Fremen.",
+        ),
         ContentItem(
             id = 2,
             imagePath = "/poster2.jpg",
@@ -33,7 +34,8 @@ private val previewItems =
             backdropPath = "/backdrop2.jpg",
             rating = 8.3,
             releaseDate = "2023-07-21",
-            overview = "The story of J. Robert Oppenheimer."),
+            overview = "The story of J. Robert Oppenheimer.",
+        ),
         ContentItem(
             id = 3,
             imagePath = "/poster3.jpg",
@@ -41,7 +43,8 @@ private val previewItems =
             backdropPath = "/backdrop3.jpg",
             rating = 7.8,
             releaseDate = "2022-03-04",
-            overview = "Batman ventures into Gotham City's underworld."),
+            overview = "Batman ventures into Gotham City's underworld.",
+        ),
         ContentItem(
             id = 4,
             imagePath = "/poster4.jpg",
@@ -49,7 +52,8 @@ private val previewItems =
             backdropPath = "/backdrop4.jpg",
             rating = 7.6,
             releaseDate = "2022-12-16",
-            overview = "Jake Sully and Ney'tiri have formed a family."),
+            overview = "Jake Sully and Ney'tiri have formed a family.",
+        ),
         ContentItem(
             id = 5,
             imagePath = "/poster5.jpg",
@@ -57,11 +61,18 @@ private val previewItems =
             backdropPath = "/backdrop5.jpg",
             rating = 8.2,
             releaseDate = "2022-05-27",
-            overview = "After thirty years, Maverick is still pushing the envelope."))
+            overview = "After thirty years, Maverick is still pushing the envelope.",
+        ),
+    )
 
 private fun createPreviewContentState(category: MovieListCategory) =
     ContentUiState(
-        items = previewItems, isLoading = false, endReached = false, page = 1, category = category)
+        items = previewItems,
+        isLoading = false,
+        endReached = false,
+        page = 1,
+        category = category,
+    )
 
 @PreviewTest
 @Preview(showBackground = true, name = "FeedScreen - Loading State")
@@ -77,7 +88,8 @@ fun FeedScreenLoading() {
             appendItems = {},
             onItemClick = {},
             onSeeAllClick = {},
-            onErrorShown = {})
+            onErrorShown = {},
+        )
     }
 }
 
@@ -95,7 +107,8 @@ fun FeedScreenWithContent() {
             appendItems = {},
             onItemClick = {},
             onSeeAllClick = {},
-            onErrorShown = {})
+            onErrorShown = {},
+        )
     }
 }
 
@@ -111,33 +124,38 @@ fun FeedScreenEmpty() {
                     isLoading = false,
                     endReached = true,
                     page = 1,
-                    category = MovieListCategory.NOW_PLAYING),
+                    category = MovieListCategory.NOW_PLAYING,
+                ),
             popularMovies =
                 ContentUiState(
                     items = emptyList(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
-                    category = MovieListCategory.POPULAR),
+                    category = MovieListCategory.POPULAR,
+                ),
             topRatedMovies =
                 ContentUiState(
                     items = emptyList(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
-                    category = MovieListCategory.TOP_RATED),
+                    category = MovieListCategory.TOP_RATED,
+                ),
             upcomingMovies =
                 ContentUiState(
                     items = emptyList(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
-                    category = MovieListCategory.UPCOMING),
+                    category = MovieListCategory.UPCOMING,
+                ),
             errorMessage = null,
             appendItems = {},
             onItemClick = {},
             onSeeAllClick = {},
-            onErrorShown = {})
+            onErrorShown = {},
+        )
     }
 }
 
@@ -156,6 +174,7 @@ fun FeedScreenPartialLoading() {
             appendItems = {},
             onItemClick = {},
             onSeeAllClick = {},
-            onErrorShown = {})
+            onErrorShown = {},
+        )
     }
 }

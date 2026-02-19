@@ -6,7 +6,7 @@ data class LibraryTask(
     val mediaId: Int,
     val mediaType: MediaType,
     val itemType: LibraryItemType,
-    val itemExistLocally: Boolean
+    val itemExistLocally: Boolean,
 ) {
     companion object {
         fun favoriteItemTask(mediaId: Int, mediaType: MediaType, itemExists: Boolean) =

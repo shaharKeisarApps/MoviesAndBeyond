@@ -12,7 +12,8 @@ fun CachedContentEntity.toContentItem(): ContentItem =
         backdropPath = backdropPath,
         rating = rating,
         releaseDate = releaseDate,
-        overview = overview)
+        overview = overview,
+    )
 
 /**
  * Maps a [ContentItem] domain model to a [CachedContentEntity] for database storage.
@@ -33,7 +34,8 @@ fun ContentItem.toCachedEntity(category: String, page: Int, position: Int): Cach
         rating = rating,
         releaseDate = releaseDate,
         overview = overview,
-        fetchedAt = System.currentTimeMillis())
+        fetchedAt = System.currentTimeMillis(),
+    )
 
 /**
  * Maps a list of [ContentItem]s to [CachedContentEntity]s with proper positioning.

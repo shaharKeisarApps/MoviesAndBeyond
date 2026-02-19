@@ -14,7 +14,7 @@ internal class SearchRepositoryImpl @Inject constructor(private val tmdbApi: Tmd
 
     override suspend fun getSearchSuggestions(
         query: String,
-        includeAdult: Boolean
+        includeAdult: Boolean,
     ): NetworkResponse<List<SearchItem>> {
         return try {
             val result =

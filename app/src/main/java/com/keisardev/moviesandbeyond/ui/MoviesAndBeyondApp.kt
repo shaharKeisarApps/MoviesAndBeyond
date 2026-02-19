@@ -27,7 +27,8 @@ import dev.chrisbanes.haze.HazeState
 @OptIn(
     ExperimentalHazeApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalSharedTransitionApi::class)
+    ExperimentalSharedTransitionApi::class,
+)
 @Composable
 fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
     // Wrap entire app with SharedTransitionLayout for shared element transitions
@@ -57,17 +58,21 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
                             destinations = bottomBarDestinations,
                             selectedDestination =
                                 topLevelRouteToDestination(
-                                    navigationState.topLevelBackStack.topLevelKey),
+                                    navigationState.topLevelBackStack.topLevelKey
+                                ),
                             onNavigateToDestination = { destination ->
                                 navigationState.topLevelBackStack.switchToTopLevel(
-                                    destinationToTopLevelRoute(destination))
+                                    destinationToTopLevelRoute(destination)
+                                )
                             },
-                            modifier = Modifier.fillMaxWidth())
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 },
-                contentWindowInsets = WindowInsets.safeDrawing) { padding ->
-                    MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
-                }
+                contentWindowInsets = WindowInsets.safeDrawing,
+            ) { padding ->
+                MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+            }
         }
     }
 }
@@ -87,7 +92,7 @@ fun MoviesAndBeyondNavigationBar(
     destinations: List<MoviesAndBeyondDestination>,
     selectedDestination: MoviesAndBeyondDestination?,
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     FloatingNavigationBar(hazeState = hazeState, modifier = modifier) {
         destinations.forEach { destination ->
@@ -101,7 +106,8 @@ fun MoviesAndBeyondNavigationBar(
                 unselectedIcon = {
                     Icon(imageVector = destination.icon, contentDescription = null)
                 },
-                label = { Text(stringResource(id = destination.titleId)) })
+                label = { Text(stringResource(id = destination.titleId)) },
+            )
         }
     }
 }

@@ -31,10 +31,7 @@ class StartupBenchmark {
      */
     @Test
     fun startupColdNoCompilation() =
-        startup(
-            compilationMode = CompilationMode.None(),
-            startupMode = StartupMode.COLD,
-        )
+        startup(compilationMode = CompilationMode.None(), startupMode = StartupMode.COLD)
 
     /**
      * Measures cold startup time with baseline profile compilation. This represents typical
@@ -42,10 +39,7 @@ class StartupBenchmark {
      */
     @Test
     fun startupColdWithBaselineProfile() =
-        startup(
-            compilationMode = CompilationMode.Partial(),
-            startupMode = StartupMode.COLD,
-        )
+        startup(compilationMode = CompilationMode.Partial(), startupMode = StartupMode.COLD)
 
     /**
      * Measures warm startup time. This represents startup when the app was recently used and is
@@ -53,10 +47,7 @@ class StartupBenchmark {
      */
     @Test
     fun startupWarm() =
-        startup(
-            compilationMode = CompilationMode.Partial(),
-            startupMode = StartupMode.WARM,
-        )
+        startup(compilationMode = CompilationMode.Partial(), startupMode = StartupMode.WARM)
 
     /**
      * Measures hot startup time. This represents startup when the app's activity is recreated but
@@ -64,15 +55,9 @@ class StartupBenchmark {
      */
     @Test
     fun startupHot() =
-        startup(
-            compilationMode = CompilationMode.Partial(),
-            startupMode = StartupMode.HOT,
-        )
+        startup(compilationMode = CompilationMode.Partial(), startupMode = StartupMode.HOT)
 
-    private fun startup(
-        compilationMode: CompilationMode,
-        startupMode: StartupMode,
-    ) =
+    private fun startup(compilationMode: CompilationMode, startupMode: StartupMode) =
         benchmarkRule.measureRepeated(
             packageName = "com.keisardev.moviesandbeyond",
             metrics = listOf(StartupTimingMetric()),

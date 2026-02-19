@@ -27,7 +27,8 @@ import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContent
             AccountDetailsEntity::class,
             CachedContentEntity::class,
             CachedMovieDetailsEntity::class,
-            CachedTvDetailsEntity::class],
+            CachedTvDetailsEntity::class,
+        ],
     version = 3,
     /*autoMigrations = [
         AutoMigration(from = 5, to = 6, spec = MoviesAndBeyondDatabase.Companion.Migration5to6::class)
@@ -60,13 +61,15 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                         """
                         ALTER TABLE favorite_content ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'SYNCED'
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
                     // Add added_at column to favorite_content
                     db.execSQL(
                         """
                         ALTER TABLE favorite_content ADD COLUMN added_at INTEGER NOT NULL DEFAULT 0
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
 
                     // Add sync_status column to watchlist_content (default SYNCED for existing
                     // rows)
@@ -74,13 +77,15 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                         """
                         ALTER TABLE watchlist_content ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'SYNCED'
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
                     // Add added_at column to watchlist_content
                     db.execSQL(
                         """
                         ALTER TABLE watchlist_content ADD COLUMN added_at INTEGER NOT NULL DEFAULT 0
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -106,11 +111,14 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                             PRIMARY KEY(content_id, category)
                         )
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
                     db.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_cached_content_category ON cached_content (category)")
+                        "CREATE INDEX IF NOT EXISTS index_cached_content_category ON cached_content (category)"
+                    )
                     db.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_cached_content_fetched_at ON cached_content (fetched_at)")
+                        "CREATE INDEX IF NOT EXISTS index_cached_content_fetched_at ON cached_content (fetched_at)"
+                    )
 
                     // Create cached_movie_details table
                     db.execSQL(
@@ -121,7 +129,8 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                             fetched_at INTEGER NOT NULL
                         )
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
 
                     // Create cached_tv_details table
                     db.execSQL(
@@ -132,7 +141,8 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                             fetched_at INTEGER NOT NULL
                         )
                         """
-                            .trimIndent())
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -143,15 +153,17 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    ALTER TABLE trending_content ADD COLUMN remote_id INTEGER NOT NULL
-                    """
-                            .trimIndent())
+                        ALTER TABLE trending_content ADD COLUMN remote_id INTEGER NOT NULL
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL(
                         """
-                    ALTER TABLE trending_content
-                    MODIFY COLUMN id INTEGER AUTOINCREMENT NOT NULL
-                    """
-                            .trimIndent())
+                        ALTER TABLE trending_content
+                        MODIFY COLUMN id INTEGER AUTOINCREMENT NOT NULL
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -161,42 +173,46 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE temp_fc (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    remote_id INTEGER NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    overview TEXT NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE temp_fc (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        remote_id INTEGER NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        overview TEXT NOT NULL)
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL(
                         """
-                   INSERT INTO temp_fc (remote_id, image_path, name, overview)
-                   SELECT id, image_path, name, overview FROM free_content
-                """
-                            .trimIndent())
+                        INSERT INTO temp_fc (remote_id, image_path, name, overview)
+                        SELECT id, image_path, name, overview FROM free_content
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL("DROP TABLE free_content")
                     db.execSQL("ALTER TABLE temp_fc RENAME TO free_content")
 
                     db.execSQL(
                         """
-                    CREATE TABLE temp_pc (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    remote_id INTEGER NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    overview TEXT NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE temp_pc (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        remote_id INTEGER NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        overview TEXT NOT NULL)
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL(
                         """
-                   INSERT INTO temp_pc (remote_id, image_path, name, overview)
-                   SELECT id, image_path, name, overview FROM popular_content
-                   """
-                            .trimIndent())
+                        INSERT INTO temp_pc (remote_id, image_path, name, overview)
+                        SELECT id, image_path, name, overview FROM popular_content
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL("DROP TABLE popular_content")
                     db.execSQL("ALTER TABLE temp_pc RENAME TO popular_content")
@@ -209,20 +225,22 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE IF NOT EXISTS free_content_remote_key (
-                    id INTEGER NOT NULL,
-                    nextKey INTEGER NULL,
-                    PRIMARY KEY(id))
-                    """
-                            .trimIndent())
+                        CREATE TABLE IF NOT EXISTS free_content_remote_key (
+                        id INTEGER NOT NULL,
+                        nextKey INTEGER NULL,
+                        PRIMARY KEY(id))
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL(
                         """
-                    CREATE TABLE IF NOT EXISTS popular_content_remote_key (
-                    id INTEGER NOT NULL,
-                    nextKey INTEGER NULL,
-                    PRIMARY KEY(id))
-                    """
-                            .trimIndent())
+                        CREATE TABLE IF NOT EXISTS popular_content_remote_key (
+                        id INTEGER NOT NULL,
+                        nextKey INTEGER NULL,
+                        PRIMARY KEY(id))
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -231,27 +249,30 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE IF NOT EXISTS entity_last_modified (
-                    name TEXT PRIMARY KEY NOT NULL,
-                    last_modified INTEGER NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE IF NOT EXISTS entity_last_modified (
+                        name TEXT PRIMARY KEY NOT NULL,
+                        last_modified INTEGER NOT NULL)
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL(
                         """
-                    INSERT INTO entity_last_modified VALUES
-                    ('trending_content', 0),
-                    ('free_content', 0),
-                    ('popular_content', 0)
-                """
-                            .trimIndent())
+                        INSERT INTO entity_last_modified VALUES
+                        ('trending_content', 0),
+                        ('free_content', 0),
+                        ('popular_content', 0)
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
         @DeleteColumn.Entries(
             DeleteColumn("trending_content", "overview"),
             DeleteColumn("free_content", "overview"),
-            DeleteColumn("popular_content", "overview"))
+            DeleteColumn("popular_content", "overview"),
+        )
         class Migration5to6 : AutoMigrationSpec
 
         val MIGRATION_6_7 =
@@ -259,14 +280,15 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE favorite_content (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    created_at INTEGER NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE favorite_content (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        created_at INTEGER NOT NULL)
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -275,14 +297,15 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE watchlist_content (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    created_at INTEGER NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE watchlist_content (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        created_at INTEGER NOT NULL)
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -304,17 +327,18 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE account_details (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    gravatar_hash TEXT NOT NULL,
-                    include_adult INTEGER NOT NULL,
-                    iso_639_1 TEXT NOT NULL,
-                    iso_3166_1 TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    tmdb_avatar_path TEXT NULL,
-                    username TEXT NOT NULL)
-                    """
-                            .trimIndent())
+                        CREATE TABLE account_details (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        gravatar_hash TEXT NOT NULL,
+                        include_adult INTEGER NOT NULL,
+                        iso_639_1 TEXT NOT NULL,
+                        iso_3166_1 TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        tmdb_avatar_path TEXT NULL,
+                        username TEXT NOT NULL)
+                        """
+                            .trimIndent()
+                    )
                 }
             }
 
@@ -323,39 +347,43 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE fc (
-                    id INTEGER NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    created_at INTEGER NOT NULL,
-                    PRIMARY KEY(id,media_type))
-                    """
-                            .trimIndent())
+                        CREATE TABLE fc (
+                        id INTEGER NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        created_at INTEGER NOT NULL,
+                        PRIMARY KEY(id,media_type))
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL(
                         """
-                    INSERT INTO fc SELECT * FROM favorite_content
-                    """
-                            .trimIndent())
+                        INSERT INTO fc SELECT * FROM favorite_content
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL("DROP TABLE favorite_content")
                     db.execSQL("ALTER TABLE fc RENAME TO favorite_content")
 
                     db.execSQL(
                         """
-                    CREATE TABLE wc (
-                    id INTEGER NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    created_at INTEGER NOT NULL,
-                    PRIMARY KEY(id,media_type))
-                    """
-                            .trimIndent())
+                        CREATE TABLE wc (
+                        id INTEGER NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL,
+                        created_at INTEGER NOT NULL,
+                        PRIMARY KEY(id,media_type))
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL(
                         """
-                    INSERT INTO wc SELECT * FROM watchlist_content
-                    """
-                            .trimIndent())
+                        INSERT INTO wc SELECT * FROM watchlist_content
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL("DROP TABLE watchlist_content")
                     db.execSQL("ALTER TABLE wc RENAME TO watchlist_content")
                 }
@@ -366,55 +394,61 @@ abstract class MoviesAndBeyondDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
                         """
-                    CREATE TABLE favorite_content_temp (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    media_id INTEGER NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL
+                        CREATE TABLE favorite_content_temp (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        media_id INTEGER NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL
+                        )
+                        """
+                            .trimIndent()
                     )
-                    """
-                            .trimIndent())
                     db.execSQL(
                         """
-                    INSERT INTO favorite_content_temp (media_id, media_type, image_path, name)
-                    SELECT id, media_type, image_path, name FROM favorite_content
-                    """
-                            .trimIndent())
+                        INSERT INTO favorite_content_temp (media_id, media_type, image_path, name)
+                        SELECT id, media_type, image_path, name FROM favorite_content
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL("DROP TABLE favorite_content")
                     db.execSQL("ALTER TABLE favorite_content_temp RENAME TO favorite_content")
                     db.execSQL(
                         """
-                    CREATE UNIQUE INDEX IF NOT EXISTS index_favorite_content_media_id_media_type
-                    ON favorite_content (media_id, media_type)
-                    """
-                            .trimIndent())
+                        CREATE UNIQUE INDEX IF NOT EXISTS index_favorite_content_media_id_media_type
+                        ON favorite_content (media_id, media_type)
+                        """
+                            .trimIndent()
+                    )
 
                     db.execSQL(
                         """
-                    CREATE TABLE watchlist_content_temp (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    media_id INTEGER NOT NULL,
-                    media_type TEXT NOT NULL,
-                    image_path TEXT NOT NULL,
-                    name TEXT NOT NULL
+                        CREATE TABLE watchlist_content_temp (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        media_id INTEGER NOT NULL,
+                        media_type TEXT NOT NULL,
+                        image_path TEXT NOT NULL,
+                        name TEXT NOT NULL
+                        )
+                        """
+                            .trimIndent()
                     )
-                    """
-                            .trimIndent())
                     db.execSQL(
                         """
-                    INSERT INTO watchlist_content_temp (media_id, media_type, image_path, name)
-                    SELECT id, media_type, image_path, name FROM watchlist_content
-                    """
-                            .trimIndent())
+                        INSERT INTO watchlist_content_temp (media_id, media_type, image_path, name)
+                        SELECT id, media_type, image_path, name FROM watchlist_content
+                        """
+                            .trimIndent()
+                    )
                     db.execSQL("DROP TABLE watchlist_content")
                     db.execSQL("ALTER TABLE watchlist_content_temp RENAME TO watchlist_content")
                     db.execSQL(
                         """
-                    CREATE UNIQUE INDEX IF NOT EXISTS index_watchlist_content_media_id_media_type
-                    ON watchlist_content (media_id, media_type)
-                    """
-                            .trimIndent())
+                        CREATE UNIQUE INDEX IF NOT EXISTS index_watchlist_content_media_id_media_type
+                        ON watchlist_content (media_id, media_type)
+                        """
+                            .trimIndent()
+                    )
                 }
             }
     }

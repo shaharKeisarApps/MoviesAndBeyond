@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class RequestTokenResponse(
     @Json(name = "expires_at") val expiresAt: String,
-    @Json(name = "request_token") val requestToken: String
+    @Json(name = "request_token") val requestToken: String,
 )
 
 @JsonClass(generateAdapter = true)

@@ -28,7 +28,7 @@ interface LibraryTaskSyncOperation {
         id: Int,
         mediaType: MediaType,
         libraryItemType: LibraryItemType,
-        itemExistsLocally: Boolean
+        itemExistsLocally: Boolean,
     ): Boolean
 }
 
@@ -41,14 +41,16 @@ interface Synchronizer {
         fetchFromNetwork: suspend (mediaTypeString: String) -> List<NetworkContentItem>,
         fetchStaleItemsFromLocalSource:
             suspend (mediaType: MediaType, networkResultsPair: List<Pair<Int, String>>) -> List<
-                    Pair<Int, String>>,
+                    Pair<Int, String>
+                >,
         fetchFromLocalSource:
             suspend (
                 mediaType: MediaType,
                 mediaTypeString: String,
-                networkResults: List<NetworkContentItem>) -> List<LibraryItem>,
+                networkResults: List<NetworkContentItem>,
+            ) -> List<LibraryItem>,
         updateLocalSource:
-            suspend (libraryItems: List<LibraryItem>, staleItems: List<Pair<Int, String>>) -> Unit
+            suspend (libraryItems: List<LibraryItem>, staleItems: List<Pair<Int, String>>) -> Unit,
     ): Boolean {
         val movieMediaTypeString = MediaType.MOVIE.name.lowercase()
         val tvMediaTypeString = MediaType.TV.name.lowercase()
@@ -70,11 +72,18 @@ interface Synchronizer {
 
                     staleMovies.addAll(
                         fetchStaleItemsFromLocalSource(
-                            MediaType.MOVIE, moviesLibraryNetworkResultsPair))
+                            MediaType.MOVIE,
+                            moviesLibraryNetworkResultsPair,
+                        )
+                    )
 
                     moviesLibrary.addAll(
                         fetchFromLocalSource(
-                            MediaType.MOVIE, movieMediaTypeString, moviesLibraryNetworkResults))
+                            MediaType.MOVIE,
+                            movieMediaTypeString,
+                            moviesLibraryNetworkResults,
+                        )
+                    )
                 }
 
                 launch {
@@ -87,11 +96,18 @@ interface Synchronizer {
 
                     staleTvShows.addAll(
                         fetchStaleItemsFromLocalSource(
-                            MediaType.TV, tvShowsLibraryNetworkResultsPair))
+                            MediaType.TV,
+                            tvShowsLibraryNetworkResultsPair,
+                        )
+                    )
 
                     tvShowsLibrary.addAll(
                         fetchFromLocalSource(
-                            MediaType.TV, tvMediaTypeString, tvShowsLibraryNetworkResults))
+                            MediaType.TV,
+                            tvMediaTypeString,
+                            tvShowsLibraryNetworkResults,
+                        )
+                    )
                 }
             }
 

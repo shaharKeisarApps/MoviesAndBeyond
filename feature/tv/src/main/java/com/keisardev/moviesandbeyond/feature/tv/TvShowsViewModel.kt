@@ -58,38 +58,48 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
         createContentFlow(
                 category = TvShowListCategory.AIRING_TODAY,
                 pageFlow = _airingTodayPage,
-                accumulatedFlow = _airingTodayAccumulated)
+                accumulatedFlow = _airingTodayAccumulated,
+            )
             .stateInWhileSubscribed(
                 scope = viewModelScope,
-                initialValue = ContentUiState(TvShowListCategory.AIRING_TODAY))
+                initialValue = ContentUiState(TvShowListCategory.AIRING_TODAY),
+            )
 
     // On Air TV Shows with offline-first support
     val onAirTvShows: StateFlow<ContentUiState> =
         createContentFlow(
                 category = TvShowListCategory.ON_THE_AIR,
                 pageFlow = _onAirPage,
-                accumulatedFlow = _onAirAccumulated)
+                accumulatedFlow = _onAirAccumulated,
+            )
             .stateInWhileSubscribed(
                 scope = viewModelScope,
-                initialValue = ContentUiState(TvShowListCategory.ON_THE_AIR))
+                initialValue = ContentUiState(TvShowListCategory.ON_THE_AIR),
+            )
 
     // Popular TV Shows with offline-first support
     val popularTvShows: StateFlow<ContentUiState> =
         createContentFlow(
                 category = TvShowListCategory.POPULAR,
                 pageFlow = _popularPage,
-                accumulatedFlow = _popularAccumulated)
+                accumulatedFlow = _popularAccumulated,
+            )
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentUiState(TvShowListCategory.POPULAR))
+                scope = viewModelScope,
+                initialValue = ContentUiState(TvShowListCategory.POPULAR),
+            )
 
     // Top Rated TV Shows with offline-first support
     val topRatedTvShows: StateFlow<ContentUiState> =
         createContentFlow(
                 category = TvShowListCategory.TOP_RATED,
                 pageFlow = _topRatedPage,
-                accumulatedFlow = _topRatedAccumulated)
+                accumulatedFlow = _topRatedAccumulated,
+            )
             .stateInWhileSubscribed(
-                scope = viewModelScope, initialValue = ContentUiState(TvShowListCategory.TOP_RATED))
+                scope = viewModelScope,
+                initialValue = ContentUiState(TvShowListCategory.TOP_RATED),
+            )
 
     /**
      * Creates a Flow that observes content from Store5 and combines it with accumulated items for
@@ -98,7 +108,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
     private fun createContentFlow(
         category: TvShowListCategory,
         pageFlow: MutableStateFlow<Int>,
-        accumulatedFlow: MutableStateFlow<List<ContentItem>>
+        accumulatedFlow: MutableStateFlow<List<ContentItem>>,
     ) =
         pageFlow
             .flatMapLatest { page ->
@@ -119,7 +129,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
         response: StoreReadResponse<List<ContentItem>>,
         category: TvShowListCategory,
         page: Int,
-        accumulatedFlow: MutableStateFlow<List<ContentItem>>
+        accumulatedFlow: MutableStateFlow<List<ContentItem>>,
     ): ContentUiState {
         return when (response) {
             is StoreReadResponse.Initial,
@@ -130,7 +140,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false)
+                    isFromCache = false,
+                )
             }
             is StoreReadResponse.Data -> {
                 val newItems = response.value.orEmpty()
@@ -146,7 +157,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     endReached = newItems.isEmpty(),
                     page = page,
                     category = category,
-                    isFromCache = response.isFromCache)
+                    isFromCache = response.isFromCache,
+                )
             }
             is StoreReadResponse.Error -> {
                 _errorMessage.update { response.errorMessageOrNull() }
@@ -156,7 +168,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false)
+                    isFromCache = false,
+                )
             }
             is StoreReadResponse.NoNewData -> {
                 // Keep current state, data hasn't changed
@@ -166,7 +179,8 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = true)
+                    isFromCache = true,
+                )
             }
         }
     }
@@ -232,7 +246,7 @@ data class ContentUiState(
     val endReached: Boolean,
     val page: Int,
     val category: TvShowListCategory,
-    val isFromCache: Boolean = false
+    val isFromCache: Boolean = false,
 ) {
     constructor(
         category: TvShowListCategory
@@ -242,5 +256,6 @@ data class ContentUiState(
         endReached = false,
         page = 1,
         category = category,
-        isFromCache = false)
+        isFromCache = false,
+    )
 }
