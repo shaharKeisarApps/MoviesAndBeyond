@@ -1,7 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.you
 
-import android.os.Build
-import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -10,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -31,7 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.AlertDialog
@@ -53,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -74,13 +70,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
-import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.LIGHT
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.SYSTEM
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
+import com.keisardev.moviesandbeyond.core.ui.LocalThemePreviewState
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -101,7 +97,6 @@ fun YouRoute(
         YouScreenCallbacks(
             onChangeTheme = viewModel::setDynamicColorPreference,
             onChangeDarkMode = viewModel::setDarkModePreference,
-            onChangeSeedColor = viewModel::setSeedColorPreference,
             onChangeCustomColorArgb = viewModel::setCustomColorArgb,
             onChangeIncludeAdult = viewModel::setAdultResultPreference,
             onChangeUseLocalOnly = viewModel::toggleUseLocalOnly,
@@ -125,7 +120,6 @@ fun YouRoute(
 internal class YouScreenCallbacks(
     val onChangeTheme: (Boolean) -> Unit,
     val onChangeDarkMode: (SelectedDarkMode) -> Unit,
-    val onChangeSeedColor: (SeedColor) -> Unit,
     val onChangeCustomColorArgb: (Long) -> Unit,
     val onChangeIncludeAdult: (Boolean) -> Unit,
     val onChangeUseLocalOnly: (Boolean) -> Unit,
@@ -162,7 +156,6 @@ internal fun YouScreen(
             userSettings = userSettings,
             onChangeTheme = callbacks.onChangeTheme,
             onChangeDarkMode = callbacks.onChangeDarkMode,
-            onChangeSeedColor = callbacks.onChangeSeedColor,
             onChangeCustomColorArgb = callbacks.onChangeCustomColorArgb,
             onChangeIncludeAdult = callbacks.onChangeIncludeAdult,
             onChangeUseLocalOnly = callbacks.onChangeUseLocalOnly,
@@ -583,7 +576,6 @@ private fun SettingsDialog(
     userSettings: UserSettings?,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
-    onChangeSeedColor: (SeedColor) -> Unit,
     onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
     onChangeUseLocalOnly: (Boolean) -> Unit,
@@ -607,7 +599,6 @@ private fun SettingsDialog(
                         settings = userSettings,
                         onChangeTheme = onChangeTheme,
                         onChangeDarkMode = onChangeDarkMode,
-                        onChangeSeedColor = onChangeSeedColor,
                         onChangeCustomColorArgb = onChangeCustomColorArgb,
                         onChangeIncludeAdult = onChangeIncludeAdult,
                         onChangeUseLocalOnly = onChangeUseLocalOnly,
@@ -634,62 +625,94 @@ private fun SettingsPanel(
     settings: UserSettings,
     onChangeTheme: (Boolean) -> Unit,
     onChangeDarkMode: (SelectedDarkMode) -> Unit,
-    onChangeSeedColor: (SeedColor) -> Unit,
     onChangeCustomColorArgb: (Long) -> Unit,
     onChangeIncludeAdult: (Boolean) -> Unit,
     onChangeUseLocalOnly: (Boolean) -> Unit,
 ) {
-    if (supportsDynamicColorTheme()) {
-        SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_theme))
-        Column(Modifier.selectableGroup()) {
-            SettingsDialogChooserRow(
-                text = stringResource(id = R.string.settings_dialog_theme_default),
-                selected = !settings.useDynamicColor,
-                onClick = { onChangeTheme(false) },
-            )
-            SettingsDialogChooserRow(
-                text = stringResource(id = R.string.settings_dialog_theme_dynamic),
-                selected = settings.useDynamicColor,
-                onClick = { onChangeTheme(true) },
-            )
-        }
-        Spacer(modifier = Modifier.height(Spacing.sm))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-    }
+    var showColorPicker by remember { mutableStateOf(false) }
+    val isSeedColorMode = !settings.useDynamicColor
 
-    // Show seed color picker when dynamic color is disabled or not supported
-    if (!settings.useDynamicColor || !supportsDynamicColorTheme()) {
-        SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_seed_color))
-        SeedColorPicker(
-            selectedColor = settings.seedColor,
-            customColorArgb = settings.customColorArgb,
-            onColorSelected = onChangeSeedColor,
-            onCustomColorChanged = onChangeCustomColorArgb,
-            modifier = Modifier.padding(vertical = 8.dp),
+    SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_theme))
+    Column(Modifier.selectableGroup()) {
+        SettingsDialogChooserRow(
+            text = stringResource(id = R.string.settings_dialog_theme_dynamic),
+            selected = settings.useDynamicColor,
+            onClick = {
+                onChangeTheme(true)
+                showColorPicker = false
+            },
         )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        SeedColorChooserRow(
+            selected = isSeedColorMode,
+            customColorArgb = settings.customColorArgb,
+            onClick = {
+                onChangeTheme(false)
+                showColorPicker = true
+            },
+            onSwatchClick = {
+                onChangeTheme(false)
+                showColorPicker = !showColorPicker
+            },
+        )
     }
 
+    // Inline HSV color picker — appears when Seed Color is active
+    AnimatedVisibility(visible = isSeedColorMode && showColorPicker) {
+        InlineColorPicker(
+            customColorArgb = settings.customColorArgb,
+            onCustomColorChanged = onChangeCustomColorArgb,
+            onDismiss = { showColorPicker = false },
+        )
+    }
+
+    Spacer(modifier = Modifier.height(Spacing.sm))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+    DarkModeSection(darkMode = settings.darkMode, onChangeDarkMode = onChangeDarkMode)
+    Spacer(modifier = Modifier.height(Spacing.sm))
+    SettingsToggles(
+        includeAdultResults = settings.includeAdultResults,
+        useLocalOnly = settings.useLocalOnly,
+        onChangeIncludeAdult = onChangeIncludeAdult,
+        onChangeUseLocalOnly = onChangeUseLocalOnly,
+    )
+}
+
+/** Dark mode radio group: System / Dark / Light. */
+@Composable
+private fun DarkModeSection(
+    darkMode: SelectedDarkMode,
+    onChangeDarkMode: (SelectedDarkMode) -> Unit,
+) {
     SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_dark_mode))
     Column(Modifier.selectableGroup()) {
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_default),
-            selected = settings.darkMode == SYSTEM,
+            selected = darkMode == SYSTEM,
             onClick = { onChangeDarkMode(SYSTEM) },
         )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_yes),
-            selected = settings.darkMode == DARK,
+            selected = darkMode == DARK,
             onClick = { onChangeDarkMode(DARK) },
         )
         SettingsDialogChooserRow(
             text = stringResource(id = R.string.settings_dialog_dark_no),
-            selected = settings.darkMode == LIGHT,
+            selected = darkMode == LIGHT,
             onClick = { onChangeDarkMode(LIGHT) },
         )
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-    Spacer(modifier = Modifier.height(Spacing.sm))
+}
+
+/** Adult results and local-only toggle switches. */
+@Composable
+private fun SettingsToggles(
+    includeAdultResults: Boolean,
+    useLocalOnly: Boolean,
+    onChangeIncludeAdult: (Boolean) -> Unit,
+    onChangeUseLocalOnly: (Boolean) -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Row(
             modifier =
@@ -701,7 +724,7 @@ private fun SettingsPanel(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SettingsDialogSectionTitle(text = stringResource(id = R.string.settings_dialog_adult))
-            Switch(checked = settings.includeAdultResults, onCheckedChange = onChangeIncludeAdult)
+            Switch(checked = includeAdultResults, onCheckedChange = onChangeIncludeAdult)
         }
         Row(
             modifier =
@@ -722,206 +745,136 @@ private fun SettingsPanel(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Switch(checked = settings.useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
+            Switch(checked = useLocalOnly, onCheckedChange = onChangeUseLocalOnly)
         }
     }
 }
 
-/**
- * A composable that displays seed color options with an inline HSV color picker (NoteNest style).
- *
- * Features:
- * - Horizontal row of preset color options
- * - Custom color option as a radio button row (NoteNest pattern)
- * - Inline HSV color picker using AnimatedVisibility
- * - Live theme preview as user picks colors
- * - Submit/Cancel buttons to confirm or revert
- *
- * @param selectedColor The currently selected seed color
- * @param customColorArgb The custom color ARGB value
- * @param onColorSelected Callback invoked when a preset color is selected
- * @param onCustomColorChanged Callback invoked when the custom color is changed
- * @param modifier Modifier to be applied to the component
- */
+/** "Seed Color" radio row with a color swatch preview on the right side. */
 @Composable
-fun SeedColorPicker(
-    selectedColor: SeedColor,
+private fun SeedColorChooserRow(
+    selected: Boolean,
     customColorArgb: Long,
-    onColorSelected: (SeedColor) -> Unit,
-    onCustomColorChanged: (Long) -> Unit,
-    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    onSwatchClick: () -> Unit,
 ) {
-    var showColorPicker by remember { mutableStateOf(false) }
-    val colorPickerController = rememberColorPickerController()
-    // Store original color to restore on cancel
-    val originalColorArgb = remember(showColorPicker) { customColorArgb }
-    val isCustomSelected = selectedColor == SeedColor.CUSTOM
-
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Preset colors row (excluding CUSTOM)
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp),
-        ) {
-            items(SeedColor.entries.filter { it != SeedColor.CUSTOM }) { seedColor ->
-                val isSelected = seedColor == selectedColor
-                Box(
-                    modifier =
-                        Modifier.size(48.dp)
-                            .clip(CircleShape)
-                            .background(Color(seedColor.argb))
-                            .then(
-                                if (isSelected) {
-                                    Modifier.border(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = CircleShape,
-                                    )
-                                } else {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outlineVariant,
-                                        shape = CircleShape,
-                                    )
-                                }
-                            )
-                            .clickable {
-                                showColorPicker = false
-                                onColorSelected(seedColor)
-                            },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (isSelected) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(id = R.string.seed_color_selected),
-                            tint = getContrastColor(Color(seedColor.argb)),
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                }
-            }
-        }
-
-        // Custom color radio button row (NoteNest pattern)
-        Row(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(
-                        color =
-                            if (isCustomSelected)
-                                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                            else Color.Transparent
-                    )
-                    .selectable(
-                        selected = isCustomSelected,
-                        role = Role.RadioButton,
-                        onClick = {
-                            onColorSelected(SeedColor.CUSTOM)
-                            showColorPicker = true
-                        },
-                    )
-                    .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            RadioButton(selected = isCustomSelected, onClick = null)
-            Spacer(Modifier.size(Spacing.xs))
-            Text(
-                text = stringResource(id = R.string.custom_color_picker),
-                style = MaterialTheme.typography.bodyLarge,
+    Row(
+        Modifier.fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .background(
                 color =
-                    if (isCustomSelected) MaterialTheme.colorScheme.onSecondaryContainer
-                    else MaterialTheme.colorScheme.onSurface,
+                    if (selected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                    else Color.Transparent
             )
-            Spacer(modifier = Modifier.weight(1f))
-            // Color box preview with rounded corners
-            Box(
-                modifier =
-                    Modifier.size(32.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(color = Color(customColorArgb))
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = MaterialTheme.shapes.small,
-                        )
-                        .clickable {
-                            onColorSelected(SeedColor.CUSTOM)
-                            showColorPicker = true
-                        }
-            )
-        }
-
-        // Inline color picker (NoteNest style - appears below when Custom is selected)
-        AnimatedVisibility(visible = showColorPicker && isCustomSelected) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                            shape = MaterialTheme.shapes.large,
-                        )
-                        .padding(Spacing.md),
-            ) {
-                Text(
-                    text = stringResource(id = R.string.pick_a_color),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-
-                HsvColorPicker(
-                    modifier =
-                        Modifier.fillMaxWidth().height(240.dp).padding(horizontal = Spacing.xs),
-                    controller = colorPickerController,
-                    onColorChanged = { colorEnvelope ->
-                        // Live preview: update theme in real-time as user picks
-                        onCustomColorChanged(colorEnvelope.color.value.toLong())
-                    },
-                    initialColor = Color(customColorArgb),
-                )
-
-                // Submit and Cancel buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                ) {
-                    Button(
-                        onClick = { showColorPicker = false },
-                        modifier = Modifier.weight(1f),
-                        shape = MaterialTheme.shapes.medium,
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.submit),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                    TextButton(
-                        onClick = {
-                            // Restore original color on cancel
-                            onCustomColorChanged(originalColorArgb)
-                            showColorPicker = false
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = MaterialTheme.shapes.medium,
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                }
-            }
-        }
+            .padding(horizontal = Spacing.sm, vertical = Spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Spacer(modifier = Modifier.width(Spacing.xs))
+        Text(
+            text = stringResource(id = R.string.settings_dialog_theme_seed),
+            style = MaterialTheme.typography.bodyLarge,
+            color =
+                if (selected) MaterialTheme.colorScheme.onSecondaryContainer
+                else MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier =
+                Modifier.size(28.dp)
+                    .clip(CircleShape)
+                    .background(Color(customColorArgb))
+                    .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                    .clickable(onClick = onSwatchClick)
+        )
     }
 }
 
-/** Returns a contrasting color (black or white) based on the luminance of the input color. */
-private fun getContrastColor(color: Color): Color {
-    val luminance = 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue
-    return if (luminance > 0.5) Color.Black else Color.White
+/** Inline HSV color picker with live preview via [LocalThemePreviewState]. */
+@Composable
+private fun InlineColorPicker(
+    customColorArgb: Long,
+    onCustomColorChanged: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val colorPickerController = rememberColorPickerController()
+    val themePreview = LocalThemePreviewState.current
+
+    // Clear preview when this composable leaves composition (dialog dismissed, etc.)
+    DisposableEffect(Unit) { onDispose { themePreview.previewColorArgb = null } }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(top = Spacing.xs)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    shape = MaterialTheme.shapes.large,
+                )
+                .padding(Spacing.md),
+    ) {
+        Text(
+            text = stringResource(id = R.string.pick_a_color),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        HsvColorPicker(
+            modifier = Modifier.fillMaxWidth().height(240.dp).padding(horizontal = Spacing.xs),
+            controller = colorPickerController,
+            onColorChanged = { colorEnvelope ->
+                // Live preview only — no DataStore write
+                themePreview.previewColorArgb =
+                    colorEnvelope.color.toArgb().toLong() and 0xFFFFFFFFL
+            },
+            initialColor = Color(customColorArgb),
+        )
+
+        ColorPickerActions(
+            onSubmit = {
+                themePreview.previewColorArgb?.let { onCustomColorChanged(it) }
+                themePreview.previewColorArgb = null
+                onDismiss()
+            },
+            onCancel = {
+                themePreview.previewColorArgb = null
+                onDismiss()
+            },
+        )
+    }
+}
+
+/** Submit and Cancel buttons for the color picker. */
+@Composable
+private fun ColorPickerActions(onSubmit: () -> Unit, onCancel: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+    ) {
+        Button(
+            onClick = onSubmit,
+            modifier = Modifier.weight(1f),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Text(
+                text = stringResource(id = R.string.submit),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+        TextButton(
+            onClick = onCancel,
+            modifier = Modifier.weight(1f),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Text(
+                text = stringResource(id = R.string.cancel),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+    }
 }
 
 @Composable
@@ -961,9 +914,6 @@ private fun SettingsDialogChooserRow(text: String, selected: Boolean, onClick: (
     }
 }
 
-@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
-fun supportsDynamicColorTheme() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-
 @Preview(showBackground = true)
 @Composable
 private fun YouScreenPreview() {
@@ -992,16 +942,14 @@ private fun YouScreenPreview() {
                 useDynamicColor = true,
                 includeAdultResults = false,
                 darkMode = SYSTEM,
-                seedColor = SeedColor.DEFAULT,
                 useLocalOnly = false,
-                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+                customColorArgb = 0xFF6750A4,
             ),
         libraryItemCounts = LibraryItemCounts(favoritesCount = 5, watchlistCount = 3),
         callbacks =
             YouScreenCallbacks(
                 onChangeTheme = {},
                 onChangeDarkMode = {},
-                onChangeSeedColor = {},
                 onChangeCustomColorArgb = {},
                 onChangeIncludeAdult = {},
                 onChangeUseLocalOnly = {},
@@ -1024,26 +972,13 @@ private fun SettingsDialogPreview() {
                 useDynamicColor = false,
                 includeAdultResults = true,
                 darkMode = SYSTEM,
-                seedColor = SeedColor.BLUE,
                 useLocalOnly = false,
-                customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+                customColorArgb = 0xFF1976D2,
             ),
         onChangeTheme = {},
         onChangeDarkMode = {},
-        onChangeSeedColor = {},
         onChangeCustomColorArgb = {},
         onChangeIncludeAdult = {},
         onChangeUseLocalOnly = {},
     ) {}
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SeedColorPickerPreview() {
-    SeedColorPicker(
-        selectedColor = SeedColor.BLUE,
-        customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
-        onColorSelected = {},
-        onCustomColorChanged = {},
-    )
 }

@@ -12,98 +12,38 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.keisardev.moviesandbeyond.core.model.SeedColor
+import com.keisardev.moviesandbeyond.core.ui.LocalThemePreviewState
+import com.keisardev.moviesandbeyond.core.ui.ThemePreviewState
 import com.materialkolor.dynamiccolor.MaterialDynamicColors
 import com.materialkolor.hct.Hct
 import com.materialkolor.scheme.SchemeTonalSpot
 
-/** Cinematic Light Color Scheme. Secondary option for users who prefer light mode. */
-private val cinematicLightScheme =
-    lightColorScheme(
-        primary = primaryLight,
-        onPrimary = onPrimaryLight,
-        primaryContainer = primaryContainerLight,
-        onPrimaryContainer = onPrimaryContainerLight,
-        secondary = secondaryLight,
-        onSecondary = onSecondaryLight,
-        secondaryContainer = secondaryContainerLight,
-        onSecondaryContainer = onSecondaryContainerLight,
-        tertiary = tertiaryLight,
-        onTertiary = onTertiaryLight,
-        tertiaryContainer = tertiaryContainerLight,
-        onTertiaryContainer = onTertiaryContainerLight,
-        error = errorLight,
-        onError = onErrorLight,
-        errorContainer = errorContainerLight,
-        onErrorContainer = onErrorContainerLight,
-        background = backgroundLight,
-        onBackground = onBackgroundLight,
-        surface = surfaceLight,
-        onSurface = onSurfaceLight,
-        surfaceVariant = surfaceVariantLight,
-        onSurfaceVariant = onSurfaceVariantLight,
-        outline = outlineLight,
-        outlineVariant = outlineVariantLight,
-        scrim = scrimLight,
-        inverseSurface = inverseSurfaceLight,
-        inverseOnSurface = inverseOnSurfaceLight,
-        inversePrimary = inversePrimaryLight,
-        surfaceDim = surfaceDimLight,
-        surfaceBright = surfaceBrightLight,
-        surfaceContainerLowest = surfaceContainerLowestLight,
-        surfaceContainerLow = surfaceContainerLowLight,
-        surfaceContainer = surfaceContainerLight,
-        surfaceContainerHigh = surfaceContainerHighLight,
-        surfaceContainerHighest = surfaceContainerHighestLight,
-    )
+/**
+ * Default seed color ARGB for the fallback M3 palette on pre-Android 12 devices. A cinema-inspired
+ * blue that generates a harmonious tonal palette via Material Design color utilities.
+ */
+private const val DEFAULT_SEED_COLOR_ARGB = 0xFF3D5AFEL
 
 /**
- * Cinematic Dark Color Scheme. Primary theme - movies look best on dark backgrounds. Features deep
- * blacks with blue tint for immersive cinema feel.
+ * Fallback light scheme generated from [DEFAULT_SEED_COLOR_ARGB] for devices without dynamic color.
  */
-private val cinematicDarkScheme =
-    darkColorScheme(
-        primary = primaryDark,
-        onPrimary = onPrimaryDark,
-        primaryContainer = primaryContainerDark,
-        onPrimaryContainer = onPrimaryContainerDark,
-        secondary = secondaryDark,
-        onSecondary = onSecondaryDark,
-        secondaryContainer = secondaryContainerDark,
-        onSecondaryContainer = onSecondaryContainerDark,
-        tertiary = tertiaryDark,
-        onTertiary = onTertiaryDark,
-        tertiaryContainer = tertiaryContainerDark,
-        onTertiaryContainer = onTertiaryContainerDark,
-        error = errorDark,
-        onError = onErrorDark,
-        errorContainer = errorContainerDark,
-        onErrorContainer = onErrorContainerDark,
-        background = backgroundDark,
-        onBackground = onBackgroundDark,
-        surface = surfaceDark,
-        onSurface = onSurfaceDark,
-        surfaceVariant = surfaceVariantDark,
-        onSurfaceVariant = onSurfaceVariantDark,
-        outline = outlineDark,
-        outlineVariant = outlineVariantDark,
-        scrim = scrimDark,
-        inverseSurface = inverseSurfaceDark,
-        inverseOnSurface = inverseOnSurfaceDark,
-        inversePrimary = inversePrimaryDark,
-        surfaceDim = surfaceDimDark,
-        surfaceBright = surfaceBrightDark,
-        surfaceContainerLowest = surfaceContainerLowestDark,
-        surfaceContainerLow = surfaceContainerLowDark,
-        surfaceContainer = surfaceContainerDark,
-        surfaceContainerHigh = surfaceContainerHighDark,
-        surfaceContainerHighest = surfaceContainerHighestDark,
-    )
+private val fallbackLightScheme: ColorScheme by lazy {
+    generateColorSchemeFromSeed(DEFAULT_SEED_COLOR_ARGB, isDark = false)
+}
+
+/**
+ * Fallback dark scheme generated from [DEFAULT_SEED_COLOR_ARGB] for devices without dynamic color.
+ */
+private val fallbackDarkScheme: ColorScheme by lazy {
+    generateColorSchemeFromSeed(DEFAULT_SEED_COLOR_ARGB, isDark = true)
+}
 
 /** Check if the device supports dynamic color theming (Android 12+). */
 fun supportsDynamicColorTheme(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -200,21 +140,12 @@ private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): C
 }
 
 /**
- * MoviesAndBeyond app theme with cinematic design system.
- *
- * Features:
- * - Dark-first theme optimized for movie content
- * - Material You dynamic colors on Android 12+ (default)
- * - Seed color customization for older Android or user preference
- * - Electric blue primary, cinema red secondary, gold tertiary (cinematic fallback)
- * - Deep surface hierarchy for immersive feel
- * - Cinematic typography scale
- * - Premium rounded shapes
+ * MoviesAndBeyond app theme.
  *
  * @param darkTheme Whether to use dark theme (default: system preference)
- * @param dynamicColor Whether to use Material You dynamic colors on Android 12+
- * @param seedColor The seed color to use when dynamic color is disabled or unavailable
- * @param customColorArgb The custom color ARGB value to use when seedColor is CUSTOM
+ * @param dynamicColor Whether to use Material You dynamic colors on Android 12+ (with fallback on
+ *   older devices)
+ * @param customColorArgb The custom seed color ARGB when [dynamicColor] is false
  * @param content The composable content to apply theme to
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -222,27 +153,33 @@ private fun generateColorSchemeFromSeed(seedColorArgb: Long, isDark: Boolean): C
 fun MoviesAndBeyondTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
-    seedColor: SeedColor = SeedColor.DEFAULT,
-    customColorArgb: Long = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
+    customColorArgb: Long = DEFAULT_SEED_COLOR_ARGB,
     content: @Composable () -> Unit,
 ) {
+    val themePreviewState = remember { ThemePreviewState() }
+    val previewColor = themePreviewState.previewColorArgb
+
     val colorScheme =
         when {
+            // Live preview from color picker — overrides everything
+            previewColor != null -> {
+                remember(previewColor, darkTheme) {
+                    generateColorSchemeFromSeed(previewColor, darkTheme)
+                }
+            }
             dynamicColor && supportsDynamicColorTheme() -> {
                 val context = LocalContext.current
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             }
-            seedColor == SeedColor.DEFAULT -> {
-                // Use the custom cinematic theme when DEFAULT seed color is selected
-                if (darkTheme) cinematicDarkScheme else cinematicLightScheme
-            }
-            seedColor == SeedColor.CUSTOM -> {
-                // Use custom color ARGB for CUSTOM seed color
-                generateColorSchemeFromSeed(customColorArgb, darkTheme)
+            dynamicColor -> {
+                // Pre-Android 12 fallback for "Dynamic Color" option
+                if (darkTheme) fallbackDarkScheme else fallbackLightScheme
             }
             else -> {
-                // Generate color scheme from preset seed color
-                generateColorSchemeFromSeed(seedColor.argb, darkTheme)
+                // User-chosen seed color — cached to avoid recomputing on every recomposition
+                remember(customColorArgb, darkTheme) {
+                    generateColorSchemeFromSeed(customColorArgb, darkTheme)
+                }
             }
         }
 
@@ -259,11 +196,13 @@ fun MoviesAndBeyondTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = CinematicM3Typography,
-        shapes = CinematicM3Shapes,
-        motionScheme = MotionScheme.expressive(),
-        content = content,
-    )
+    CompositionLocalProvider(LocalThemePreviewState provides themePreviewState) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = CinematicM3Typography,
+            shapes = CinematicM3Shapes,
+            motionScheme = MotionScheme.expressive(),
+            content = content,
+        )
+    }
 }

@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
-import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.ui.MoviesAndBeyondApp
 import com.keisardev.moviesandbeyond.ui.theme.MoviesAndBeyondTheme
@@ -55,13 +54,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkTheme = shouldUseDarkTheme(uiState)
             val dynamicColor = shouldUseDynamicColor(uiState)
-            val seedColor = getSeedColor(uiState)
             val customColorArgb = getCustomColorArgb(uiState)
 
             MoviesAndBeyondTheme(
                 darkTheme = darkTheme,
                 dynamicColor = dynamicColor,
-                seedColor = seedColor,
                 customColorArgb = customColorArgb,
             ) {
                 if (uiState is Success) {
@@ -88,21 +85,14 @@ private fun shouldUseDarkTheme(uiState: MainActivityUiState): Boolean {
 @Composable
 private fun shouldUseDynamicColor(uiState: MainActivityUiState): Boolean {
     return when (uiState) {
-        Loading -> false
+        Loading -> true
         is Success -> uiState.useDynamicColor
-    }
-}
-
-private fun getSeedColor(uiState: MainActivityUiState): SeedColor {
-    return when (uiState) {
-        Loading -> SeedColor.DEFAULT
-        is Success -> uiState.seedColor
     }
 }
 
 private fun getCustomColorArgb(uiState: MainActivityUiState): Long {
     return when (uiState) {
-        Loading -> SeedColor.DEFAULT_CUSTOM_COLOR_ARGB
+        Loading -> 0xFF6750A4
         is Success -> uiState.customColorArgb
     }
 }

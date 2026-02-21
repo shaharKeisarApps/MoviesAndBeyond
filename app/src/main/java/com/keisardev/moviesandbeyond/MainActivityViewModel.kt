@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
-import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
@@ -32,7 +31,6 @@ constructor(
                     useDynamicColor = it.useDynamicColor,
                     darkMode = it.darkMode,
                     hideOnboarding = it.hideOnboarding,
-                    seedColor = it.seedColor,
                     customColorArgb = it.customColorArgb,
                 )
             }
@@ -59,7 +57,6 @@ sealed interface MainActivityUiState {
         val useDynamicColor: Boolean,
         val darkMode: SelectedDarkMode,
         val hideOnboarding: Boolean,
-        val seedColor: SeedColor,
         val customColorArgb: Long,
     ) : MainActivityUiState
 }

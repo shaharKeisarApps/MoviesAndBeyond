@@ -66,7 +66,6 @@ class YouViewModelTest {
                 useDynamicColor = testUserData.useDynamicColor,
                 includeAdultResults = testUserData.includeAdultResults,
                 darkMode = testUserData.darkMode,
-                seedColor = testUserData.seedColor,
                 useLocalOnly = testUserData.useLocalOnly,
                 customColorArgb = testUserData.customColorArgb,
             ),

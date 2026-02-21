@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -44,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
+import com.keisardev.moviesandbeyond.core.ui.loading.shimmerBrush
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
@@ -331,27 +334,43 @@ private fun PosterCarouselItem(
     }
 }
 
-/** Shimmer loading state for poster carousel. */
+/** Shimmer loading state for poster carousel. Shows animated shimmer cards matching real layout. */
 @Composable
 fun ShimmerPosterCarousel(posterSize: PosterSize, modifier: Modifier = Modifier) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(posterSize.height)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-    )
+    val brush = shimmerBrush()
+
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
+        userScrollEnabled = false,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        items(5) {
+            Box(
+                modifier =
+                    Modifier.size(width = posterSize.width, height = posterSize.height)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(brush)
+            )
+        }
+    }
 }
 
-/** Shimmer loading state for hero carousel. */
+/**
+ * Shimmer loading state for hero carousel. Shows animated shimmer card matching hero dimensions.
+ */
 @Composable
 fun ShimmerHeroCarousel(modifier: Modifier = Modifier) {
+    val brush = shimmerBrush()
+
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
                 .height(Dimens.heroMaxHeight)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(horizontal = Spacing.screenPadding)
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(brush)
     )
 }
 

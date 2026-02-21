@@ -25,6 +25,7 @@ import com.keisardev.moviesandbeyond.core.ui.ContentSectionHeader
 import com.keisardev.moviesandbeyond.core.ui.HeroCarouselItem
 import com.keisardev.moviesandbeyond.core.ui.MediaHeroCarousel
 import com.keisardev.moviesandbeyond.core.ui.MediaPosterCarousel
+import com.keisardev.moviesandbeyond.core.ui.ShimmerHeroCarousel
 import com.keisardev.moviesandbeyond.core.ui.ShimmerPosterCarousel
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -91,28 +92,30 @@ internal fun FeedScreen(
         ) {
             // Hero carousel with popular movies
             item(key = "hero") {
-                if (popularMovies.items.isNotEmpty()) {
-                    val heroItems =
-                        remember(popularMovies.items) {
-                            popularMovies.items.take(5).map { item ->
-                                HeroCarouselItem(
-                                    id = item.id,
-                                    title = item.name,
-                                    posterPath = item.imagePath,
-                                    backdropPath = item.backdropPath,
-                                    rating = item.rating,
-                                    releaseYear = item.releaseDate?.take(4),
-                                    overview = item.overview,
-                                )
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    ContentSectionHeader(
+                        sectionName = stringResource(id = R.string.popular),
+                        onSeeAllClick = null,
+                        modifier = Modifier.padding(horizontal = Spacing.screenPadding),
+                    )
+                    if (popularMovies.items.isNotEmpty()) {
+                        val heroItems =
+                            remember(popularMovies.items) {
+                                popularMovies.items.take(5).map { item ->
+                                    HeroCarouselItem(
+                                        id = item.id,
+                                        title = item.name,
+                                        posterPath = item.imagePath,
+                                        backdropPath = item.backdropPath,
+                                        rating = item.rating,
+                                        releaseYear = item.releaseDate?.take(4),
+                                        overview = item.overview,
+                                    )
+                                }
                             }
-                        }
-                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                        ContentSectionHeader(
-                            sectionName = stringResource(id = R.string.popular),
-                            onSeeAllClick = null,
-                            modifier = Modifier.padding(horizontal = Spacing.screenPadding),
-                        )
                         MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
+                    } else {
+                        ShimmerHeroCarousel()
                     }
                 }
             }

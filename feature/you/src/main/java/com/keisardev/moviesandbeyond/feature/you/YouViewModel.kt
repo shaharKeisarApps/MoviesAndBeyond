@@ -44,7 +44,6 @@ constructor(
                     useDynamicColor = it.useDynamicColor,
                     includeAdultResults = it.includeAdultResults,
                     darkMode = it.darkMode,
-                    seedColor = it.seedColor,
                     useLocalOnly = it.useLocalOnly,
                     customColorArgb = it.customColorArgb,
                 )
@@ -182,7 +181,6 @@ data class UserSettings(
     val useDynamicColor: Boolean,
     val includeAdultResults: Boolean,
     val darkMode: SelectedDarkMode,
-    val seedColor: SeedColor,
     val useLocalOnly: Boolean,
     val customColorArgb: Long,
 )
