@@ -38,7 +38,7 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
             val hazeState = remember { HazeState() }
 
             // Navigation 3: Use NavigationState instead of NavController
-            val navigationState = remember { NavigationState(hideOnboarding) }
+            val navigationState = remember(hideOnboarding) { NavigationState(hideOnboarding) }
 
             val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
 
