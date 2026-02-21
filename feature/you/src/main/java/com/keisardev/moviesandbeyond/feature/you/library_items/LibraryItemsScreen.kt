@@ -330,7 +330,7 @@ private fun LibraryContent(
                         start = Spacing.screenPadding,
                         end = Spacing.screenPadding,
                         top = Spacing.md,
-                        bottom = Spacing.xl,
+                        bottom = Spacing.feedBottomPadding,
                     ),
                 itemSpacing = Spacing.md,
             ) {

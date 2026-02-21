@@ -6,7 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,6 +21,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
+import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
 import com.keisardev.moviesandbeyond.ui.MoviesAndBeyondApp
 import com.keisardev.moviesandbeyond.ui.theme.MoviesAndBeyondTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen BEFORE super.onCreate() per Android 12+ guidelines
         val splashScreen = installSplashScreen()
@@ -55,14 +60,17 @@ class MainActivity : ComponentActivity() {
             val darkTheme = shouldUseDarkTheme(uiState)
             val dynamicColor = shouldUseDynamicColor(uiState)
             val customColorArgb = getCustomColorArgb(uiState)
+            val windowSizeClass = calculateWindowSizeClass(this)
 
-            MoviesAndBeyondTheme(
-                darkTheme = darkTheme,
-                dynamicColor = dynamicColor,
-                customColorArgb = customColorArgb,
-            ) {
-                if (uiState is Success) {
-                    MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
+            CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
+                MoviesAndBeyondTheme(
+                    darkTheme = darkTheme,
+                    dynamicColor = dynamicColor,
+                    customColorArgb = customColorArgb,
+                ) {
+                    if (uiState is Success) {
+                        MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
+                    }
                 }
             }
         }

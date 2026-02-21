@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -89,7 +90,10 @@ private fun CreditsScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = Spacing.xxxs)) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         stickyHeader { CategoryHeader(stringResource(id = R.string.cast)) }
         items(items = credits.cast, key = { it.id }) { castMember ->
             val stableClick =

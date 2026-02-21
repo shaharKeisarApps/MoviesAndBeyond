@@ -274,7 +274,12 @@ private fun LoggedInView(
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
+                .padding(
+                    start = Spacing.screenPadding,
+                    top = Spacing.lg,
+                    end = Spacing.screenPadding,
+                    bottom = Spacing.feedBottomPadding,
+                ),
     ) {
         // Profile header section with premium surface
         Column(
@@ -356,49 +361,14 @@ private fun LoggedOutView(
         modifier =
             Modifier.fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.lg),
+                .padding(
+                    start = Spacing.screenPadding,
+                    top = Spacing.lg,
+                    end = Spacing.screenPadding,
+                    bottom = Spacing.feedBottomPadding,
+                ),
     ) {
-        // Welcome card with premium surface
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.md),
-            modifier =
-                Modifier.fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        shape = MaterialTheme.shapes.extraLarge,
-                    )
-                    .padding(Spacing.xl),
-        ) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.size(Dimens.iconSizeLarge),
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = stringResource(id = R.string.log_in_welcome),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(id = R.string.log_in_description),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Button(
-                onClick = onNavigateToAuth,
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.large,
-            ) {
-                Text(
-                    text = stringResource(id = R.string.log_in),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        }
+        LoggedOutWelcomeCard(onNavigateToAuth = onNavigateToAuth)
 
         HorizontalDivider(
             modifier = Modifier.padding(vertical = Spacing.sm),
@@ -410,6 +380,50 @@ private fun LoggedOutView(
             libraryItemCounts = libraryItemCounts,
             onLibraryItemClick = onLibraryItemClick,
         )
+    }
+}
+
+@Composable
+private fun LoggedOutWelcomeCard(onNavigateToAuth: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+        modifier =
+            Modifier.fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = MaterialTheme.shapes.extraLarge,
+                )
+                .padding(Spacing.xl),
+    ) {
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = null,
+            modifier = Modifier.size(Dimens.iconSizeLarge),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            text = stringResource(id = R.string.log_in_welcome),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(id = R.string.log_in_description),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(
+            onClick = onNavigateToAuth,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+        ) {
+            Text(
+                text = stringResource(id = R.string.log_in),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
     }
 }
 

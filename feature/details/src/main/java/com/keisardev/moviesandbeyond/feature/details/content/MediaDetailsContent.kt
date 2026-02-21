@@ -149,7 +149,12 @@ internal fun MediaDetailsContent(
         )
         LazyColumn(
             contentPadding =
-                PaddingValues(horizontal = Spacing.screenPadding, vertical = Spacing.sm),
+                PaddingValues(
+                    start = Spacing.screenPadding,
+                    top = Spacing.sm,
+                    end = Spacing.screenPadding,
+                    bottom = Spacing.feedBottomPadding,
+                ),
             verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
             modifier = Modifier.fillMaxWidth(),
         ) {

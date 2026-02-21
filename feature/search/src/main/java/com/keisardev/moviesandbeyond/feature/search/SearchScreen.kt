@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
@@ -34,11 +33,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.model.SearchItem
+import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
 import com.keisardev.moviesandbeyond.core.ui.MediaSharedElementKey
 import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
 import com.keisardev.moviesandbeyond.core.ui.MoviesAndBeyondSearchBar
 import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.adaptiveSearchGridColumns
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
@@ -98,12 +99,16 @@ internal fun SearchScreen(
                     // Empty search results state
                     SearchEmptyState(query = searchQuery)
                 } else {
+                    val gridColumns =
+                        LocalWindowSizeClass.current.adaptiveSearchGridColumns()
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(Dimens.searchGridColumns),
+                        columns = gridColumns,
                         contentPadding =
                             PaddingValues(
-                                horizontal = Spacing.screenPadding,
-                                vertical = Spacing.sm,
+                                start = Spacing.screenPadding,
+                                top = Spacing.sm,
+                                end = Spacing.screenPadding,
+                                bottom = Spacing.feedBottomPadding,
                             ),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
                         verticalArrangement = Arrangement.spacedBy(Spacing.md),
