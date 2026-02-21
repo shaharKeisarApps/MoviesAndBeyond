@@ -37,15 +37,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -86,6 +87,34 @@ fun AuthRoute(onBackClick: () -> Unit, viewModel: AuthViewModel = hiltViewModel(
     )
 }
 
+private class StaggeredVisibility {
+    var headline by mutableStateOf(false)
+    var description by mutableStateOf(false)
+    var username by mutableStateOf(false)
+    var password by mutableStateOf(false)
+    var signInButton by mutableStateOf(false)
+    var bottomSection by mutableStateOf(false)
+}
+
+@Composable
+private fun rememberStaggeredVisibility(): StaggeredVisibility {
+    val state = remember { StaggeredVisibility() }
+    LaunchedEffect(Unit) {
+        state.headline = true
+        delay(100)
+        state.description = true
+        delay(50)
+        state.username = true
+        delay(50)
+        state.password = true
+        delay(100)
+        state.signInButton = true
+        delay(100)
+        state.bottomSection = true
+    }
+    return state
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AuthScreen(
@@ -113,41 +142,31 @@ internal fun AuthScreen(
         }
     }
 
-    var headlineVisible by rememberSaveable { mutableStateOf(false) }
-    var descriptionVisible by rememberSaveable { mutableStateOf(false) }
-    var usernameVisible by rememberSaveable { mutableStateOf(false) }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    var signInButtonVisible by rememberSaveable { mutableStateOf(false) }
-    var bottomSectionVisible by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        headlineVisible = true
-        delay(100)
-        descriptionVisible = true
-        delay(50)
-        usernameVisible = true
-        delay(50)
-        passwordVisible = true
-        delay(100)
-        signInButtonVisible = true
-        delay(100)
-        bottomSectionVisible = true
-    }
+    val stagger = rememberStaggeredVisibility()
 
     Scaffold(
-        topBar = { TopAppBarWithBackButton(onBackClick = onBackClick) },
+        topBar = {
+            TopAppBarWithBackButton(
+                onBackClick = onBackClick,
+                topAppBarColors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                    ),
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         AuthScreenContent(
             uiState = uiState,
             hideOnboarding = hideOnboarding,
-            headlineVisible = headlineVisible,
-            descriptionVisible = descriptionVisible,
-            usernameVisible = usernameVisible,
-            passwordVisible = passwordVisible,
-            signInButtonVisible = signInButtonVisible,
-            bottomSectionVisible = bottomSectionVisible,
+            headlineVisible = stagger.headline,
+            descriptionVisible = stagger.description,
+            usernameVisible = stagger.username,
+            passwordVisible = stagger.password,
+            signInButtonVisible = stagger.signInButton,
+            bottomSectionVisible = stagger.bottomSection,
             onLogInClick = onLogInClick,
             onContinueWithoutSignInClick = onContinueWithoutSignInClick,
             onUsernameChange = onUsernameChange,
