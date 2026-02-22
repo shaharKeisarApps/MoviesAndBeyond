@@ -99,8 +99,7 @@ internal fun SearchScreen(
                     // Empty search results state
                     SearchEmptyState(query = searchQuery)
                 } else {
-                    val gridColumns =
-                        LocalWindowSizeClass.current.adaptiveSearchGridColumns()
+                    val gridColumns = LocalWindowSizeClass.current.adaptiveSearchGridColumns()
                     LazyVerticalGrid(
                         columns = gridColumns,
                         contentPadding =
