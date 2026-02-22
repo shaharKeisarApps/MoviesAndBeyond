@@ -39,6 +39,7 @@ import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
 import com.keisardev.moviesandbeyond.core.ui.MoviesAndBeyondSearchBar
 import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.adaptiveSearchGridColumns
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -107,7 +108,7 @@ internal fun SearchScreen(
                                 start = Spacing.screenPadding,
                                 top = Spacing.sm,
                                 end = Spacing.screenPadding,
-                                bottom = Spacing.feedBottomPadding,
+                                bottom = adaptiveFeedBottomPadding(),
                             ),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.itemSpacing),
                         verticalArrangement = Arrangement.spacedBy(Spacing.md),

@@ -3,7 +3,11 @@ package com.keisardev.moviesandbeyond.core.ui
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.unit.Dp
+import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
+import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
 /**
  * CompositionLocal that provides the current [WindowSizeClass] to descendant composables.
@@ -61,4 +65,50 @@ fun WindowSizeClass.adaptiveSearchGridColumns(): GridCells {
  */
 fun WindowSizeClass.isCompactWidth(): Boolean {
     return widthSizeClass == WindowWidthSizeClass.Compact
+}
+
+/**
+ * CompositionLocal indicating whether a NavigationRail is currently visible. When true, feature
+ * screens should use reduced bottom padding since the floating bottom bar is not present.
+ */
+val LocalUseNavigationRail = staticCompositionLocalOf { false }
+
+/**
+ * Returns the appropriate bottom padding for feed/list content based on the current navigation
+ * mode. When a NavigationRail is active, returns a smaller padding since there is no floating
+ * bottom bar to clear.
+ */
+@Composable
+fun adaptiveFeedBottomPadding(): Dp {
+    return if (LocalUseNavigationRail.current) {
+        Spacing.feedBottomPaddingRail
+    } else {
+        Spacing.feedBottomPadding
+    }
+}
+
+/**
+ * Returns the hero carousel max height, reduced in landscape/rail mode where vertical space is
+ * limited (~443dp on a phone vs ~986dp in portrait).
+ */
+@Composable
+fun adaptiveHeroMaxHeight(): Dp {
+    return if (LocalUseNavigationRail.current) {
+        Dimens.heroMaxHeightRail
+    } else {
+        Dimens.heroMaxHeight
+    }
+}
+
+/**
+ * Returns the detail backdrop expanded height, reduced in landscape/rail mode to avoid the backdrop
+ * consuming the entire screen.
+ */
+@Composable
+fun adaptiveDetailBackdropExpanded(): Dp {
+    return if (LocalUseNavigationRail.current) {
+        Dimens.detailBackdropExpandedRail
+    } else {
+        Dimens.detailBackdropExpanded
+    }
 }

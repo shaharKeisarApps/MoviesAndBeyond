@@ -81,6 +81,7 @@ import com.keisardev.moviesandbeyond.core.ui.MediaType as SharedMediaType
 import com.keisardev.moviesandbeyond.core.ui.SharedElementOrigin
 import com.keisardev.moviesandbeyond.core.ui.SharedElementType
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.you.R
@@ -330,7 +331,7 @@ private fun LibraryContent(
                         start = Spacing.screenPadding,
                         end = Spacing.screenPadding,
                         top = Spacing.md,
-                        bottom = Spacing.feedBottomPadding,
+                        bottom = adaptiveFeedBottomPadding(),
                     ),
                 itemSpacing = Spacing.md,
             ) {

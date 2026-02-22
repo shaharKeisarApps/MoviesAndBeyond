@@ -74,6 +74,9 @@ object Spacing {
      */
     val feedBottomPadding = 100.dp
 
+    /** Bottom padding when using NavigationRail (no floating bar to clear). */
+    val feedBottomPaddingRail = 16.dp
+
     /** Spacing between inline elements (text, icons) - 8.dp */
     val inlineSpacing = xs
 

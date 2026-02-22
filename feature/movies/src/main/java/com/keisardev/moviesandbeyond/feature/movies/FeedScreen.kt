@@ -27,6 +27,7 @@ import com.keisardev.moviesandbeyond.core.ui.MediaHeroCarousel
 import com.keisardev.moviesandbeyond.core.ui.MediaPosterCarousel
 import com.keisardev.moviesandbeyond.core.ui.ShimmerHeroCarousel
 import com.keisardev.moviesandbeyond.core.ui.ShimmerPosterCarousel
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
@@ -86,7 +87,8 @@ internal fun FeedScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         LazyColumn(
-            contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
+            contentPadding =
+                PaddingValues(top = Spacing.feedTopPadding, bottom = adaptiveFeedBottomPadding()),
             modifier = modifier.fillMaxWidth().padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
         ) {

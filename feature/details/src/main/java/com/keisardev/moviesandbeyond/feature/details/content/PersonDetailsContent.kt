@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
@@ -54,7 +55,7 @@ internal fun PersonDetailsContent(
                     start = Spacing.screenPadding,
                     top = Spacing.sm,
                     end = Spacing.screenPadding,
-                    bottom = Spacing.feedBottomPadding,
+                    bottom = adaptiveFeedBottomPadding(),
                 ),
             verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             modifier = Modifier.fillMaxWidth().padding(paddingValues),

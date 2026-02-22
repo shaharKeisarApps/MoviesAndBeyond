@@ -173,6 +173,12 @@ object Dimens {
     /** Detail backdrop expanded height - 60% viewport equivalent */
     val detailBackdropExpanded = 360.dp
 
+    /** Detail backdrop expanded height for landscape/rail mode (limited vertical space) */
+    val detailBackdropExpandedRail = 200.dp
+
+    /** Hero carousel max height for landscape/rail mode */
+    val heroMaxHeightRail = 220.dp
+
     /** Floating poster width on detail screen */
     val detailPosterWidth = 120.dp
 

@@ -74,6 +74,8 @@ import com.keisardev.moviesandbeyond.core.ui.RatingBadge
 import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TmdbBackdropImage
 import com.keisardev.moviesandbeyond.core.ui.TmdbProfileImage
+import com.keisardev.moviesandbeyond.core.ui.adaptiveDetailBackdropExpanded
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
@@ -84,9 +86,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
 // M3 Premium Hero Dimensions - Cinematic immersive experience
-private val backdropExpandedHeight = Dimens.detailBackdropExpanded
 private val collapsedHeight = Dimens.detailBackdropCollapsed
-private val heightToCollapse = backdropExpandedHeight - collapsedHeight
 
 @OptIn(FlowPreview::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -112,6 +112,8 @@ internal fun MediaDetailsContent(
     onBackdropCollapse: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val backdropExpandedHeight = adaptiveDetailBackdropExpanded()
+    val heightToCollapse = backdropExpandedHeight - collapsedHeight
     val heightToCollapsePx = with(LocalDensity.current) { heightToCollapse.toPx() }
 
     // persist collapse offset between different Details screen
@@ -153,7 +155,7 @@ internal fun MediaDetailsContent(
                     start = Spacing.screenPadding,
                     top = Spacing.sm,
                     end = Spacing.screenPadding,
-                    bottom = Spacing.feedBottomPadding,
+                    bottom = adaptiveFeedBottomPadding(),
                 ),
             verticalArrangement = Arrangement.spacedBy(Spacing.sectionSpacing),
             modifier = Modifier.fillMaxWidth(),

@@ -31,6 +31,7 @@ import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -91,7 +92,7 @@ private fun CreditsScreen(
 @Composable
 private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
     LazyColumn(
-        contentPadding = PaddingValues(bottom = Spacing.feedBottomPadding),
+        contentPadding = PaddingValues(bottom = adaptiveFeedBottomPadding()),
         modifier = Modifier.fillMaxWidth(),
     ) {
         stickyHeader { CategoryHeader(stringResource(id = R.string.cast)) }

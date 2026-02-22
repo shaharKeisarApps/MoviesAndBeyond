@@ -2,21 +2,35 @@ package com.keisardev.moviesandbeyond.ui
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import com.keisardev.moviesandbeyond.core.ui.AnimatedNavigationItem
 import com.keisardev.moviesandbeyond.core.ui.FloatingNavigationBar
 import com.keisardev.moviesandbeyond.core.ui.HazeScaffold
 import com.keisardev.moviesandbeyond.core.ui.LocalSharedTransitionScope
+import com.keisardev.moviesandbeyond.core.ui.LocalUseNavigationRail
+import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
+import com.keisardev.moviesandbeyond.core.ui.isExpandedOrMediumWidth
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNav3
 import com.keisardev.moviesandbeyond.ui.navigation.NavigationState
@@ -40,39 +54,115 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
             // Navigation 3: Use NavigationState instead of NavController
             val navigationState = remember(hideOnboarding) { NavigationState(hideOnboarding) }
 
-            val bottomBarDestinations = remember { MoviesAndBeyondDestination.entries }
+            val destinations = remember { MoviesAndBeyondDestination.entries }
 
-            // Determine if bottom bar should be shown based on current navigation state
-            val showBottomBar =
+            val showNavigation =
                 navigationState.hasCompletedOnboarding &&
                     isTopLevelDestination(navigationState.topLevelBackStack.topLevelKey)
 
-            HazeScaffold(
-                hazeState = hazeState,
-                blurBottomBar =
-                    false, // Don't blur the wrapper - FloatingNavigationBar handles its own blur
-                bottomBar = {
-                    if (showBottomBar) {
-                        MoviesAndBeyondNavigationBar(
-                            hazeState = hazeState, // Pass hazeState to FloatingNavigationBar
-                            destinations = bottomBarDestinations,
-                            selectedDestination =
-                                topLevelRouteToDestination(
-                                    navigationState.topLevelBackStack.topLevelKey
-                                ),
-                            onNavigateToDestination = { destination ->
-                                navigationState.topLevelBackStack.switchToTopLevel(
-                                    destinationToTopLevelRoute(destination)
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                },
-                contentWindowInsets = WindowInsets.safeDrawing,
-            ) { padding ->
-                MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+            val selectedDestination =
+                topLevelRouteToDestination(navigationState.topLevelBackStack.topLevelKey)
+
+            val onNavigate = { destination: MoviesAndBeyondDestination ->
+                navigationState.topLevelBackStack.switchToTopLevel(
+                    destinationToTopLevelRoute(destination)
+                )
             }
+
+            val useRail = LocalWindowSizeClass.current.isExpandedOrMediumWidth()
+
+            CompositionLocalProvider(LocalUseNavigationRail provides (useRail && showNavigation)) {
+                if (useRail) {
+                    RailContent(
+                        hazeState = hazeState,
+                        navigationState = navigationState,
+                        destinations = destinations,
+                        selectedDestination = selectedDestination,
+                        onNavigate = onNavigate,
+                        showNavigation = showNavigation,
+                    )
+                } else {
+                    CompactContent(
+                        hazeState = hazeState,
+                        navigationState = navigationState,
+                        destinations = destinations,
+                        selectedDestination = selectedDestination,
+                        onNavigate = onNavigate,
+                        showNavigation = showNavigation,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Compact layout: HazeScaffold with FloatingNavigationBar at the bottom. */
+@OptIn(ExperimentalHazeApi::class)
+@Composable
+private fun CompactContent(
+    hazeState: HazeState,
+    navigationState: NavigationState,
+    destinations: List<MoviesAndBeyondDestination>,
+    selectedDestination: MoviesAndBeyondDestination?,
+    onNavigate: (MoviesAndBeyondDestination) -> Unit,
+    showNavigation: Boolean,
+) {
+    HazeScaffold(
+        hazeState = hazeState,
+        blurBottomBar = false,
+        bottomBar = {
+            if (showNavigation) {
+                MoviesAndBeyondNavigationBar(
+                    hazeState = hazeState,
+                    destinations = destinations,
+                    selectedDestination = selectedDestination,
+                    onNavigateToDestination = onNavigate,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets.safeDrawing,
+    ) { padding ->
+        MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+    }
+}
+
+/** Medium+ layout: NavigationRail on the left with HazeScaffold filling the remaining width. */
+@OptIn(ExperimentalHazeApi::class)
+@Composable
+private fun RailContent(
+    hazeState: HazeState,
+    navigationState: NavigationState,
+    destinations: List<MoviesAndBeyondDestination>,
+    selectedDestination: MoviesAndBeyondDestination?,
+    onNavigate: (MoviesAndBeyondDestination) -> Unit,
+    showNavigation: Boolean,
+) {
+    Row(
+        Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(
+                WindowInsets.safeDrawing.only(
+                    WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                )
+            )
+            .clipToBounds()
+    ) {
+        if (showNavigation) {
+            MoviesAndBeyondNavigationRail(
+                destinations = destinations,
+                selectedDestination = selectedDestination,
+                onNavigateToDestination = onNavigate,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+            )
+        }
+        HazeScaffold(
+            hazeState = hazeState,
+            blurBottomBar = false,
+            contentWindowInsets = WindowInsets.statusBars,
+            modifier = Modifier.weight(1f),
+        ) { padding ->
+            MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
         }
     }
 }
@@ -105,6 +195,32 @@ fun MoviesAndBeyondNavigationBar(
                 },
                 unselectedIcon = {
                     Icon(imageVector = destination.icon, contentDescription = null)
+                },
+                label = { Text(stringResource(id = destination.titleId)) },
+            )
+        }
+    }
+}
+
+/** M3 NavigationRail shown on the left edge for medium+ width windows. */
+@Composable
+fun MoviesAndBeyondNavigationRail(
+    destinations: List<MoviesAndBeyondDestination>,
+    selectedDestination: MoviesAndBeyondDestination?,
+    onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NavigationRail(modifier = modifier) {
+        destinations.forEach { destination ->
+            val selected = destination == selectedDestination
+            NavigationRailItem(
+                selected = selected,
+                onClick = { onNavigateToDestination(destination) },
+                icon = {
+                    Icon(
+                        imageVector = if (selected) destination.selectedIcon else destination.icon,
+                        contentDescription = null,
+                    )
                 },
                 label = { Text(stringResource(id = destination.titleId)) },
             )

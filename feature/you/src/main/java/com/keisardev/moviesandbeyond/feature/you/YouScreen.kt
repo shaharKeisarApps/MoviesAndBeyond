@@ -78,6 +78,7 @@ import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.ui.LocalThemePreviewState
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.skydoves.landscapist.ImageOptions
@@ -278,7 +279,7 @@ private fun LoggedInView(
                     start = Spacing.screenPadding,
                     top = Spacing.lg,
                     end = Spacing.screenPadding,
-                    bottom = Spacing.feedBottomPadding,
+                    bottom = adaptiveFeedBottomPadding(),
                 ),
     ) {
         // Profile header section with premium surface
@@ -365,7 +366,7 @@ private fun LoggedOutView(
                     start = Spacing.screenPadding,
                     top = Spacing.lg,
                     end = Spacing.screenPadding,
-                    bottom = Spacing.feedBottomPadding,
+                    bottom = adaptiveFeedBottomPadding(),
                 ),
     ) {
         LoggedOutWelcomeCard(onNavigateToAuth = onNavigateToAuth)
