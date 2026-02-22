@@ -2,6 +2,7 @@ package com.keisardev.moviesandbeyond.feature.details.content
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.ui.SimpleMediaItemCard
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.details.OverviewSection
 import com.keisardev.moviesandbeyond.feature.details.R
@@ -44,12 +46,19 @@ internal fun PersonDetailsContent(
                 onBackClick = onBackClick,
             )
         },
-        modifier = Modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection),
+        modifier = modifier.nestedScroll(pinnedScrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         LazyColumn(
+            contentPadding =
+                PaddingValues(
+                    start = Spacing.screenPadding,
+                    top = Spacing.sm,
+                    end = Spacing.screenPadding,
+                    bottom = adaptiveFeedBottomPadding(),
+                ),
             verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-            modifier = modifier.fillMaxWidth().padding(paddingValues),
+            modifier = Modifier.fillMaxWidth().padding(paddingValues),
         ) {
             item {
                 Row(Modifier.fillMaxWidth()) {

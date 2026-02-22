@@ -47,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.ui.loading.shimmerBrush
-import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -97,7 +96,7 @@ fun MediaHeroCarousel(
 
     HorizontalMultiBrowseCarousel(
         state = carouselState,
-        modifier = modifier.fillMaxWidth().height(Dimens.heroMaxHeight),
+        modifier = modifier.fillMaxWidth().height(adaptiveHeroMaxHeight()),
         preferredItemWidth = 300.dp,
         itemSpacing = Spacing.sm,
         contentPadding = PaddingValues(horizontal = Spacing.screenPadding),
@@ -367,7 +366,7 @@ fun ShimmerHeroCarousel(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(Dimens.heroMaxHeight)
+                .height(adaptiveHeroMaxHeight())
                 .padding(horizontal = Spacing.screenPadding)
                 .clip(MaterialTheme.shapes.extraLarge)
                 .background(brush)

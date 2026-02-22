@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,7 +20,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -97,132 +95,116 @@ internal fun DetailsScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetState = rememberModalBottomSheetState()
-    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
-
-    LaunchedEffect(uiState.showSignInSheet) {
-        if (uiState.showSignInSheet) {
-            scaffoldState.bottomSheetState.expand()
-        }
-    }
 
     var isBackdropImageCollapsed by rememberSaveable { mutableStateOf(false) }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        sheetContent = {
-            val signInSheetContentDescription = stringResource(id = R.string.details_sign_in_sheet)
-            if (uiState.showSignInSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = onHideBottomSheet,
-                    sheetState = bottomSheetState,
-                    //                    windowInsets = WindowInsets.navigationBars,
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (contentDetailsUiState) {
+            ContentDetailUiState.Loading -> {
+                val loadingContentDescription = stringResource(id = R.string.details_loading)
+                CircularProgressIndicator(
                     modifier =
-                        Modifier.semantics { contentDescription = signInSheetContentDescription },
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier =
-                            Modifier.fillMaxWidth()
-                                .padding(horizontal = Spacing.screenPadding, vertical = Spacing.xs),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.sign_in_sheet_text),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-
-                        Spacer(Modifier.height(Spacing.xxl))
-
-                        Button(
-                            onClick = {
-                                scope
-                                    .launch { scaffoldState.bottomSheetState.hide() }
-                                    .invokeOnCompletion { onHideBottomSheet() }
-                                onSignInClick()
-                            },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                        ) {
-                            Text(text = stringResource(id = R.string.sign_in))
+                        Modifier.align(Alignment.Center).semantics {
+                            contentDescription = loadingContentDescription
                         }
+                )
+            }
+
+            ContentDetailUiState.Empty -> {
+                LaunchedEffect(uiState.errorMessage) {
+                    uiState.errorMessage?.let {
+                        snackbarHostState.showSnackbar(it)
+                        onErrorShown()
                     }
                 }
             }
-        },
-        sheetPeekHeight = 0.dp,
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            when (contentDetailsUiState) {
-                ContentDetailUiState.Loading -> {
-                    val loadingContentDescription = stringResource(id = R.string.details_loading)
-                    CircularProgressIndicator(
-                        modifier =
-                            Modifier.align(Alignment.Center).semantics {
-                                contentDescription = loadingContentDescription
-                            }
-                    )
-                }
 
-                ContentDetailUiState.Empty -> {
-                    LaunchedEffect(uiState.errorMessage) {
-                        uiState.errorMessage?.let {
-                            snackbarHostState.showSnackbar(it)
-                            onErrorShown()
-                        }
-                    }
-                }
-
-                is ContentDetailUiState.Movie -> {
-                    MovieDetailsContent(
-                        movieDetails = contentDetailsUiState.data,
-                        isFavorite = uiState.markedFavorite,
-                        isAddedToWatchList = uiState.savedInWatchlist,
-                        onFavoriteClick = onFavoriteClick,
-                        onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = onSeeAllCastClick,
-                        onCastClick = onItemClick,
-                        onRecommendationClick = onItemClick,
-                        onBackdropCollapse = { isBackdropImageCollapsed = it },
-                    )
-                }
-
-                is ContentDetailUiState.TV -> {
-                    TvShowDetailsContent(
-                        tvDetails = contentDetailsUiState.data,
-                        isFavorite = uiState.markedFavorite,
-                        isAddedToWatchList = uiState.savedInWatchlist,
-                        onFavoriteClick = onFavoriteClick,
-                        onWatchlistClick = onWatchlistClick,
-                        onSeeAllCastClick = onSeeAllCastClick,
-                        onCastClick = onItemClick,
-                        onRecommendationClick = onItemClick,
-                        onBackdropCollapse = { isBackdropImageCollapsed = it },
-                    )
-                }
-
-                is ContentDetailUiState.Person -> {
-                    PersonDetailsContent(
-                        personDetails = contentDetailsUiState.data,
-                        onBackClick = onBackClick,
-                        modifier =
-                            Modifier.padding(
-                                horizontal = Spacing.screenPadding,
-                                vertical = Spacing.sm,
-                            ),
-                    )
-                }
+            is ContentDetailUiState.Movie -> {
+                MovieDetailsContent(
+                    movieDetails = contentDetailsUiState.data,
+                    isFavorite = uiState.markedFavorite,
+                    isAddedToWatchList = uiState.savedInWatchlist,
+                    onFavoriteClick = onFavoriteClick,
+                    onWatchlistClick = onWatchlistClick,
+                    onSeeAllCastClick = onSeeAllCastClick,
+                    onCastClick = onItemClick,
+                    onRecommendationClick = onItemClick,
+                    onBackdropCollapse = { isBackdropImageCollapsed = it },
+                )
             }
 
-            if (contentDetailsUiState !is ContentDetailUiState.Person) {
-                DetailsTopAppBar(
-                    showTitle = isBackdropImageCollapsed,
-                    title =
-                        when (contentDetailsUiState) {
-                            is ContentDetailUiState.Movie -> contentDetailsUiState.data.title
-                            is ContentDetailUiState.TV -> contentDetailsUiState.data.name
-                            else -> ""
-                        },
+            is ContentDetailUiState.TV -> {
+                TvShowDetailsContent(
+                    tvDetails = contentDetailsUiState.data,
+                    isFavorite = uiState.markedFavorite,
+                    isAddedToWatchList = uiState.savedInWatchlist,
+                    onFavoriteClick = onFavoriteClick,
+                    onWatchlistClick = onWatchlistClick,
+                    onSeeAllCastClick = onSeeAllCastClick,
+                    onCastClick = onItemClick,
+                    onRecommendationClick = onItemClick,
+                    onBackdropCollapse = { isBackdropImageCollapsed = it },
+                )
+            }
+
+            is ContentDetailUiState.Person -> {
+                PersonDetailsContent(
+                    personDetails = contentDetailsUiState.data,
                     onBackClick = onBackClick,
                 )
+            }
+        }
+
+        if (contentDetailsUiState !is ContentDetailUiState.Person) {
+            DetailsTopAppBar(
+                showTitle = isBackdropImageCollapsed,
+                title =
+                    when (contentDetailsUiState) {
+                        is ContentDetailUiState.Movie -> contentDetailsUiState.data.title
+                        is ContentDetailUiState.TV -> contentDetailsUiState.data.name
+                        else -> ""
+                    },
+                onBackClick = onBackClick,
+            )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
+
+    if (uiState.showSignInSheet) {
+        val signInSheetContentDescription = stringResource(id = R.string.details_sign_in_sheet)
+        ModalBottomSheet(
+            onDismissRequest = onHideBottomSheet,
+            sheetState = bottomSheetState,
+            modifier = Modifier.semantics { contentDescription = signInSheetContentDescription },
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(horizontal = Spacing.screenPadding, vertical = Spacing.xs),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.sign_in_sheet_text),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+                Spacer(Modifier.height(Spacing.xxl))
+
+                Button(
+                    onClick = {
+                        scope
+                            .launch { bottomSheetState.hide() }
+                            .invokeOnCompletion { onHideBottomSheet() }
+                        onSignInClick()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                ) {
+                    Text(text = stringResource(id = R.string.sign_in))
+                }
             }
         }
     }

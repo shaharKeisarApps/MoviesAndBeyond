@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,6 +31,7 @@ import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.details.people.Credits
 import com.keisardev.moviesandbeyond.core.ui.PersonImage
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.noRippleClickable
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
@@ -89,7 +91,10 @@ private fun CreditsScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CreditsLazyColumn(credits: Credits, onItemClick: (String) -> Unit) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = Spacing.xxxs)) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = adaptiveFeedBottomPadding()),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         stickyHeader { CategoryHeader(stringResource(id = R.string.cast)) }
         items(items = credits.cast, key = { it.id }) { castMember ->
             val stableClick =

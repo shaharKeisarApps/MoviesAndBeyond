@@ -69,6 +69,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.keisardev.moviesandbeyond.core.ui.AnnotatedClickableText
 import com.keisardev.moviesandbeyond.core.ui.TopAppBarWithBackButton
+import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import kotlinx.coroutines.delay
 
 @Composable
@@ -175,7 +176,8 @@ internal fun AuthScreen(
                 Modifier.fillMaxWidth()
                     .padding(paddingValues)
                     .padding(horizontal = 24.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = adaptiveFeedBottomPadding()),
         )
     }
 }
