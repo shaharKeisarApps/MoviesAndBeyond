@@ -213,7 +213,36 @@ git branch -d release/X.Y.Z
 git push origin --delete release/X.Y.Z
 ```
 
-### Phase 8: Release Artifacts
+### Phase 8: GitHub Release with APK
+
+**MANDATORY**: Every GitHub release tag MUST have the release APK attached.
+
+```bash
+# Build release APK
+./gradlew assembleRelease
+
+# Create GitHub release with APK attached
+gh release create vX.Y.Z \
+  --target main \
+  --title "vX.Y.Z: [Release Title]" \
+  --notes "[Release notes]" \
+  app/build/outputs/apk/release/app-release.apk#MoviesAndBeyond-vX.Y.Z-release.apk
+
+# If release tag already exists (created separately), upload APK to it:
+gh release upload vX.Y.Z \
+  app/build/outputs/apk/release/app-release.apk#MoviesAndBeyond-vX.Y.Z-release.apk \
+  --clobber
+
+# If gh CLI hits GraphQL rate limits, use REST API:
+RELEASE_ID=$(gh api repos/{owner}/{repo}/releases/tags/vX.Y.Z --jq '.id')
+gh api \
+  --method POST \
+  -H "Content-Type: application/vnd.android.package-archive" \
+  "https://uploads.github.com/repos/{owner}/{repo}/releases/${RELEASE_ID}/assets?name=MoviesAndBeyond-vX.Y.Z-release.apk" \
+  --input app/build/outputs/apk/release/app-release.apk
+```
+
+### Phase 9: Distribution (Optional)
 
 ```markdown
 **Android:**
@@ -280,8 +309,10 @@ git branch -d hotfix/X.Y.Z
 - [ ] Release branch deleted
 
 ### Post-Release
-- [ ] Artifacts uploaded
-- [ ] Release notes published
+- [ ] Release APK attached to GitHub release tag (MANDATORY)
+- [ ] Release notes published on GitHub
+- [ ] dev branch synced with main (merge main back into dev)
+- [ ] Artifacts uploaded to stores (if applicable)
 - [ ] Team notified
 - [ ] Monitoring enabled
 - [ ] Rollback plan ready
