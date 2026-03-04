@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.LibraryExtension
+import com.keisardev.moviesandbeyond.ProjectConfig
 import com.keisardev.moviesandbeyond.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,6 +12,13 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             val extension = extensions.getByType<LibraryExtension>()
             configureKotlinAndroid(extension)
+            extension.apply {
+                defaultConfig { minSdk = ProjectConfig.MIN_SDK }
+                compileOptions {
+                    sourceCompatibility = ProjectConfig.JAVA_VERSION
+                    targetCompatibility = ProjectConfig.JAVA_VERSION
+                }
+            }
         }
     }
 }

@@ -12,7 +12,14 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = ProjectConfig.TARGET_SDK
+                defaultConfig {
+                    minSdk = ProjectConfig.MIN_SDK
+                    targetSdk = ProjectConfig.TARGET_SDK
+                }
+                compileOptions {
+                    sourceCompatibility = ProjectConfig.JAVA_VERSION
+                    targetCompatibility = ProjectConfig.JAVA_VERSION
+                }
             }
         }
     }

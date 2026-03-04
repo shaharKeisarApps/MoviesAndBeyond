@@ -16,6 +16,15 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Updates",
   "automerge": false,
+  "ignoreDeps": [
+    "moviesandbeyond.android.application",
+    "moviesandbeyond.android.application.compose",
+    "moviesandbeyond.android.library",
+    "moviesandbeyond.android.library.compose",
+    "moviesandbeyond.android.hilt",
+    "moviesandbeyond.android.feature",
+    "moviesandbeyond.android.screenshot.test"
+  ],
   "packageRules": [
     {
       "matchManagers": [

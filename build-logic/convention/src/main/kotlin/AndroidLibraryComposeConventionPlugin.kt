@@ -8,7 +8,8 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             val extension = extensions.getByType<LibraryExtension>()
-            configureAndroidCompose(extension)
+            extension.buildFeatures.compose = true
+            configureAndroidCompose()
         }
     }
 }

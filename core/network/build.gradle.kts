@@ -1,9 +1,15 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
 
 plugins {
     id("moviesandbeyond.android.library")
     id("moviesandbeyond.android.hilt")
 }
+
+val localProperties =
+    Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) file.inputStream().use { load(it) }
+    }
 
 android {
     namespace = "com.keisardev.moviesandbeyond.core.network"
@@ -11,10 +17,9 @@ android {
     buildFeatures { buildConfig = true }
 
     defaultConfig {
-        val baseUrl = gradleLocalProperties(rootDir, providers).getProperty("BASE_URL") ?: ""
+        val baseUrl = localProperties.getProperty("BASE_URL") ?: ""
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-        val accessToken =
-            gradleLocalProperties(rootDir, providers).getProperty("ACCESS_TOKEN") ?: ""
+        val accessToken = localProperties.getProperty("ACCESS_TOKEN") ?: ""
         buildConfigField("String", "ACCESS_TOKEN", "\"$accessToken\"")
     }
 }
