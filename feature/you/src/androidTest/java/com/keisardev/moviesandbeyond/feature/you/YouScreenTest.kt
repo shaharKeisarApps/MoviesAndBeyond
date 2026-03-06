@@ -18,7 +18,6 @@ class YouScreenTest {
         YouScreenCallbacks(
             onChangeTheme = {},
             onChangeDarkMode = {},
-            onChangeSeedColor = {},
             onChangeCustomColorArgb = {},
             onChangeIncludeAdult = {},
             onChangeUseLocalOnly = {},
@@ -71,7 +70,6 @@ class YouScreenTest {
                         useDynamicColor = false,
                         includeAdultResults = false,
                         darkMode = SelectedDarkMode.SYSTEM,
-                        seedColor = SeedColor.DEFAULT,
                         useLocalOnly = false,
                         customColorArgb = SeedColor.DEFAULT_CUSTOM_COLOR_ARGB,
                     ),
