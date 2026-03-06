@@ -521,7 +521,7 @@ private fun LibraryItemCardContent(
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ),
             modifier =
-                Modifier.align(Alignment.TopEnd).padding(Spacing.xxs).size(32.dp).clip(CircleShape),
+                Modifier.align(Alignment.TopEnd).padding(Spacing.xxs).size(40.dp).clip(CircleShape),
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,

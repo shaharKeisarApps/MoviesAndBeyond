@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
+/** Reusable top app bar with a back-arrow navigation icon. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarWithBackButton(

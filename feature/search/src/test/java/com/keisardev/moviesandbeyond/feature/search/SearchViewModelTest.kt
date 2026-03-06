@@ -1,6 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.search
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestSearchRepository
@@ -14,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,14 +65,12 @@ class SearchViewModelTest {
             launch(UnconfinedTestDispatcher()) { viewModel.searchSuggestions.collect() }
 
         searchRepository.generateError(true)
-        val errorResponse =
-            searchRepository.getSearchSuggestions("test", false) as NetworkResponse.Error
         viewModel.changeSearchQuery("test")
         advanceUntilIdle()
 
         assertEquals(emptyList<SearchItem>(), viewModel.searchSuggestions.value)
-
-        assertEquals(errorResponse.errorMessage, viewModel.errorMessage.value)
+        // Error was mapped to a user-friendly message
+        assertFalse(viewModel.errorMessage.value.isNullOrEmpty())
 
         searchQueryCollectJob.cancel()
         searchResultCollectJob.cancel()
@@ -83,5 +81,51 @@ class SearchViewModelTest {
         viewModel.onErrorShown()
 
         assertNull(viewModel.errorMessage.value)
+    }
+
+    @Test
+    fun `test empty query produces no results`() = runTest {
+        val searchResultCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchSuggestions.collect() }
+
+        viewModel.changeSearchQuery("")
+        advanceUntilIdle()
+
+        assertEquals(emptyList<SearchItem>(), viewModel.searchSuggestions.value)
+
+        searchResultCollectJob.cancel()
+    }
+
+    @Test
+    fun `test error then retry returns success`() = runTest {
+        val searchQueryCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchQuery.collect() }
+        val searchResultCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.searchSuggestions.collect() }
+        val errorCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.errorMessage.collect() }
+
+        // First query fails
+        searchRepository.generateError(true)
+        viewModel.changeSearchQuery("test")
+        advanceUntilIdle()
+
+        assertFalse(viewModel.errorMessage.value.isNullOrEmpty())
+
+        // Dismiss error, fix repo, retry
+        viewModel.onErrorShown()
+        searchRepository.generateError(false)
+
+        // Trigger a new search by going back then searching again
+        viewModel.onBack()
+        viewModel.changeSearchQuery("test")
+        advanceUntilIdle()
+
+        assertEquals(testSearchResults, viewModel.searchSuggestions.value)
+        assertNull(viewModel.errorMessage.value)
+
+        searchQueryCollectJob.cancel()
+        searchResultCollectJob.cancel()
+        errorCollectJob.cancel()
     }
 }

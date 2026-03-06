@@ -37,13 +37,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Build release APK
-        run: ./gradlew :app:assembleRelease
+      - name: Build release APK and AAB
+        run: ./gradlew :app:assembleRelease :app:bundleRelease
 
-      - name: Extract version from build.gradle.kts
+      - name: Extract version from gradle.properties
         id: version
         run: |
-          VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          VERSION=$(grep '^VERSION_NAME=' gradle.properties | cut -d= -f2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
@@ -56,17 +56,20 @@ jobs:
             ## Movies And Beyond v${{ steps.version.outputs.version }}
 
             ### Download
-            Download the APK below to install on your Android device.
+            - **APK** — Install directly on your Android device
+            - **AAB** — For Google Play Store upload
 
-            ### Installation
+            ### Installation (APK)
             1. Enable "Install from unknown sources" in your device settings
             2. Download the APK file
             3. Open the downloaded file to install
 
             ### Requirements
-            - Android device with API level 24 or higher
+            - Android device with API level 28 or higher
             - TMDB account for full functionality
-          files: app/build/outputs/apk/release/app-release.apk
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
           draft: false
           prerelease: false
           generate_release_notes: true

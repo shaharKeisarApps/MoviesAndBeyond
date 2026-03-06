@@ -62,6 +62,7 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecy
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "andriodx-security-crypto" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
@@ -155,6 +156,7 @@ moviesandbeyond-android-library = { id = "moviesandbeyond.android.library", vers
 moviesandbeyond-android-library-compose = { id = "moviesandbeyond.android.library.compose", version = "unspecified" }
 moviesandbeyond-android-hilt = { id = "moviesandbeyond.android.hilt", version = "unspecified" }
 moviesandbeyond-android-feature = { id = "moviesandbeyond.android.feature", version = "unspecified" }
+moviesandbeyond-android-jacoco = { id = "moviesandbeyond.android.jacoco", version = "unspecified" }
 moviesandbeyond-android-screenshot-test = { id = "moviesandbeyond.android.screenshot.test", version = "unspecified" }
 
 [bundles]

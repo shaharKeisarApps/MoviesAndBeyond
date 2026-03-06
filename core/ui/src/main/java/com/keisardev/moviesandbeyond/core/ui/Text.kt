@@ -19,6 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
+/**
+ * Text composable that supports clickable [AnnotatedString] annotations (e.g., hyperlinks).
+ *
+ * @param attributionString The annotated string containing clickable spans
+ * @param onClick Callback with the character offset that was tapped
+ */
 @Composable
 fun AnnotatedClickableText(
     attributionString: AnnotatedString,
@@ -42,6 +48,7 @@ fun AnnotatedClickableText(
     )
 }
 
+/** Single-line text with animated fade-in/out visibility. Used for collapsing top-bar titles. */
 @Composable
 fun AnimatedText(
     text: String,

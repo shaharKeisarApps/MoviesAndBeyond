@@ -230,8 +230,8 @@ private fun DetailsTopAppBar(showTitle: Boolean, title: String, onBackClick: () 
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     val iconColors =
         IconButtonDefaults.iconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.5f),
-            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
+            contentColor = MaterialTheme.colorScheme.inverseOnSurface,
         )
     TopAppBarWithBackButton(
         title = { AnimatedText(text = title, visible = showTitle) },

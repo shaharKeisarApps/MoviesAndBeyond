@@ -17,16 +17,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -53,6 +57,10 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 fun FloatingNavigationBar(
     hazeState: HazeState,
     modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.extraLarge,
+    containerColor: Color = NavigationBarDefaults.containerColor,
+    contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
+    tonalElevation: Dp = NavigationBarDefaults.Elevation,
     content: @Composable RowScope.() -> Unit,
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -66,10 +74,10 @@ fun FloatingNavigationBar(
     ) {
         // Surface with blur - ONLY the bar itself has blur
         Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            color = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            tonalElevation = 0.dp,
+            shape = shape,
+            color = containerColor,
+            contentColor = contentColor,
+            tonalElevation = tonalElevation,
             border =
                 BorderStroke(
                     width = 0.5.dp,
@@ -86,7 +94,7 @@ fun FloatingNavigationBar(
                 Modifier.clip(MaterialTheme.shapes.extraLarge)
                     .hazeEffect(
                         state = hazeState,
-                        style = CupertinoMaterials.regular(colorScheme.surface),
+                        style = CupertinoMaterials.thin(colorScheme.background),
                     ),
         ) {
             Row(

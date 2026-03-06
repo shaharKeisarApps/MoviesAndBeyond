@@ -27,6 +27,16 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.CupertinoMaterials
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
+/**
+ * Scaffold with frosted-glass blur effect on the top and bottom bars (Tivi-style).
+ *
+ * Wraps [NestedScaffold] and applies a [HazeState]-driven blur to the bars while keeping the main
+ * content as the blur source. Bars animate in/out with spring-based slide and fade transitions.
+ *
+ * @param hazeState Shared haze state that connects the blur source (content) to blur targets (bars)
+ * @param blurTopBar Whether the top bar should have the blur effect
+ * @param blurBottomBar Whether the bottom bar should have the blur effect
+ */
 @OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun HazeScaffold(
@@ -36,9 +46,7 @@ fun HazeScaffold(
     snackbarHost: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
-    containerColor: Color =
-        MaterialTheme.colorScheme
-            .background, // Use surface color for proper edge-to-edge backgrounds
+    containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = WindowInsets.safeDrawing,
     hazeState: HazeState,

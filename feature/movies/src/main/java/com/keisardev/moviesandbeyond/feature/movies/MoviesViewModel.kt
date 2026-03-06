@@ -3,12 +3,12 @@ package com.keisardev.moviesandbeyond.feature.movies
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
-import com.keisardev.moviesandbeyond.data.store.errorMessageOrNull
-import com.keisardev.moviesandbeyond.data.store.isFromCache
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mobilenativefoundation.store.store5.StoreReadResponse
 
 /**
  * ViewModel for the Movies feed screen using Store5 for offline-first caching and
@@ -102,8 +101,8 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
             )
 
     /**
-     * Creates a Flow that observes content from Store5 and combines it with accumulated items for
-     * pagination support.
+     * Creates a Flow that observes content from the repository and combines it with accumulated
+     * items for pagination support.
      */
     private fun createContentFlow(
         category: MovieListCategory,
@@ -112,9 +111,9 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
     ) =
         pageFlow
             .flatMapLatest { page ->
-                contentRepository.observeMovieItems(category = category, page = page).map { response
+                contentRepository.observeMovieItems(category = category, page = page).map { result
                     ->
-                    handleStoreResponse(response, category, page, accumulatedFlow)
+                    handleResult(result, category, page, accumulatedFlow)
                 }
             }
             .combine(accumulatedFlow) { currentState, accumulated ->
@@ -122,30 +121,26 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
             }
 
     /**
-     * Handles StoreReadResponse and updates accumulated items. Returns a ContentUiState based on
-     * the response.
+     * Handles Result and updates accumulated items. Returns a ContentUiState based on the result.
      */
-    private fun handleStoreResponse(
-        response: StoreReadResponse<List<ContentItem>>,
+    private fun handleResult(
+        result: Result<List<ContentItem>>,
         category: MovieListCategory,
         page: Int,
         accumulatedFlow: MutableStateFlow<List<ContentItem>>,
     ): ContentUiState {
-        return when (response) {
-            is StoreReadResponse.Initial,
-            is StoreReadResponse.Loading -> {
+        return when (result) {
+            is Result.Loading -> {
                 ContentUiState(
                     items = accumulatedFlow.value,
                     isLoading = true,
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false,
                 )
             }
-            is StoreReadResponse.Data -> {
-                val newItems = response.value.orEmpty()
-                // Accumulate items for pagination
+            is Result.Success -> {
+                val newItems = result.data
                 if (newItems.isNotEmpty()) {
                     accumulatedFlow.update { current ->
                         if (page == 1) newItems else (current + newItems).distinctBy { it.id }
@@ -157,33 +152,29 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
                     endReached = newItems.isEmpty(),
                     page = page,
                     category = category,
-                    isFromCache = response.isFromCache,
                 )
             }
-            is StoreReadResponse.Error -> {
-                _errorMessage.update { response.errorMessageOrNull() }
+            is Result.Error -> {
+                _errorMessage.update { toUserFriendlyMessage(result) }
                 ContentUiState(
                     items = accumulatedFlow.value,
                     isLoading = false,
                     endReached = false,
                     page = page,
                     category = category,
-                    isFromCache = false,
-                )
-            }
-            is StoreReadResponse.NoNewData -> {
-                // Keep current state, data hasn't changed
-                ContentUiState(
-                    items = accumulatedFlow.value,
-                    isLoading = false,
-                    endReached = false,
-                    page = page,
-                    category = category,
-                    isFromCache = true,
                 )
             }
         }
     }
+
+    private fun toUserFriendlyMessage(error: Result.Error): String =
+        when (val ex = error.exception) {
+            is NetworkError.RateLimited -> "Too many requests. Please wait and try again."
+            is NetworkError.Unauthorized -> "Session expired. Please sign in again."
+            is NetworkError.ConnectionError -> "No internet connection. Please check your network."
+            is NetworkError.ServerError -> "Server error (${ex.code}). Please try again later."
+            else -> error.message ?: "Something went wrong. Please try again."
+        }
 
     /** Loads the next page of items for the specified category. */
     fun appendItems(category: MovieListCategory) {
@@ -198,28 +189,24 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
     /** Forces a refresh of items for the specified category. */
     fun refresh(category: MovieListCategory) {
         viewModelScope.launch {
-            try {
-                // Reset accumulated items and page
-                when (category) {
-                    MovieListCategory.NOW_PLAYING -> {
-                        _nowPlayingAccumulated.value = emptyList()
-                        _nowPlayingPage.value = 1
-                    }
-                    MovieListCategory.POPULAR -> {
-                        _popularAccumulated.value = emptyList()
-                        _popularPage.value = 1
-                    }
-                    MovieListCategory.TOP_RATED -> {
-                        _topRatedAccumulated.value = emptyList()
-                        _topRatedPage.value = 1
-                    }
-                    MovieListCategory.UPCOMING -> {
-                        _upcomingAccumulated.value = emptyList()
-                        _upcomingPage.value = 1
-                    }
+            // Reset accumulated items and page — triggers flatMapLatest to re-fetch
+            when (category) {
+                MovieListCategory.NOW_PLAYING -> {
+                    _nowPlayingAccumulated.value = emptyList()
+                    _nowPlayingPage.value = 1
                 }
-            } catch (e: Exception) {
-                _errorMessage.update { e.message ?: "Refresh failed" }
+                MovieListCategory.POPULAR -> {
+                    _popularAccumulated.value = emptyList()
+                    _popularPage.value = 1
+                }
+                MovieListCategory.TOP_RATED -> {
+                    _topRatedAccumulated.value = emptyList()
+                    _topRatedPage.value = 1
+                }
+                MovieListCategory.UPCOMING -> {
+                    _upcomingAccumulated.value = emptyList()
+                    _upcomingPage.value = 1
+                }
             }
         }
     }
@@ -230,14 +217,13 @@ class MoviesViewModel @Inject constructor(private val contentRepository: Content
 }
 
 /**
- * UI state for content lists with offline-first support.
+ * UI state for content lists.
  *
  * @param items The list of content items to display
  * @param isLoading Whether data is currently being fetched
  * @param endReached Whether all pages have been loaded
  * @param page The current page number
  * @param category The movie list category
- * @param isFromCache Whether the current data is from cache (stale data indicator)
  */
 @Immutable
 data class ContentUiState(
@@ -246,16 +232,14 @@ data class ContentUiState(
     val endReached: Boolean,
     val page: Int,
     val category: MovieListCategory,
-    val isFromCache: Boolean = false,
 ) {
     constructor(
         category: MovieListCategory
     ) : this(
         items = emptyList(),
-        isLoading = true, // Start with loading state
+        isLoading = true,
         endReached = false,
         page = 1,
         category = category,
-        isFromCache = false,
     )
 }

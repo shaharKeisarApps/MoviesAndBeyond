@@ -142,6 +142,19 @@ build-logic/            Custom Gradle convention plugins
 
 3. Open in Android Studio, sync Gradle, and run.
 
+### Release Signing (Optional)
+
+For local release builds, set these environment variables:
+
+```bash
+export KEYSTORE_PATH=/path/to/your/keystore.jks
+export KEYSTORE_PASSWORD=your_store_password
+export KEY_ALIAS=your_key_alias
+export KEY_PASSWORD=your_key_password
+```
+
+Without these variables, release builds fall back to the debug signing key. For CI, add the same variables as GitHub Actions secrets.
+
 ## Code Quality & CI
 
 The project enforces code quality on every push via [GitHub Actions](.github/workflows/build.yml):
@@ -155,6 +168,23 @@ The project enforces code quality on every push via [GitHub Actions](.github/wor
 # Run the full quality suite locally
 ./gradlew spotlessCheck detekt lintDebug test
 ```
+
+## Architecture Decision Records
+
+Key architectural decisions are documented in [`docs/adr/`](docs/adr/):
+
+| ADR | Decision |
+|-----|----------|
+| [001](docs/adr/001-multi-module-architecture.md) | Multi-module architecture with convention plugins |
+| [002](docs/adr/002-store5-offline-first-caching.md) | Store5 for offline-first caching |
+| [003](docs/adr/003-hilt-dependency-injection.md) | Hilt for dependency injection |
+| [004](docs/adr/004-compose-navigation.md) | Type-safe Compose Navigation |
+| [005](docs/adr/005-haze-blur-effects.md) | Haze for frosted-glass blur effects |
+| [006](docs/adr/006-dual-networking-stack.md) | Dual networking stack (Retrofit + Ktor) |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on setting up the project, running quality checks, and submitting pull requests.
 
 ## License & Attribution
 
