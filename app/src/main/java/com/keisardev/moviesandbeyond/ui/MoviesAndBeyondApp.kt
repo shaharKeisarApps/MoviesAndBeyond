@@ -23,6 +23,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.keisardev.moviesandbeyond.core.ui.AnimatedNavigationItem
 import com.keisardev.moviesandbeyond.core.ui.FloatingNavigationBar
@@ -184,7 +185,11 @@ fun MoviesAndBeyondNavigationBar(
     onNavigateToDestination: (MoviesAndBeyondDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FloatingNavigationBar(hazeState = hazeState, modifier = modifier) {
+    FloatingNavigationBar(
+        hazeState = hazeState,
+        modifier = modifier,
+        containerColor = Color.Transparent,
+    ) {
         destinations.forEach { destination ->
             val selected = destination == selectedDestination
             AnimatedNavigationItem(

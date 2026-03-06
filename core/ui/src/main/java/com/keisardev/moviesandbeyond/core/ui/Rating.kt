@@ -14,6 +14,12 @@ import androidx.compose.ui.unit.dp
 
 private val starColor = Color(0xFFF2D349)
 
+/**
+ * Inline star rating display with score and vote count.
+ *
+ * @param rating The rating score (displayed as X.X/5)
+ * @param count Total number of votes
+ */
 @Composable
 fun Rating(rating: Double, count: Int) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {

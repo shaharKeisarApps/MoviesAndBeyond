@@ -13,12 +13,24 @@ android {
 
     defaultConfig {
         applicationId = "com.keisardev.moviesandbeyond"
-        versionCode = 2
-        versionName = "0.0.2"
+        versionCode = property("VERSION_CODE").toString().toInt()
+        versionName = property("VERSION_NAME").toString()
 
         vectorDrawables { useSupportLibrary = true }
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.keisardev.moviesandbeyond.HiltTestRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH")
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -31,7 +43,12 @@ android {
                 "proguard-rules.pro",
             )
             isDebuggable = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig =
+                if (System.getenv("KEYSTORE_PATH") != null) {
+                    signingConfigs.getByName("release")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
         }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
@@ -84,5 +101,7 @@ dependencies {
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
     testImplementation(libs.junit)
 }

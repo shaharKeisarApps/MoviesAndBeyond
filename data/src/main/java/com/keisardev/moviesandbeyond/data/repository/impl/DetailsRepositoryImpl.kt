@@ -1,6 +1,6 @@
 package com.keisardev.moviesandbeyond.data.repository.impl
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
@@ -11,36 +11,39 @@ import javax.inject.Inject
 import retrofit2.HttpException
 
 class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) : DetailsRepository {
-    override suspend fun getMovieDetails(id: Int): NetworkResponse<MovieDetails> {
+    override suspend fun getMovieDetails(id: Int): Result<MovieDetails> {
         return try {
-            val response = tmdbApi.getMovieDetails(id).asModel()
-            NetworkResponse.Success(response)
+            Result.Success(tmdbApi.getMovieDetails(id).asModel())
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
-            NetworkResponse.Error()
+            Result.Error(e, e.message)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
-    override suspend fun getTvShowDetails(id: Int): NetworkResponse<TvDetails> {
+    override suspend fun getTvShowDetails(id: Int): Result<TvDetails> {
         return try {
-            val response = tmdbApi.getTvShowDetails(id).asModel()
-            NetworkResponse.Success(response)
+            Result.Success(tmdbApi.getTvShowDetails(id).asModel())
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
-            NetworkResponse.Error()
+            Result.Error(e, e.message)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
-    override suspend fun getPersonDetails(id: Int): NetworkResponse<PersonDetails> {
+    override suspend fun getPersonDetails(id: Int): Result<PersonDetails> {
         return try {
-            val response = tmdbApi.getPersonDetails(id).asModel()
-            NetworkResponse.Success(response)
+            Result.Success(tmdbApi.getPersonDetails(id).asModel())
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
-            NetworkResponse.Error()
+            Result.Error(e, e.message)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 }

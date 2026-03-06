@@ -5,7 +5,7 @@ import com.keisardev.moviesandbeyond.core.local.database.dao.FavoriteContentDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
 import com.keisardev.moviesandbeyond.core.local.session.SessionManager
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.network.model.auth.DeleteSessionRequest
 import com.keisardev.moviesandbeyond.core.network.model.auth.LoginRequest
 import com.keisardev.moviesandbeyond.core.network.model.auth.SessionRequest
@@ -31,7 +31,7 @@ constructor(
 ) : AuthRepository {
     override val isLoggedIn = sessionManager.isLoggedIn
 
-    override suspend fun login(username: String, password: String): NetworkResponse<Unit> {
+    override suspend fun login(username: String, password: String): Result<Unit> {
         return try {
             val response = tmdbApi.createRequestToken()
             val loginRequest =
@@ -53,16 +53,18 @@ constructor(
 
             syncScheduler.scheduleLibrarySyncWork()
 
-            NetworkResponse.Success(Unit)
+            Result.Success(Unit)
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
             val errorMessage = getErrorMessage(e)
-            NetworkResponse.Error(errorMessage)
+            Result.Error(e, errorMessage)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 
-    override suspend fun logout(accountId: Int): NetworkResponse<Unit> {
+    override suspend fun logout(accountId: Int): Result<Unit> {
         return try {
             val sessionId = sessionManager.getSessionId()!!
             val deleteSessionRequest = DeleteSessionRequest(sessionId)
@@ -75,12 +77,14 @@ constructor(
             favoriteContentDao.deleteSyncedFavoriteItems()
             watchlistContentDao.deleteSyncedWatchlistItems()
 
-            NetworkResponse.Success(Unit)
+            Result.Success(Unit)
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
             val errorMessage = getErrorMessage(e)
-            NetworkResponse.Error(errorMessage)
+            Result.Error(e, errorMessage)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 }

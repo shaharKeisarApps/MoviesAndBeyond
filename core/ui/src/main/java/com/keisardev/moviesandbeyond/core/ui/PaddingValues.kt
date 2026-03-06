@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 
+/** Creates a new [PaddingValues] selectively copying edges from this instance (zeros the rest). */
 fun PaddingValues.copy(
     copyStart: Boolean = true,
     copyTop: Boolean = true,
@@ -24,6 +25,7 @@ fun PaddingValues.copy(
         bottom = if (copyBottom) calculateBottomPadding() else 0.dp,
     )
 
+/** Returns a new [PaddingValues] with each edge summed from both instances. */
 fun PaddingValues.plus(
     plus: PaddingValues,
     layoutDirection: LayoutDirection = LayoutDirection.Ltr,
@@ -36,6 +38,7 @@ fun PaddingValues.plus(
         bottom = calculateBottomPadding() + plus.calculateBottomPadding(),
     )
 
+/** Returns a new [PaddingValues] with each edge subtracted, clamped to zero. */
 fun PaddingValues.minus(
     other: PaddingValues,
     layoutDirection: LayoutDirection = LayoutDirection.Ltr,
@@ -51,6 +54,7 @@ fun PaddingValues.minus(
         bottom = (calculateBottomPadding() - other.calculateBottomPadding()).coerceAtLeast(0.dp),
     )
 
+/** Returns a new [PaddingValues] with each edge clamped to the maximum of the other. */
 fun PaddingValues.coerceAtMost(
     paddingValues: PaddingValues,
     layoutDirection: LayoutDirection = LayoutDirection.Ltr,

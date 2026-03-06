@@ -40,9 +40,6 @@ private val backdropImageOptions =
 private val profileImageOptions =
     ImageOptions(contentScale = ContentScale.Crop, requestSize = IntSize(185, 278))
 
-// Cache for backdrop images with different content scales to avoid recreation
-private val backdropImageOptionsCache = mutableMapOf<ContentScale, ImageOptions>()
-
 /**
  * Reusable image component for person/cast profile images. Uses CircularRevealPlugin for animated
  * reveal effect.
@@ -72,10 +69,19 @@ fun PersonImage(
             // Remember URL to prevent lambda recreation
             val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w300$imageUrl" }
 
+            val imageOptions =
+                if (contentDescription != null) {
+                    remember(contentDescription) {
+                        personImageOptions.copy(contentDescription = contentDescription)
+                    }
+                } else {
+                    personImageOptions
+                }
+
             LandscapistImage(
                 imageModel = { fullUrl },
                 modifier = Modifier.fillMaxSize(),
-                imageOptions = personImageOptions,
+                imageOptions = imageOptions,
                 component = rememberImageComponent { +CircularRevealPlugin(duration = 350) },
             )
         }
@@ -155,7 +161,6 @@ fun TmdbImage(
  * @param contentDescription Accessibility description for the image
  * @param modifier Modifier for the image container
  */
-@Suppress("UnusedParameter") // contentDescription kept for API consistency and future accessibility
 @Composable
 fun TmdbListImage(
     imageUrl: String,
@@ -183,9 +188,18 @@ fun TmdbListImage(
             // No CrossfadePlugin - cached images display instantly without animation delay
         }
 
+        val imageOptions =
+            if (contentDescription != null) {
+                remember(contentDescription) {
+                    listImageOptions.copy(contentDescription = contentDescription)
+                }
+            } else {
+                listImageOptions
+            }
+
         LandscapistImage(
             imageModel = { fullUrl },
-            imageOptions = listImageOptions,
+            imageOptions = imageOptions,
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = {
@@ -210,7 +224,6 @@ fun TmdbListImage(
  * @param contentScale How the image should be scaled (default: Crop)
  * @param contentDescription Accessibility description for the image
  */
-@Suppress("UnusedParameter")
 @Composable
 fun TmdbBackdropImage(
     imageUrl: String,
@@ -238,12 +251,13 @@ fun TmdbBackdropImage(
             // CrossfadePlugin removed - cached images display instantly without flash/re-render
         }
 
-        // PERFORMANCE: Cache ImageOptions per contentScale to avoid recreation on recomposition
+        // PERFORMANCE: Cache ImageOptions per contentScale, include contentDescription
         val imageOptions =
-            remember(contentScale) {
-                backdropImageOptionsCache.getOrPut(contentScale) {
-                    backdropImageOptions.copy(contentScale = contentScale)
-                }
+            remember(contentScale, contentDescription) {
+                backdropImageOptions.copy(
+                    contentScale = contentScale,
+                    contentDescription = contentDescription,
+                )
             }
 
         LandscapistImage(
@@ -272,7 +286,6 @@ fun TmdbBackdropImage(
  * @param modifier Modifier for the image container
  * @param contentDescription Accessibility description for the image
  */
-@Suppress("UnusedParameter")
 @Composable
 fun TmdbProfileImage(
     imageUrl: String,
@@ -292,9 +305,18 @@ fun TmdbProfileImage(
             +CircularRevealPlugin(duration = 250)
         }
 
+        val imageOptions =
+            if (contentDescription != null) {
+                remember(contentDescription) {
+                    profileImageOptions.copy(contentDescription = contentDescription)
+                }
+            } else {
+                profileImageOptions
+            }
+
         LandscapistImage(
             imageModel = { fullUrl },
-            imageOptions = profileImageOptions,
+            imageOptions = imageOptions,
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = { Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) },

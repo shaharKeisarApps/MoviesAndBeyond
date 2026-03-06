@@ -12,6 +12,12 @@ private const val creditsNavigationRoute = "credits"
 internal const val idNavigationArgument = "id"
 private const val detailsNavigationRouteWithArg = "$detailsNavigationRoute/{$idNavigationArgument}"
 
+/**
+ * Registers the details nested navigation graph (detail + credits screens).
+ *
+ * The ViewModel is scoped to the nested graph so it is shared between the detail and credits
+ * screens.
+ */
 fun NavGraphBuilder.detailsScreen(navController: NavController, navigateToAuth: () -> Unit) {
     navigation(route = detailsNavigationRouteWithArg, startDestination = detailsNavigationRoute) {
         composable(route = detailsNavigationRoute) { backStackEntry ->
@@ -46,6 +52,11 @@ fun NavGraphBuilder.detailsScreen(navController: NavController, navigateToAuth: 
     }
 }
 
+/**
+ * Navigates to the detail screen for a movie, TV show, or person.
+ *
+ * @param id Encoded detail identifier in the format `"tmdbId,MEDIA_TYPE"`
+ */
 fun NavController.navigateToDetails(id: String) {
     navigate("$detailsNavigationRoute/$id")
 }

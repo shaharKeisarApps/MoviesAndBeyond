@@ -14,6 +14,7 @@ private const val youNavigationRoute = "you"
 private const val libraryItemsNavigationRoute = "library_items"
 const val libraryItemTypeNavigationArgument = "type"
 
+/** Registers the "You" nested navigation graph (profile + library items screens). */
 fun NavGraphBuilder.youScreen(
     navController: NavController,
     navigateToAuth: () -> Unit,
@@ -42,10 +43,12 @@ fun NavGraphBuilder.youScreen(
     }
 }
 
+/** Navigates to the "You" profile tab, applying the given [navOptions] for bottom bar behavior. */
 fun NavController.navigateToYou(navOptions: NavOptions) {
     navigate(youNavigationRoute, navOptions)
 }
 
+/** Navigates to the library items list for the given [type] (FAVORITE or WATCHLIST). */
 fun NavController.navigateToLibraryItem(type: String) {
     navigate("$libraryItemsNavigationRoute/$type")
 }

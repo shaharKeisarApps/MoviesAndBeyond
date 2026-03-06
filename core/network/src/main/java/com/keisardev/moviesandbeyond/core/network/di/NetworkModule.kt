@@ -1,6 +1,7 @@
 package com.keisardev.moviesandbeyond.core.network.di
 
 import com.keisardev.moviesandbeyond.core.network.BuildConfig
+import com.keisardev.moviesandbeyond.core.network.error.HttpErrorInterceptor
 import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import dagger.Module
 import dagger.Provides
@@ -41,6 +42,7 @@ internal object NetworkModule {
                         chain.proceed(newRequest)
                     }
                 )
+                .addInterceptor(HttpErrorInterceptor())
                 .build()
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)

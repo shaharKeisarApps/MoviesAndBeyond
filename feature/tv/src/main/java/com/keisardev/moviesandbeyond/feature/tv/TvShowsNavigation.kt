@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 
 private const val tvShowsNavigationRoute = "tv_shows"
 
+/** Registers the TV shows nested navigation graph (feed + category items screens). */
 fun NavGraphBuilder.tvShowsScreen(
     navController: NavController,
     navigateToDetails: (String) -> Unit,
@@ -50,6 +51,7 @@ internal object TvShowsScreenRoutes {
     const val ITEMS = "tv_shows_items"
 }
 
+/** Navigates to the TV shows feed tab, applying the given [navOptions] for bottom bar behavior. */
 fun NavController.navigateToTvShows(navOptions: NavOptions) {
     navigate(tvShowsNavigationRoute, navOptions)
 }

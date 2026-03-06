@@ -8,6 +8,12 @@ import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContent
 import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object for the user's watchlist movies and TV shows.
+ *
+ * Supports offline-first sync via [SyncStatus]: items can be LOCAL_ONLY, PENDING_PUSH,
+ * PENDING_DELETE, or SYNCED. Queries exclude PENDING_DELETE items from user-facing results.
+ */
 @Dao
 interface WatchlistContentDao {
 

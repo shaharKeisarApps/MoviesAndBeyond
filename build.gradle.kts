@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.spotless)
     alias(libs.plugins.detekt)
+    jacoco
 }
 
 // Configure Spotless for code formatting
@@ -66,6 +67,146 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         txt.required.set(false)
         sarif.required.set(false)
         md.required.set(false)
+    }
+}
+
+// =============================================================================
+// JaCoCo Merged Coverage Report
+// =============================================================================
+
+val jacocoExcludes =
+    listOf(
+        "**/Hilt_*.*",
+        "**/*_HiltModules*.*",
+        "**/*_ComponentTreeDeps*.*",
+        "**/*_GeneratedInjector*.*",
+        "**/dagger/**",
+        "**/hilt_aggregated_deps/**",
+        "**/*_Factory.*",
+        "**/*_MembersInjector.*",
+        "**/BuildConfig.*",
+        "**/databinding/**",
+        "**/BR.*",
+        "**/*_Impl.*",
+        "**/*_Impl\$*.*",
+        "**/R.class",
+        "**/R\$*.class",
+        "**/Manifest*.*",
+        "**/*\$Lambda\$*.*",
+        "**/*Companion*.*",
+        "**/*\$\$serializer.*",
+        "**/*Directions*.*",
+        "**/*Args*.*",
+    )
+
+// Modules that apply the jacoco plugin (via the library convention plugin)
+val jacocoModules =
+    listOf(
+        ":core:local",
+        ":core:model",
+        ":core:network",
+        ":core:testing",
+        ":core:ui",
+        ":data",
+        ":feature:auth",
+        ":feature:details",
+        ":feature:movies",
+        ":feature:search",
+        ":feature:tv",
+        ":feature:you",
+        ":sync",
+    )
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "Verification"
+    description = "Merge JaCoCo coverage from all modules into a single report"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val classDirs = files()
+    val srcDirs = files()
+    val execDirs = files()
+
+    jacocoModules.forEach { modulePath ->
+        val moduleProject = project(modulePath)
+        classDirs.from(
+            fileTree(moduleProject.layout.buildDirectory.dir("intermediates/javac/debug")) {
+                exclude(jacocoExcludes)
+            },
+            fileTree(moduleProject.layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+                exclude(jacocoExcludes)
+            },
+        )
+        srcDirs.from(
+            files(
+                "${moduleProject.projectDir}/src/main/java",
+                "${moduleProject.projectDir}/src/main/kotlin",
+            )
+        )
+        execDirs.from(
+            fileTree(moduleProject.layout.buildDirectory) {
+                include(
+                    "jacoco/testDebugUnitTest.exec",
+                    "outputs/unit_test_code_coverage/debugUnitTest/**/*.exec",
+                )
+            }
+        )
+    }
+
+    classDirectories.setFrom(classDirs)
+    sourceDirectories.setFrom(srcDirs)
+    executionData.setFrom(execDirs)
+
+    dependsOn(jacocoModules.map { "$it:testDebugUnitTest" })
+}
+
+// =============================================================================
+// JaCoCo Coverage Verification
+// =============================================================================
+
+tasks.register<JacocoCoverageVerification>("jacocoCoverageVerification") {
+    group = "Verification"
+    description = "Verify minimum code coverage thresholds per module tier"
+
+    dependsOn("jacocoTestReport")
+
+    // Coverage thresholds by module tier
+    val dataModuleThreshold = 0.80
+    val featureModuleThreshold = 0.70
+    val coreModuleThreshold = 0.60
+
+    jacocoModules.forEach { modulePath ->
+        val moduleProject = project(modulePath)
+        val threshold =
+            when {
+                modulePath.startsWith(":data") -> dataModuleThreshold
+                modulePath.startsWith(":feature:") -> featureModuleThreshold
+                modulePath.startsWith(":core:") -> coreModuleThreshold
+                else -> coreModuleThreshold
+            }
+
+        classDirectories.from(
+            fileTree(moduleProject.layout.buildDirectory.dir("intermediates/javac/debug")) {
+                exclude(jacocoExcludes)
+            },
+            fileTree(moduleProject.layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+                exclude(jacocoExcludes)
+            },
+        )
+        executionData.from(
+            fileTree(moduleProject.layout.buildDirectory) {
+                include(
+                    "jacoco/testDebugUnitTest.exec",
+                    "outputs/unit_test_code_coverage/debugUnitTest/**/*.exec",
+                )
+            }
+        )
+
+        violationRules { rule { limit { minimum = threshold.toBigDecimal() } } }
     }
 }
 

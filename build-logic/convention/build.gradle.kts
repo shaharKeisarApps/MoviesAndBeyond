@@ -41,5 +41,9 @@ gradlePlugin {
             id = "moviesandbeyond.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
+        register("androidJacoco") {
+            id = "moviesandbeyond.android.jacoco"
+            implementationClass = "AndroidJacocoConventionPlugin"
+        }
     }
 }

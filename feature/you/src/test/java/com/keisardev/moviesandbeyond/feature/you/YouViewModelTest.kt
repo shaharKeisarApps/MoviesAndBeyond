@@ -1,6 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.you
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
@@ -16,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -109,10 +109,10 @@ class YouViewModelTest {
             generateError(true)
         }
 
-        val errorResponse = authRepository.logout(0) as NetworkResponse.Error
         viewModel.logOut()
 
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        // ViewModel maps Result.Error to a user-friendly message
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()
@@ -126,10 +126,31 @@ class YouViewModelTest {
 
         authRepository.setAuthStatus(true)
         userRepository.generateError(true)
-        val errorResponse = userRepository.updateAccountDetails(0) as NetworkResponse.Error
         viewModel.onRefresh()
 
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        // ViewModel maps Result.Error to a user-friendly message
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
+
+        uiStateCollectJob.cancel()
+        loggedInCollectJob.cancel()
+    }
+
+    @Test
+    fun `test logout error then error shown clears message`() = runTest {
+        val uiStateCollectJob = launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
+        val loggedInCollectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.isLoggedIn.collect() }
+
+        with(authRepository) {
+            setAuthStatus(true)
+            generateError(true)
+        }
+        viewModel.logOut()
+
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
+
+        viewModel.onErrorShown()
+        assertNull(viewModel.uiState.value.errorMessage)
 
         uiStateCollectJob.cancel()
         loggedInCollectJob.cancel()

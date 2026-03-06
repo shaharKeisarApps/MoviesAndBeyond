@@ -1,6 +1,6 @@
 package com.keisardev.moviesandbeyond.data.testdoubles.repository
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
@@ -58,11 +58,11 @@ class TestUserRepository : UserRepository {
         _userData.update { it.copy(seedColor = seedColor) }
     }
 
-    override suspend fun updateAccountDetails(accountId: Int): NetworkResponse<Unit> {
+    override suspend fun updateAccountDetails(accountId: Int): Result<Unit> {
         return if (generateError) {
-            NetworkResponse.Error()
+            Result.Error(RuntimeException("Update account details failed"))
         } else {
-            NetworkResponse.Success(Unit)
+            Result.Success(Unit)
         }
     }
 

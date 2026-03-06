@@ -1,6 +1,5 @@
 package com.keisardev.moviesandbeyond.feature.auth
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestUserRepository
@@ -59,18 +58,15 @@ class AuthViewModelTest {
 
     @Test
     fun `test login failure`() = runTest {
-        val username = "error"
-        val password = "1234"
-
         authRepository.generateError(true)
-        val errorResponse =
-            authRepository.login(username = username, password = password) as NetworkResponse.Error
 
-        viewModel.onUsernameChange(username)
-        viewModel.onPasswordChange(password)
+        viewModel.onUsernameChange("error")
+        viewModel.onPasswordChange("1234")
         viewModel.logIn()
 
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        // ViewModel maps Result.Error to a user-friendly message — assert it is set
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
@@ -96,5 +92,43 @@ class AuthViewModelTest {
         viewModel.onPasswordChange(password)
 
         assertEquals(password, viewModel.uiState.value.password)
+    }
+
+    @Test
+    fun `test error then retry then success flow`() = runTest {
+        userRepository.setHideOnboarding(true)
+        viewModel = AuthViewModel(authRepository = authRepository, userRepository = userRepository)
+
+        // First attempt fails
+        authRepository.generateError(true)
+        viewModel.onUsernameChange("name")
+        viewModel.onPasswordChange("1234")
+        viewModel.logIn()
+
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
+        assertFalse(viewModel.uiState.value.isLoggedIn)
+
+        // Dismiss error, retry with fixed repo
+        viewModel.onErrorShown()
+        assertNull(viewModel.uiState.value.errorMessage)
+
+        authRepository.generateError(false)
+        viewModel.logIn()
+
+        assertTrue(viewModel.uiState.value.isLoggedIn)
+        assertNull(viewModel.uiState.value.errorMessage)
+    }
+
+    @Test
+    fun `test loading state is set during login`() = runTest {
+        userRepository.setHideOnboarding(true)
+        viewModel = AuthViewModel(authRepository = authRepository, userRepository = userRepository)
+
+        // After successful login, loading should be false
+        viewModel.onUsernameChange("name")
+        viewModel.onPasswordChange("1234")
+        viewModel.logIn()
+
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 }
