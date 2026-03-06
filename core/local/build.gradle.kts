@@ -16,9 +16,7 @@ android {
         consumerProguardFiles("consumer-proguard-rules.pro")
     }
 
-    sourceSets {
-        getByName("androidTest").assets.srcDirs("$projectDir/schemas")
-    }
+    sourceSets { getByName("androidTest").assets.srcDirs("$projectDir/schemas") }
 }
 
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
