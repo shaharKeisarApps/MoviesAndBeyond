@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
@@ -136,7 +136,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
@@ -171,7 +171,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
@@ -218,7 +218,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
