@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import org.junit.Rule
@@ -32,7 +33,7 @@ class FeedScreenTest {
         }
 
         composeTestRule.onNodeWithText(nowPlayingText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(popularText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(popularText).performScrollTo().assertIsDisplayed()
     }
 
     @Test

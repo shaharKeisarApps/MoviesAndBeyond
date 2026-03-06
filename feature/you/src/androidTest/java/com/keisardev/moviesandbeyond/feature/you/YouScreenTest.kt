@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
@@ -96,10 +97,10 @@ class YouScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(favoritesText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(watchlistText).assertIsDisplayed()
-        composeTestRule.onNodeWithText("7").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12").assertIsDisplayed()
+        composeTestRule.onNodeWithText(favoritesText).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText(watchlistText).performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("7").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("12").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -129,6 +130,6 @@ class YouScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(logOutText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(logOutText).performScrollTo().assertIsDisplayed()
     }
 }
