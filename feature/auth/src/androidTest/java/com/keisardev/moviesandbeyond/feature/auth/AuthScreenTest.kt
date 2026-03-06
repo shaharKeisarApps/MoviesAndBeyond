@@ -52,6 +52,10 @@ class AuthScreenTest {
             )
         }
 
+        // Advance past stagger delays so AnimatedVisibility elements appear
+        composeTestRule.mainClock.advanceTimeBy(1000)
+        composeTestRule.waitForIdle()
+
         composeTestRule.onNode(hasContentDescription(authIndicatorDescription)).assertIsDisplayed()
 
         composeTestRule.onNode(hasContentDescription(signInText)).assertIsNotDisplayed()
@@ -93,6 +97,10 @@ class AuthScreenTest {
                 onContinueWithoutSignInClick = {},
             )
         }
+
+        // Advance past stagger delays so AnimatedVisibility elements appear
+        composeTestRule.mainClock.advanceTimeBy(1000)
+        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText(continueText).assertIsDisplayed()
     }

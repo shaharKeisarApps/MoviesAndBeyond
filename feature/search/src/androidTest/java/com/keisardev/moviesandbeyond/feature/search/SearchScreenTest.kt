@@ -1,13 +1,18 @@
 package com.keisardev.moviesandbeyond.feature.search
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.keisardev.moviesandbeyond.core.model.SearchItem
+import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 class SearchScreenTest {
 
     @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -17,15 +22,19 @@ class SearchScreenTest {
         val searchHint = composeTestRule.activity.getString(R.string.search_hint)
 
         composeTestRule.setContent {
-            SearchScreen(
-                searchQuery = "",
-                errorMessage = null,
-                searchSuggestions = emptyList(),
-                onSearchQueryChange = {},
-                onBack = {},
-                onSearchResultClick = {},
-                onErrorShown = {},
-            )
+            CompositionLocalProvider(
+                LocalWindowSizeClass provides calculateWindowSizeClass(composeTestRule.activity)
+            ) {
+                SearchScreen(
+                    searchQuery = "",
+                    errorMessage = null,
+                    searchSuggestions = emptyList(),
+                    onSearchQueryChange = {},
+                    onBack = {},
+                    onSearchResultClick = {},
+                    onErrorShown = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
@@ -36,15 +45,19 @@ class SearchScreenTest {
         val testItem = SearchItem(id = 1, name = "Inception", mediaType = "movie", imagePath = "")
 
         composeTestRule.setContent {
-            SearchScreen(
-                searchQuery = "inc",
-                errorMessage = null,
-                searchSuggestions = listOf(testItem),
-                onSearchQueryChange = {},
-                onBack = {},
-                onSearchResultClick = {},
-                onErrorShown = {},
-            )
+            CompositionLocalProvider(
+                LocalWindowSizeClass provides calculateWindowSizeClass(composeTestRule.activity)
+            ) {
+                SearchScreen(
+                    searchQuery = "inc",
+                    errorMessage = null,
+                    searchSuggestions = listOf(testItem),
+                    onSearchQueryChange = {},
+                    onBack = {},
+                    onSearchResultClick = {},
+                    onErrorShown = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithText("Inception").assertIsDisplayed()
@@ -55,15 +68,19 @@ class SearchScreenTest {
         val errorMessage = "Search failed"
 
         composeTestRule.setContent {
-            SearchScreen(
-                searchQuery = "test",
-                errorMessage = errorMessage,
-                searchSuggestions = emptyList(),
-                onSearchQueryChange = {},
-                onBack = {},
-                onSearchResultClick = {},
-                onErrorShown = {},
-            )
+            CompositionLocalProvider(
+                LocalWindowSizeClass provides calculateWindowSizeClass(composeTestRule.activity)
+            ) {
+                SearchScreen(
+                    searchQuery = "test",
+                    errorMessage = errorMessage,
+                    searchSuggestions = emptyList(),
+                    onSearchQueryChange = {},
+                    onBack = {},
+                    onSearchResultClick = {},
+                    onErrorShown = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
@@ -74,15 +91,19 @@ class SearchScreenTest {
         val noResultsTitle = composeTestRule.activity.getString(R.string.no_results_title)
 
         composeTestRule.setContent {
-            SearchScreen(
-                searchQuery = "xyznonexistent",
-                errorMessage = null,
-                searchSuggestions = emptyList(),
-                onSearchQueryChange = {},
-                onBack = {},
-                onSearchResultClick = {},
-                onErrorShown = {},
-            )
+            CompositionLocalProvider(
+                LocalWindowSizeClass provides calculateWindowSizeClass(composeTestRule.activity)
+            ) {
+                SearchScreen(
+                    searchQuery = "xyznonexistent",
+                    errorMessage = null,
+                    searchSuggestions = emptyList(),
+                    onSearchQueryChange = {},
+                    onBack = {},
+                    onSearchResultClick = {},
+                    onErrorShown = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithText(noResultsTitle).assertIsDisplayed()
