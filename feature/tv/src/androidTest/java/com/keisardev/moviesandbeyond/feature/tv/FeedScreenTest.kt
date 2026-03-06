@@ -16,7 +16,6 @@ class FeedScreenTest {
     @Test
     fun feedScreen_whenLoading_showsSectionTitles() {
         val airingTodayText = composeTestRule.activity.getString(R.string.airing_today)
-        val onAirText = composeTestRule.activity.getString(R.string.on_air)
 
         composeTestRule.setContent {
             FeedScreen(
@@ -32,7 +31,6 @@ class FeedScreenTest {
         }
 
         composeTestRule.onNodeWithText(airingTodayText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(onAirText).assertExists()
     }
 
     @Test

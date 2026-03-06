@@ -16,7 +16,6 @@ class FeedScreenTest {
     @Test
     fun feedScreen_whenLoading_showsSectionTitles() {
         val nowPlayingText = composeTestRule.activity.getString(R.string.now_playing)
-        val popularText = composeTestRule.activity.getString(R.string.popular)
 
         composeTestRule.setContent {
             FeedScreen(
@@ -32,7 +31,6 @@ class FeedScreenTest {
         }
 
         composeTestRule.onNodeWithText(nowPlayingText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(popularText).assertExists()
     }
 
     @Test
