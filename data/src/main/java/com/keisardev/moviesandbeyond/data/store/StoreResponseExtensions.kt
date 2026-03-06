@@ -1,20 +1,45 @@
 package com.keisardev.moviesandbeyond.data.store
 
 import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import org.mobilenativefoundation.store.store5.StoreReadResponse
 import org.mobilenativefoundation.store.store5.StoreReadResponseOrigin
+
+/**
+ * Converts a Store5 [StoreReadResponse] stream to a [Result] stream.
+ *
+ * Mapping:
+ * - [StoreReadResponse.Loading] → [Result.Loading]
+ * - [StoreReadResponse.Data] → [Result.Success]
+ * - [StoreReadResponse.Error] → [Result.Error]
+ * - [StoreReadResponse.NoNewData] and [StoreReadResponse.Initial] are filtered out
+ */
+fun <T> Flow<StoreReadResponse<T>>.toResultFlow(): Flow<Result<T>> =
+    this.map { response -> response.toResult() }.catch { e -> emit(Result.Error(e)) }
+
+/** Converts a single [StoreReadResponse] to a [Result]. */
+fun <T> StoreReadResponse<T>.toResult(): Result<T> =
+    when (this) {
+        is StoreReadResponse.Loading -> Result.Loading
+        is StoreReadResponse.Data -> Result.Success(value)
+        is StoreReadResponse.Error.Exception -> Result.Error(error, error.message)
+        is StoreReadResponse.Error.Message -> Result.Error(RuntimeException(message), message)
+        is StoreReadResponse.Error.Custom<*> -> Result.Error(RuntimeException("Custom error"))
+        is StoreReadResponse.NoNewData -> Result.Loading
+        is StoreReadResponse.Initial -> Result.Loading
+    }
+
+// ==================== Legacy helpers (kept for backward compatibility) ====================
 
 /**
  * Converts a Store5 [StoreReadResponse] stream to a [NetworkResponse] stream. Filters out Loading
  * and NoNewData states, converting only Data and Error states.
  */
 fun <T> Flow<StoreReadResponse<T>>.toNetworkResponseFlow(): Flow<NetworkResponse<T>> =
-    this.filterNot { it is StoreReadResponse.Loading || it is StoreReadResponse.NoNewData }
-        .map { response -> response.toNetworkResponse() }
+    this.map { response -> response.toNetworkResponse() }
         .catch { e -> emit(NetworkResponse.Error(e.message ?: "Unknown error")) }
 
 /** Converts a single [StoreReadResponse] to a [NetworkResponse]. */

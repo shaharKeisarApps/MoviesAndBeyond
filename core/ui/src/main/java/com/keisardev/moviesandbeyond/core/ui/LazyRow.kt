@@ -17,6 +17,12 @@ import androidx.compose.ui.unit.dp
 import com.keisardev.moviesandbeyond.core.ui.loading.ShimmerRow
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 
+/**
+ * Horizontal content section with a header and a paginated [LazyRow].
+ *
+ * Shows a shimmer placeholder while items are loading. When [pagingEnabled] is true, automatically
+ * triggers [appendItems] when the user scrolls to the end of the row.
+ */
 @Composable
 fun LazyRowContentSection(
     modifier: Modifier = Modifier,

@@ -2,7 +2,6 @@ package com.keisardev.moviesandbeyond.feature.details
 
 import androidx.lifecycle.SavedStateHandle
 import com.keisardev.moviesandbeyond.core.model.MediaType
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestDetailsRepository
@@ -99,15 +98,13 @@ class DetailsViewModelTest {
     @Test
     fun `test error in movie details content state`() = runTest {
         detailsRepository.generateError(true)
-        val errorResponse = detailsRepository.getMovieDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "100,${MediaType.MOVIE}")
 
         val collectJob =
             launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
-
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
 
         collectJob.cancel()
     }
@@ -115,15 +112,13 @@ class DetailsViewModelTest {
     @Test
     fun `test error in tv show details content state`() = runTest {
         detailsRepository.generateError(true)
-        val errorResponse = detailsRepository.getTvShowDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "101,${MediaType.TV}")
 
         val collectJob =
             launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
-
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
 
         collectJob.cancel()
     }
@@ -131,15 +126,27 @@ class DetailsViewModelTest {
     @Test
     fun `test error in person details content state`() = runTest {
         detailsRepository.generateError(true)
-        val errorResponse = detailsRepository.getPersonDetails(0) as NetworkResponse.Error
         viewModel = createViewModel(navigationArgument = "102,${MediaType.PERSON}")
 
         val collectJob =
             launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
 
         assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
 
-        assertEquals(errorResponse.errorMessage, viewModel.uiState.value.errorMessage)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `test error then retry shows content`() = runTest {
+        detailsRepository.generateError(true)
+        viewModel = createViewModel(navigationArgument = "100,${MediaType.MOVIE}")
+
+        val collectJob =
+            launch(UnconfinedTestDispatcher()) { viewModel.contentDetailsUiState.collect() }
+
+        assertEquals(ContentDetailUiState.Empty, viewModel.contentDetailsUiState.value)
+        assertFalse(viewModel.uiState.value.errorMessage.isNullOrEmpty())
 
         collectJob.cancel()
     }

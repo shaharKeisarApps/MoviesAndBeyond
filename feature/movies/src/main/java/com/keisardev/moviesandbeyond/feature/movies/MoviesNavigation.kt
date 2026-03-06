@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 
 const val moviesNavigationRoute = "movies"
 
+/** Registers the movies nested navigation graph (feed + category items screens). */
 fun NavGraphBuilder.moviesScreen(
     navController: NavController,
     navigateToDetails: (String) -> Unit,
@@ -50,6 +51,7 @@ internal object MoviesScreenRoutes {
     const val ITEMS = "movies_items"
 }
 
+/** Navigates to the movies feed tab, applying the given [navOptions] for bottom bar behavior. */
 fun NavController.navigateToMovies(navOptions: NavOptions) {
     navigate(moviesNavigationRoute, navOptions)
 }

@@ -2,7 +2,7 @@ package com.keisardev.moviesandbeyond.data.repository.impl
 
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
@@ -43,17 +43,18 @@ constructor(
         userPreferencesDataStore.setSeedColorPreference(seedColor)
     }
 
-    override suspend fun updateAccountDetails(accountId: Int): NetworkResponse<Unit> {
+    override suspend fun updateAccountDetails(accountId: Int): Result<Unit> {
         return try {
             val accountDetails = tmdbApi.getAccountDetailsWithId(accountId).asEntity()
             accountDetailsDao.addAccountDetails(accountDetails)
             userPreferencesDataStore.setAdultResultPreference(accountDetails.includeAdult)
-
-            NetworkResponse.Success(Unit)
+            Result.Success(Unit)
         } catch (e: IOException) {
-            NetworkResponse.Error()
+            Result.Error(e)
         } catch (e: HttpException) {
-            NetworkResponse.Error()
+            Result.Error(e, e.message)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 

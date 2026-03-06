@@ -288,6 +288,9 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
     // Use actual status bar height for the scrim
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
+    // M3 scrim color for status bar overlay
+    val scrimColor = MaterialTheme.colorScheme.scrim
+
     // Cache the content gradient brush — only recreated when background color changes
     val bgColor = MaterialTheme.colorScheme.background
     val contentGradient =
@@ -328,7 +331,7 @@ private fun BackdropImageSection(path: String, scrollValue: Float, modifier: Mod
                         brush =
                             Brush.verticalGradient(
                                 colors =
-                                    listOf(Color.Black.copy(alpha = scrimAlpha), Color.Transparent)
+                                    listOf(scrimColor.copy(alpha = scrimAlpha), Color.Transparent)
                             )
                     )
                 }
@@ -605,6 +608,7 @@ private fun CastItemCard(
             TmdbProfileImage(
                 imageUrl = imagePath,
                 modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape),
+                contentDescription = name,
             )
         } else {
             // M3 fallback avatar with initial letter

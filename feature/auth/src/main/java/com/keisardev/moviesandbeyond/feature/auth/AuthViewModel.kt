@@ -1,11 +1,13 @@
 package com.keisardev.moviesandbeyond.feature.auth
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the TMDB authentication screen.
+ *
+ * Manages login form state, communicates with [AuthRepository] for credential validation, and
+ * handles first-launch onboarding dismissal.
+ */
 @HiltViewModel
 class AuthViewModel
 @Inject
@@ -25,6 +33,8 @@ constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
+
+    /** The current authentication UI state (form fields, loading, errors). */
     val uiState = _uiState.asStateFlow()
 
     var hideOnboarding: Boolean? by mutableStateOf(null)
@@ -39,13 +49,13 @@ constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val response =
+            val result =
                 authRepository.login(
                     username = _uiState.value.username,
                     password = _uiState.value.password,
                 )
-            when (response) {
-                is NetworkResponse.Success -> {
+            when (result) {
+                is Result.Success -> {
                     if (hideOnboarding == false) {
                         /**
                          * User has opened app for first time. This will recompose the NavHost and
@@ -53,15 +63,16 @@ constructor(
                          */
                         setHideOnboarding()
                     } else {
-                        _uiState.update { it.copy(isLoggedIn = true) }
+                        _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
                     }
                 }
 
-                is NetworkResponse.Error -> {
-                    _uiState.update {
-                        it.copy(isLoading = false, errorMessage = response.errorMessage)
-                    }
+                is Result.Error -> {
+                    val message = toUserFriendlyMessage(result)
+                    _uiState.update { it.copy(isLoading = false, errorMessage = message) }
                 }
+
+                is Result.Loading -> Unit
             }
         }
     }
@@ -81,8 +92,18 @@ constructor(
     fun onPasswordChange(password: String) {
         _uiState.update { it.copy(password = password) }
     }
+
+    private fun toUserFriendlyMessage(error: Result.Error): String =
+        when (val ex = error.exception) {
+            is NetworkError.Unauthorized -> "Invalid username or password."
+            is NetworkError.RateLimited -> "Too many login attempts. Please wait and try again."
+            is NetworkError.ConnectionError -> "No internet connection. Please check your network."
+            is NetworkError.ServerError -> "Server error (${ex.code}). Please try again later."
+            else -> error.message ?: "Login failed. Please try again."
+        }
 }
 
+@Immutable
 data class AuthUiState(
     val username: String = "",
     val password: String = "",

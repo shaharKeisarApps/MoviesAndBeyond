@@ -1,39 +1,26 @@
 package com.keisardev.moviesandbeyond.data.repository
 
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
 import kotlinx.coroutines.flow.Flow
-import org.mobilenativefoundation.store.store5.StoreReadResponse
 
+/**
+ * Repository for browsing movie and TV show listings from TMDB.
+ *
+ * Provides offline-first content observation via Store5 caching. Consumers observe [Flow]s that
+ * emit cached data immediately and then fresh data from the network.
+ */
 interface ContentRepository {
-    // ==================== Legacy API (Deprecated) ====================
-    // These methods are kept for backward compatibility during migration.
-    // New code should use the Store5-based methods below.
-
-    @Deprecated("Use observeMovieItems instead for offline-first support")
-    suspend fun getMovieItems(
-        page: Int,
-        category: MovieListCategory,
-    ): NetworkResponse<List<ContentItem>>
-
-    @Deprecated("Use observeTvShowItems instead for offline-first support")
-    suspend fun getTvShowItems(
-        page: Int,
-        category: TvShowListCategory,
-    ): NetworkResponse<List<ContentItem>>
-
-    // ==================== Store5 API (Offline-First) ====================
-
     /**
      * Observes movie items for a specific category and page with offline-first caching.
      *
      * Flow emissions:
-     * - [StoreReadResponse.Loading] while fetching
-     * - [StoreReadResponse.Data] with cached data (if available)
-     * - [StoreReadResponse.Data] with fresh data (from network)
-     * - [StoreReadResponse.Error] if both cache and network fail
+     * - [Result.Loading] while fetching
+     * - [Result.Success] with cached data (if available)
+     * - [Result.Success] with fresh data (from network)
+     * - [Result.Error] if both cache and network fail
      *
      * @param category The movie list category
      * @param page The page number (1-indexed)
@@ -43,7 +30,7 @@ interface ContentRepository {
         category: MovieListCategory,
         page: Int,
         refresh: Boolean = true,
-    ): Flow<StoreReadResponse<List<ContentItem>>>
+    ): Flow<Result<List<ContentItem>>>
 
     /**
      * Observes TV show items for a specific category and page with offline-first caching.
@@ -56,25 +43,28 @@ interface ContentRepository {
         category: TvShowListCategory,
         page: Int,
         refresh: Boolean = true,
-    ): Flow<StoreReadResponse<List<ContentItem>>>
+    ): Flow<Result<List<ContentItem>>>
 
     /**
      * Forces a refresh of movie items from the network.
      *
      * @param category The movie list category
      * @param page The page number (1-indexed)
-     * @return The fresh list of content items
+     * @return [Result] with fresh content items, or [Result.Error] on failure
      */
-    suspend fun refreshMovieItems(category: MovieListCategory, page: Int): List<ContentItem>
+    suspend fun refreshMovieItems(category: MovieListCategory, page: Int): Result<List<ContentItem>>
 
     /**
      * Forces a refresh of TV show items from the network.
      *
      * @param category The TV show list category
      * @param page The page number (1-indexed)
-     * @return The fresh list of content items
+     * @return [Result] with fresh content items, or [Result.Error] on failure
      */
-    suspend fun refreshTvShowItems(category: TvShowListCategory, page: Int): List<ContentItem>
+    suspend fun refreshTvShowItems(
+        category: TvShowListCategory,
+        page: Int,
+    ): Result<List<ContentItem>>
 
     /** Clears all cached content data. */
     suspend fun clearCache()

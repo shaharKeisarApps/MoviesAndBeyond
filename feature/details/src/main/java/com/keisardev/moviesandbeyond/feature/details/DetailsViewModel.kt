@@ -5,11 +5,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.MediaType
-import com.keisardev.moviesandbeyond.core.model.NetworkResponse
+import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
@@ -26,6 +27,12 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the movie/TV/person detail screen.
+ *
+ * Fetches full details from [DetailsRepository] based on a navigation argument encoded as
+ * `"id,MEDIA_TYPE"`, and manages favorite/watchlist toggle actions via [LibraryRepository].
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailsViewModel
@@ -50,8 +57,11 @@ constructor(
     }
 
     private val _uiState = MutableStateFlow(DetailsUiState())
+
+    /** UI state for library actions (favorite/watchlist toggles) and error messages. */
     val uiState = _uiState.asStateFlow()
 
+    /** The detail content state: Loading, Empty, or a Movie/TV/Person result. */
     val contentDetailsUiState: StateFlow<ContentDetailUiState> =
         idDetailsString
             .mapLatest { detailsString ->
@@ -63,18 +73,18 @@ constructor(
                         val id = idDetails.first
                         when (idDetails.second) {
                             MediaType.MOVIE -> {
-                                val response = detailsRepository.getMovieDetails(id)
-                                handleMovieDetailsResponse(response)
+                                val result = detailsRepository.getMovieDetails(id)
+                                handleMovieDetailsResponse(result)
                             }
 
                             MediaType.TV -> {
-                                val response = detailsRepository.getTvShowDetails(id)
-                                handleTvDetailsResponse(response)
+                                val result = detailsRepository.getTvShowDetails(id)
+                                handleTvDetailsResponse(result)
                             }
 
                             MediaType.PERSON -> {
-                                val response = detailsRepository.getPersonDetails(id)
-                                handlePeopleDetailsResponse(response)
+                                val result = detailsRepository.getPersonDetails(id)
+                                handlePeopleDetailsResponse(result)
                             }
 
                             else -> ContentDetailUiState.Empty
@@ -138,11 +148,11 @@ constructor(
     }
 
     private suspend fun handleMovieDetailsResponse(
-        response: NetworkResponse<MovieDetails>
+        result: Result<MovieDetails>
     ): ContentDetailUiState {
-        return when (response) {
-            is NetworkResponse.Success -> {
-                val data = response.data
+        return when (result) {
+            is Result.Success -> {
+                val data = result.data
                 _uiState.update {
                     it.copy(
                         markedFavorite =
@@ -160,19 +170,19 @@ constructor(
                 ContentDetailUiState.Movie(data = data)
             }
 
-            is NetworkResponse.Error -> {
-                _uiState.update { it.copy(errorMessage = response.errorMessage) }
+            is Result.Error -> {
+                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
                 ContentDetailUiState.Empty
             }
+
+            is Result.Loading -> ContentDetailUiState.Loading
         }
     }
 
-    private suspend fun handleTvDetailsResponse(
-        response: NetworkResponse<TvDetails>
-    ): ContentDetailUiState {
-        return when (response) {
-            is NetworkResponse.Success -> {
-                val data = response.data
+    private suspend fun handleTvDetailsResponse(result: Result<TvDetails>): ContentDetailUiState {
+        return when (result) {
+            is Result.Success -> {
+                val data = result.data
                 _uiState.update {
                     it.copy(
                         markedFavorite =
@@ -190,27 +200,37 @@ constructor(
                 ContentDetailUiState.TV(data = data)
             }
 
-            is NetworkResponse.Error -> {
-                _uiState.update { it.copy(errorMessage = response.errorMessage) }
+            is Result.Error -> {
+                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
                 ContentDetailUiState.Empty
             }
+
+            is Result.Loading -> ContentDetailUiState.Loading
         }
     }
 
-    private fun handlePeopleDetailsResponse(
-        response: NetworkResponse<PersonDetails>
-    ): ContentDetailUiState {
-        return when (response) {
-            is NetworkResponse.Success -> {
-                ContentDetailUiState.Person(data = response.data)
-            }
+    private fun handlePeopleDetailsResponse(result: Result<PersonDetails>): ContentDetailUiState {
+        return when (result) {
+            is Result.Success -> ContentDetailUiState.Person(data = result.data)
 
-            is NetworkResponse.Error -> {
-                _uiState.update { it.copy(errorMessage = response.errorMessage) }
+            is Result.Error -> {
+                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
                 ContentDetailUiState.Empty
             }
+
+            is Result.Loading -> ContentDetailUiState.Loading
         }
     }
+
+    private fun toUserFriendlyMessage(error: Result.Error): String =
+        when (val ex = error.exception) {
+            is NetworkError.NotFound -> "This content could not be found."
+            is NetworkError.Unauthorized -> "Please sign in to view this content."
+            is NetworkError.RateLimited -> "Too many requests. Please wait and try again."
+            is NetworkError.ConnectionError -> "No internet connection. Please check your network."
+            is NetworkError.ServerError -> "Server error (${ex.code}). Please try again later."
+            else -> error.message ?: "Failed to load details. Please try again."
+        }
 }
 
 @Immutable
@@ -221,6 +241,7 @@ data class DetailsUiState(
     val errorMessage: String? = null,
 )
 
+/** Sealed state representing the loaded detail content for the detail screen. */
 @Immutable
 sealed interface ContentDetailUiState {
     data object Loading : ContentDetailUiState

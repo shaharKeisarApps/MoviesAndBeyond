@@ -15,14 +15,29 @@ data class SyncResult(
     val errors: List<String>,
 )
 
+/**
+ * Repository for the user's personal library (favorites and watchlist).
+ *
+ * Supports offline-first storage: items are persisted locally via Room and optionally synced with
+ * TMDB when the user is authenticated. Guest users can still manage a local-only library.
+ */
 interface LibraryRepository : UserLibrarySyncOperations, LibraryTaskSyncOperation {
+    /** Reactive stream of the user's favorite movies, excluding items pending deletion. */
     val favoriteMovies: Flow<List<LibraryItem>>
+
+    /** Reactive stream of the user's favorite TV shows, excluding items pending deletion. */
     val favoriteTvShows: Flow<List<LibraryItem>>
+
+    /** Reactive stream of the user's movie watchlist, excluding items pending deletion. */
     val moviesWatchlist: Flow<List<LibraryItem>>
+
+    /** Reactive stream of the user's TV show watchlist, excluding items pending deletion. */
     val tvShowsWatchlist: Flow<List<LibraryItem>>
 
+    /** Returns `true` if the given media item exists in the user's favorites. */
     suspend fun itemInFavoritesExists(mediaId: Int, mediaType: MediaType): Boolean
 
+    /** Returns `true` if the given media item exists in the user's watchlist. */
     suspend fun itemInWatchlistExists(mediaId: Int, mediaType: MediaType): Boolean
 
     /**

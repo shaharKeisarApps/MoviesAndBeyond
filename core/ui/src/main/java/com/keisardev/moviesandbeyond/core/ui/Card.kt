@@ -440,6 +440,7 @@ fun PersonCard(
             TmdbProfileImage(
                 imageUrl = imagePath,
                 modifier = Modifier.size(Dimens.personAvatarSize).clip(CircleShape),
+                contentDescription = name,
             )
         } else {
             // Placeholder for missing image
