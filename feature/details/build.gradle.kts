@@ -4,7 +4,7 @@ android { namespace = "com.keisardev.moviesandbeyond.feature.details" }
 
 dependencies {
     implementation(projects.data)
-    implementation(projects.core.network)
+    implementation(libs.androidx.navigation3.ui)
 
     testImplementation(projects.core.testing)
 

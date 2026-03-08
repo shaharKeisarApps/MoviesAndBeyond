@@ -78,7 +78,7 @@ fun AuthRoute(onBackClick: () -> Unit, viewModel: AuthViewModel = hiltViewModel(
 
     AuthScreen(
         uiState = uiState,
-        hideOnboarding = viewModel.hideOnboarding,
+        hideOnboarding = viewModel.hideOnboarding.collectAsStateWithLifecycle().value,
         onBackClick = onBackClick,
         onLogInClick = viewModel::logIn,
         onContinueWithoutSignInClick = viewModel::setHideOnboarding,

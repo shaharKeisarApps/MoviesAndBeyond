@@ -170,7 +170,10 @@ class DetailsViewModelTest {
         libraryRepository.generateError(true)
         viewModel.addOrRemoveFavorite(libraryItem)
 
-        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            "Failed to update favorites. Please try again.",
+            viewModel.uiState.value.errorMessage,
+        )
     }
 
     @Test
@@ -192,7 +195,10 @@ class DetailsViewModelTest {
         libraryRepository.generateError(true)
         viewModel.addOrRemoveFromWatchlist(libraryItem)
 
-        assertEquals("An error occurred", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            "Failed to update watchlist. Please try again.",
+            viewModel.uiState.value.errorMessage,
+        )
     }
 
     @Test
@@ -211,7 +217,8 @@ class DetailsViewModelTest {
 
     private fun createViewModel(navigationArgument: String = "") =
         DetailsViewModel(
-            savedStateHandle = SavedStateHandle(mapOf(idNavigationArgument to navigationArgument)),
+            savedStateHandle =
+                SavedStateHandle(mapOf(ID_NAVIGATION_ARGUMENT to navigationArgument)),
             detailsRepository = detailsRepository,
             libraryRepository = libraryRepository,
             authRepository = authRepository,

@@ -9,14 +9,13 @@ import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +32,8 @@ import kotlinx.coroutines.launch
  * Fetches full details from [DetailsRepository] based on a navigation argument encoded as
  * `"id,MEDIA_TYPE"`, and manages favorite/watchlist toggle actions via [LibraryRepository].
  */
+internal const val ID_NAVIGATION_ARGUMENT = "id"
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailsViewModel
@@ -44,15 +45,15 @@ constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val idDetailsString =
-        savedStateHandle.getStateFlow(key = idNavigationArgument, initialValue = "")
+        savedStateHandle.getStateFlow(key = ID_NAVIGATION_ARGUMENT, initialValue = "")
 
     /**
      * Set the details ID for Navigation 3. In Nav3, the ID comes from the route key instead of URL
      * path arguments.
      */
     fun setDetailsId(id: String) {
-        if (savedStateHandle.get<String>(idNavigationArgument).isNullOrEmpty()) {
-            savedStateHandle[idNavigationArgument] = id
+        if (savedStateHandle.get<String>(ID_NAVIGATION_ARGUMENT).isNullOrEmpty()) {
+            savedStateHandle[ID_NAVIGATION_ARGUMENT] = id
         }
     }
 
@@ -103,11 +104,11 @@ constructor(
                 _uiState.update { it.copy(markedFavorite = !(it.markedFavorite)) }
                 // Save locally for both guest and authenticated users
                 libraryRepository.addOrRemoveFavorite(libraryItem, isLoggedIn)
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         markedFavorite = !(it.markedFavorite),
-                        errorMessage = "An error occurred",
+                        errorMessage = "Failed to update favorites. Please try again.",
                     )
                 }
             }
@@ -121,11 +122,11 @@ constructor(
                 _uiState.update { it.copy(savedInWatchlist = !(it.savedInWatchlist)) }
                 // Save locally for both guest and authenticated users
                 libraryRepository.addOrRemoveFromWatchlist(libraryItem, isLoggedIn)
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         savedInWatchlist = !(it.savedInWatchlist),
-                        errorMessage = "An error occurred",
+                        errorMessage = "Failed to update watchlist. Please try again.",
                     )
                 }
             }

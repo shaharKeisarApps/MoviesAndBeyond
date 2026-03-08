@@ -1,4 +1,4 @@
-package com.keisardev.moviesandbeyond.ui.navigation
+package com.keisardev.moviesandbeyond.core.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 /**
  * Sealed class representing top-level navigation destinations. These correspond to the bottom
- * navigation bar tabs.
+ * navigation bar tabs. These are pure tab identifiers and never appear in the back stack.
  */
 @Serializable
 sealed class TopLevelRoute : NavKey {
@@ -70,8 +70,7 @@ sealed class TopLevelRoute : NavKey {
 @Serializable data class DetailsRoute(val id: String) : NavKey
 
 /**
- * Route for the credits screen. Now carries its own id argument since we've flattened the nested
- * navigation.
+ * Route for the credits screen.
  *
  * @param id The media ID for which to show credits
  */

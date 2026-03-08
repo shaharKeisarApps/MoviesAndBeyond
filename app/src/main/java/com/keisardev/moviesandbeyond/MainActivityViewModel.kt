@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler

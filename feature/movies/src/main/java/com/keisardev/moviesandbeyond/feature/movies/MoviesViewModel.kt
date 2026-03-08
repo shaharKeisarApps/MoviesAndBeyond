@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

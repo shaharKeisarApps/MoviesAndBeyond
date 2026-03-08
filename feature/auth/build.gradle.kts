@@ -4,7 +4,6 @@ android { namespace = "com.keisardev.moviesandbeyond.feature.auth" }
 
 dependencies {
     implementation(projects.data)
-    implementation(projects.core.network)
 
     testImplementation(projects.core.testing)
 

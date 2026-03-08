@@ -9,11 +9,11 @@ import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContent
 import com.keisardev.moviesandbeyond.core.local.database.entity.asFavoriteContentEntity
 import com.keisardev.moviesandbeyond.core.local.database.entity.asWatchlistContentEntity
 import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryTask
 import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import com.keisardev.moviesandbeyond.core.network.model.library.FavoriteRequest

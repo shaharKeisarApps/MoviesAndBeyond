@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.SearchItem
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.SearchRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

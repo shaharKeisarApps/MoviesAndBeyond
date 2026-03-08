@@ -1,18 +1,16 @@
 package com.keisardev.moviesandbeyond.feature.auth
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.Result
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -37,11 +35,14 @@ constructor(
     /** The current authentication UI state (form fields, loading, errors). */
     val uiState = _uiState.asStateFlow()
 
-    var hideOnboarding: Boolean? by mutableStateOf(null)
+    private val _hideOnboarding = MutableStateFlow<Boolean?>(null)
+
+    /** Whether to skip the onboarding screen; null while loading. */
+    val hideOnboarding: StateFlow<Boolean?> = _hideOnboarding.asStateFlow()
 
     init {
         viewModelScope.launch {
-            hideOnboarding = userRepository.userData.map { it.hideOnboarding }.first()
+            _hideOnboarding.value = userRepository.userData.map { it.hideOnboarding }.first()
         }
     }
 
@@ -56,7 +57,7 @@ constructor(
                 )
             when (result) {
                 is Result.Success -> {
-                    if (hideOnboarding == false) {
+                    if (_hideOnboarding.value == false) {
                         /**
                          * User has opened app for first time. This will recompose the NavHost and
                          * user will be automatically navigated from AuthScreen.

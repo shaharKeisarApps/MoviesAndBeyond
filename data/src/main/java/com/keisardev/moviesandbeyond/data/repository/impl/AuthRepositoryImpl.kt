@@ -6,7 +6,7 @@ import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
 import com.keisardev.moviesandbeyond.core.local.session.SessionManager
 import com.keisardev.moviesandbeyond.core.model.Result
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.auth.DeleteSessionRequest
 import com.keisardev.moviesandbeyond.core.network.model.auth.LoginRequest

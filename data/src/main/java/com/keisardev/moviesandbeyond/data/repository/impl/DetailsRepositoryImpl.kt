@@ -4,7 +4,7 @@ import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import java.io.IOException

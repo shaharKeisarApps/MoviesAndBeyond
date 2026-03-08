@@ -6,7 +6,7 @@ import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestLibraryRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.testLibraryItems
-import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
+import com.keisardev.moviesandbeyond.feature.you.LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -126,7 +126,7 @@ class LibraryItemsViewModelTest {
 
         viewModel.deleteItem(testItem)
 
-        assertEquals("An error occurred", viewModel.errorMessage.value)
+        assertEquals("Failed to remove item. Please try again.", viewModel.errorMessage.value)
 
         libraryItemTypeCollectJob.cancel()
         errorCollectJob.cancel()
@@ -144,7 +144,9 @@ class LibraryItemsViewModelTest {
     private fun createViewModel(navigationArgument: String) =
         LibraryItemsViewModel(
             savedStateHandle =
-                SavedStateHandle(mapOf(libraryItemTypeNavigationArgument to navigationArgument)),
+                SavedStateHandle(
+                    mapOf(LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT to navigationArgument)
+                ),
             libraryRepository = libraryRepository,
             authRepository = authRepository,
         )

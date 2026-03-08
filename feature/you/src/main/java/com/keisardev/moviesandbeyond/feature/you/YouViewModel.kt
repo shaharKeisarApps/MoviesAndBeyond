@@ -7,7 +7,7 @@ import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,10 +15,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+const val LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT = "type"
 
 /**
  * ViewModel for the "You" profile and settings screen.
@@ -61,8 +64,7 @@ constructor(
 
     /** Combined count of favorites and watchlist items across movies and TV shows. */
     val libraryItemCounts: StateFlow<LibraryItemCounts> =
-        kotlinx.coroutines.flow
-            .combine(
+        combine(
                 libraryRepository.favoriteMovies,
                 libraryRepository.favoriteTvShows,
                 libraryRepository.moviesWatchlist,
@@ -116,9 +118,10 @@ constructor(
 
     fun logOut() {
         viewModelScope.launch {
+            val accountId = _uiState.value.accountDetails?.id ?: return@launch
             _uiState.update { it.copy(isLoggingOut = true) }
 
-            val result = authRepository.logout(accountId = _uiState.value.accountDetails!!.id)
+            val result = authRepository.logout(accountId = accountId)
             when (result) {
                 is Result.Success -> {}
 
@@ -137,10 +140,10 @@ constructor(
 
     fun onRefresh() {
         viewModelScope.launch {
+            val accountId = _uiState.value.accountDetails?.id ?: return@launch
             _uiState.update { it.copy(isRefreshing = true) }
 
-            val result =
-                userRepository.updateAccountDetails(accountId = _uiState.value.accountDetails!!.id)
+            val result = userRepository.updateAccountDetails(accountId = accountId)
             when (result) {
                 is Result.Success -> {
                     // Sync favorites and watchlist after refreshing account details
