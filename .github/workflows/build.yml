@@ -153,9 +153,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Validate screenshot tests
-        # TODO: Remove continue-on-error after running update-screenshots workflow on main
-        # Reference images were generated on macOS; need to regenerate on Ubuntu post-merge
-        continue-on-error: true
         run: ./gradlew validateDebugScreenshotTest
 
       - name: Upload screenshot reports

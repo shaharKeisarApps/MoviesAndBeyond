@@ -32,10 +32,11 @@ import com.keisardev.moviesandbeyond.core.ui.LocalSharedTransitionScope
 import com.keisardev.moviesandbeyond.core.ui.LocalUseNavigationRail
 import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
 import com.keisardev.moviesandbeyond.core.ui.isExpandedOrMediumWidth
+import com.keisardev.moviesandbeyond.core.ui.navigation.EntryProviderInstaller
+import com.keisardev.moviesandbeyond.core.ui.navigation.TopLevelRoute
+import com.keisardev.moviesandbeyond.ui.navigation.AppNavigatorImpl
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondDestination
 import com.keisardev.moviesandbeyond.ui.navigation.MoviesAndBeyondNav3
-import com.keisardev.moviesandbeyond.ui.navigation.NavigationState
-import com.keisardev.moviesandbeyond.ui.navigation.TopLevelRoute
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeState
 
@@ -45,29 +46,26 @@ import dev.chrisbanes.haze.HazeState
     ExperimentalSharedTransitionApi::class,
 )
 @Composable
-fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
-    // Wrap entire app with SharedTransitionLayout for shared element transitions
+fun MoviesAndBeyondApp(
+    navigator: AppNavigatorImpl,
+    entryProviders: Set<EntryProviderInstaller>,
+    hideOnboarding: Boolean,
+) {
     SharedTransitionLayout {
-        // Provide SharedTransitionScope to all child composables
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             val hazeState = remember { HazeState() }
 
-            // Navigation 3: Use NavigationState instead of NavController
-            val navigationState = remember(hideOnboarding) { NavigationState(hideOnboarding) }
+            // Communicate the hideOnboarding value to the navigator
+            navigator.setHideOnboarding(hideOnboarding)
 
             val destinations = remember { MoviesAndBeyondDestination.entries }
 
-            val showNavigation =
-                navigationState.hasCompletedOnboarding &&
-                    isTopLevelDestination(navigationState.topLevelBackStack.topLevelKey)
+            val showNavigation = navigator.hasCompletedOnboarding && navigator.isAtTabRoot()
 
-            val selectedDestination =
-                topLevelRouteToDestination(navigationState.topLevelBackStack.topLevelKey)
+            val selectedDestination = topLevelRouteToDestination(navigator.currentTab)
 
             val onNavigate = { destination: MoviesAndBeyondDestination ->
-                navigationState.topLevelBackStack.switchToTopLevel(
-                    destinationToTopLevelRoute(destination)
-                )
+                navigator.switchTab(destinationToTopLevelRoute(destination))
             }
 
             val useRail = LocalWindowSizeClass.current.isExpandedOrMediumWidth()
@@ -76,7 +74,8 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
                 if (useRail) {
                     RailContent(
                         hazeState = hazeState,
-                        navigationState = navigationState,
+                        navigator = navigator,
+                        entryProviders = entryProviders,
                         destinations = destinations,
                         selectedDestination = selectedDestination,
                         onNavigate = onNavigate,
@@ -85,7 +84,8 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
                 } else {
                     CompactContent(
                         hazeState = hazeState,
-                        navigationState = navigationState,
+                        navigator = navigator,
+                        entryProviders = entryProviders,
                         destinations = destinations,
                         selectedDestination = selectedDestination,
                         onNavigate = onNavigate,
@@ -102,7 +102,8 @@ fun MoviesAndBeyondApp(hideOnboarding: Boolean) {
 @Composable
 private fun CompactContent(
     hazeState: HazeState,
-    navigationState: NavigationState,
+    navigator: AppNavigatorImpl,
+    entryProviders: Set<EntryProviderInstaller>,
     destinations: List<MoviesAndBeyondDestination>,
     selectedDestination: MoviesAndBeyondDestination?,
     onNavigate: (MoviesAndBeyondDestination) -> Unit,
@@ -124,7 +125,11 @@ private fun CompactContent(
         },
         contentWindowInsets = WindowInsets.safeDrawing,
     ) { padding ->
-        MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+        MoviesAndBeyondNav3(
+            navigator = navigator,
+            entryProviders = entryProviders,
+            paddingValues = padding,
+        )
     }
 }
 
@@ -133,7 +138,8 @@ private fun CompactContent(
 @Composable
 private fun RailContent(
     hazeState: HazeState,
-    navigationState: NavigationState,
+    navigator: AppNavigatorImpl,
+    entryProviders: Set<EntryProviderInstaller>,
     destinations: List<MoviesAndBeyondDestination>,
     selectedDestination: MoviesAndBeyondDestination?,
     onNavigate: (MoviesAndBeyondDestination) -> Unit,
@@ -163,20 +169,15 @@ private fun RailContent(
             contentWindowInsets = WindowInsets.statusBars,
             modifier = Modifier.weight(1f),
         ) { padding ->
-            MoviesAndBeyondNav3(navigationState = navigationState, paddingValues = padding)
+            MoviesAndBeyondNav3(
+                navigator = navigator,
+                entryProviders = entryProviders,
+                paddingValues = padding,
+            )
         }
     }
 }
 
-/**
- * A TIVI-style floating navigation bar with animated navigation items.
- *
- * Features:
- * - Blur effect on the bar itself (not surrounding area)
- * - Transparent padding for true floating effect
- * - Spring scale animation on selected items
- * - Crossfade icon transitions between selected/unselected states
- */
 @Composable
 fun MoviesAndBeyondNavigationBar(
     hazeState: HazeState,
@@ -234,13 +235,12 @@ fun MoviesAndBeyondNavigationRail(
 }
 
 /** Convert a TopLevelRoute to a MoviesAndBeyondDestination enum. */
-private fun topLevelRouteToDestination(route: Any?): MoviesAndBeyondDestination? {
+private fun topLevelRouteToDestination(route: TopLevelRoute): MoviesAndBeyondDestination? {
     return when (route) {
         is TopLevelRoute.Movies -> MoviesAndBeyondDestination.MOVIES
         is TopLevelRoute.TvShows -> MoviesAndBeyondDestination.TV_SHOWS
         is TopLevelRoute.Search -> MoviesAndBeyondDestination.SEARCH
         is TopLevelRoute.You -> MoviesAndBeyondDestination.YOU
-        else -> null
     }
 }
 
@@ -252,9 +252,4 @@ private fun destinationToTopLevelRoute(destination: MoviesAndBeyondDestination):
         MoviesAndBeyondDestination.SEARCH -> TopLevelRoute.Search
         MoviesAndBeyondDestination.YOU -> TopLevelRoute.You
     }
-}
-
-/** Check if the current route is a top-level destination (for showing bottom bar). */
-private fun isTopLevelDestination(route: Any?): Boolean {
-    return route is TopLevelRoute
 }

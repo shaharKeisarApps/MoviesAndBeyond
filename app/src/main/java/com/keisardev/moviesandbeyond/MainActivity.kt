@@ -22,9 +22,12 @@ import com.keisardev.moviesandbeyond.MainActivityUiState.Loading
 import com.keisardev.moviesandbeyond.MainActivityUiState.Success
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
+import com.keisardev.moviesandbeyond.core.ui.navigation.EntryProviderInstaller
 import com.keisardev.moviesandbeyond.ui.MoviesAndBeyondApp
+import com.keisardev.moviesandbeyond.ui.navigation.AppNavigatorImpl
 import com.keisardev.moviesandbeyond.ui.theme.MoviesAndBeyondTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -32,6 +35,10 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
+
+    @Inject lateinit var navigator: AppNavigatorImpl
+
+    @Inject lateinit var entryProviders: Set<@JvmSuppressWildcards EntryProviderInstaller>
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +76,11 @@ class MainActivity : ComponentActivity() {
                     customColorArgb = customColorArgb,
                 ) {
                     if (uiState is Success) {
-                        MoviesAndBeyondApp(hideOnboarding = (uiState as Success).hideOnboarding)
+                        MoviesAndBeyondApp(
+                            navigator = navigator,
+                            entryProviders = entryProviders,
+                            hideOnboarding = (uiState as Success).hideOnboarding,
+                        )
                     }
                 }
             }

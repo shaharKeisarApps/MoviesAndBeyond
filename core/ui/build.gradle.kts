@@ -1,6 +1,7 @@
 plugins {
     id("moviesandbeyond.android.library")
     id("moviesandbeyond.android.library.compose")
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.screenshot)
 }
 
@@ -27,6 +28,10 @@ dependencies {
 
     api(libs.haze)
     api(libs.haze.materials)
+
+    // Navigation 3 contracts (NavKey, EntryProviderScope)
+    api(libs.androidx.navigation3.runtime)
+    api(libs.kotlinx.serialization.json)
 
     // Color picker for theme customization
     api(libs.colorpicker.compose)

@@ -5,12 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
-import com.keisardev.moviesandbeyond.data.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
-import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
+import com.keisardev.moviesandbeyond.feature.you.LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,13 +48,16 @@ constructor(
      * instead of URL path arguments.
      */
     fun setLibraryItemType(type: String) {
-        if (savedStateHandle.get<String>(libraryItemTypeNavigationArgument).isNullOrEmpty()) {
-            savedStateHandle[libraryItemTypeNavigationArgument] = type
+        if (savedStateHandle.get<String>(LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT).isNullOrEmpty()) {
+            savedStateHandle[LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT] = type
         }
     }
 
     private val libraryItemTypeString =
-        savedStateHandle.getStateFlow(key = libraryItemTypeNavigationArgument, initialValue = "")
+        savedStateHandle.getStateFlow(
+            key = LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT,
+            initialValue = "",
+        )
 
     /** The current library type (FAVORITE or WATCHLIST) derived from the navigation argument. */
     val libraryItemType: StateFlow<LibraryItemType?> =
@@ -102,8 +104,8 @@ constructor(
                     }
                     else -> Unit
                 }
-            } catch (e: IOException) {
-                _errorMessage.update { "An error occurred" }
+            } catch (e: Exception) {
+                _errorMessage.update { "Failed to remove item. Please try again." }
             }
         }
     }

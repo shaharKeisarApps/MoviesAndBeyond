@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.keisardev.moviesandbeyond.data.coroutines
+package com.keisardev.moviesandbeyond.core.ui.coroutines
 
 import android.os.Handler
 import android.os.Looper

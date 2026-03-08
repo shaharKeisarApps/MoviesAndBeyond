@@ -1,6 +1,6 @@
 package com.keisardev.moviesandbeyond.core.network
 
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.ktor.installNetworkErrorMapping
 import com.keisardev.moviesandbeyond.core.network.model.auth.LoginRequest

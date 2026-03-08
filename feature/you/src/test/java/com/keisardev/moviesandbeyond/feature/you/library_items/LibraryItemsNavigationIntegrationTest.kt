@@ -5,7 +5,7 @@ import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.testing.MainDispatcherRule
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestAuthRepository
 import com.keisardev.moviesandbeyond.data.testdoubles.repository.TestLibraryRepository
-import com.keisardev.moviesandbeyond.feature.you.libraryItemTypeNavigationArgument
+import com.keisardev.moviesandbeyond.feature.you.LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -170,7 +170,8 @@ class LibraryItemsNavigationIntegrationTest {
     /** Create ViewModel with pre-populated type, simulating traditional navigation argument. */
     private fun createViewModelWithType(type: String) =
         LibraryItemsViewModel(
-            savedStateHandle = SavedStateHandle(mapOf(libraryItemTypeNavigationArgument to type)),
+            savedStateHandle =
+                SavedStateHandle(mapOf(LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT to type)),
             libraryRepository = libraryRepository,
             authRepository = authRepository,
         )

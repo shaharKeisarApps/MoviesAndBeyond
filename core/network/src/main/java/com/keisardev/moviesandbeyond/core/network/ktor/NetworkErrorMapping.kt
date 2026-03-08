@@ -1,6 +1,6 @@
 package com.keisardev.moviesandbeyond.core.network.ktor
 
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.statement.bodyAsText
