@@ -6,17 +6,16 @@ import com.keisardev.moviesandbeyond.core.local.database.dao.WatchlistContentDao
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
 import com.keisardev.moviesandbeyond.core.local.session.SessionManager
 import com.keisardev.moviesandbeyond.core.model.Result
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.auth.DeleteSessionRequest
 import com.keisardev.moviesandbeyond.core.network.model.auth.LoginRequest
 import com.keisardev.moviesandbeyond.core.network.model.auth.SessionRequest
-import com.keisardev.moviesandbeyond.core.network.model.auth.getErrorMessage
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.model.asEntity
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler
 import java.io.IOException
 import javax.inject.Inject
-import retrofit2.HttpException
 
 internal class AuthRepositoryImpl
 @Inject
@@ -56,9 +55,8 @@ constructor(
             Result.Success(Unit)
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
-            val errorMessage = getErrorMessage(e)
-            Result.Error(e, errorMessage)
+        } catch (e: NetworkError) {
+            Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)
         }
@@ -80,9 +78,8 @@ constructor(
             Result.Success(Unit)
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
-            val errorMessage = getErrorMessage(e)
-            Result.Error(e, errorMessage)
+        } catch (e: NetworkError) {
+            Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)
         }

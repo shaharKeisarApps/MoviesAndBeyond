@@ -1,54 +1,42 @@
 package com.keisardev.moviesandbeyond.core.network.di
 
 import com.keisardev.moviesandbeyond.core.network.BuildConfig
-import com.keisardev.moviesandbeyond.core.network.error.HttpErrorInterceptor
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
+import com.keisardev.moviesandbeyond.core.network.ktor.installNetworkErrorMapping
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Singleton
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import kotlinx.serialization.json.Json
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal object NetworkModule {
     @Singleton
     @Provides
-    fun provideTmdbApi(): TmdbApi {
-        val logging =
-            HttpLoggingInterceptor().apply {
-                if (BuildConfig.DEBUG) {
-                    setLevel(HttpLoggingInterceptor.Level.BODY)
-                }
+    fun provideHttpClient(): HttpClient =
+        HttpClient(Android) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+            if (BuildConfig.DEBUG) {
+                install(Logging) { level = LogLevel.BODY }
             }
-        val client =
-            OkHttpClient.Builder()
-                .addInterceptor(logging)
-                .addInterceptor(
-                    Interceptor { chain ->
-                        val newRequest =
-                            chain
-                                .request()
-                                .newBuilder()
-                                .addHeader("accept", "application/json")
-                                .addHeader("Authorization", BuildConfig.ACCESS_TOKEN)
-                                .build()
+            defaultRequest {
+                url(BuildConfig.BASE_URL)
+                contentType(ContentType.Application.Json)
+                headers.append("Authorization", "Bearer ${BuildConfig.ACCESS_TOKEN}")
+            }
+            installNetworkErrorMapping()
+        }
 
-                        chain.proceed(newRequest)
-                    }
-                )
-                .addInterceptor(HttpErrorInterceptor())
-                .build()
-        return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .client(client)
-            .build()
-            .create(TmdbApi::class.java)
-    }
+    @Singleton @Provides fun provideTmdbApi(client: HttpClient): TmdbApi = TmdbApi(client)
 }

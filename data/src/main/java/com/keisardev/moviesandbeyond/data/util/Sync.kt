@@ -4,11 +4,11 @@ import com.keisardev.moviesandbeyond.core.model.MediaType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryTask
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import java.io.IOException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 /** Interface for class which schedules sync work. */
 interface SyncScheduler {
@@ -116,7 +116,7 @@ interface Synchronizer {
             return true
         } catch (e: IOException) {
             false
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             false
         }
     }

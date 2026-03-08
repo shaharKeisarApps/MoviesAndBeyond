@@ -1,45 +1,48 @@
 package com.keisardev.moviesandbeyond.core.network
 
-import com.keisardev.moviesandbeyond.core.network.model.auth.ErrorResponse
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
+import com.keisardev.moviesandbeyond.core.network.ktor.installNetworkErrorMapping
 import com.keisardev.moviesandbeyond.core.network.model.auth.LoginRequest
-import com.keisardev.moviesandbeyond.core.network.model.auth.getErrorMessage
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
-import com.squareup.moshi.Moshi
-import java.net.HttpURLConnection
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
-import org.junit.Before
+import kotlinx.serialization.json.Json
 import org.junit.Test
-import retrofit2.HttpException
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 class TmdbApiTest {
-    private lateinit var tmdbApi: TmdbApi
-    private lateinit var mockWebServer: MockWebServer
+    private val jsonHeaders =
+        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
 
-    @Before
-    fun setUp() {
-        mockWebServer = MockWebServer()
-        tmdbApi =
-            Retrofit.Builder()
-                .baseUrl(mockWebServer.url("/"))
-                .addConverterFactory(MoshiConverterFactory.create())
-                .build()
-                .create(TmdbApi::class.java)
+    private fun createMockClient(
+        responseBody: String,
+        statusCode: HttpStatusCode = HttpStatusCode.OK,
+    ): HttpClient {
+        val mockEngine = MockEngine {
+            respond(content = responseBody, status = statusCode, headers = jsonHeaders)
+        }
+        return HttpClient(mockEngine) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+            installNetworkErrorMapping()
+        }
     }
 
     @Test
     fun `test deserialization`() = runTest {
-        val response = MockResponse().setBody(resourceReader(this, "/content.json"))
-        mockWebServer.enqueue(response)
+        val json = resourceReader(this, "/content.json")
+        val client = createMockClient(json)
+        val tmdbApi = TmdbApi(client)
 
         val content = tmdbApi.getMovieLists(category = "", page = 1)
-        mockWebServer.takeRequest()
 
         assertEquals(
             NetworkContentItem(
@@ -59,27 +62,17 @@ class TmdbApiTest {
     }
 
     @Test
-    fun `test error deserialization`() = runTest {
-        val errorMessage = ErrorResponse("error occurred")
-        val moshiAdapter = Moshi.Builder().build().adapter(ErrorResponse::class.java)
-
-        val response =
-            MockResponse()
-                .setResponseCode(HttpURLConnection.HTTP_UNAUTHORIZED)
-                .setBody(moshiAdapter.toJson(errorMessage))
-        mockWebServer.enqueue(response)
+    fun `test error response throws NetworkError`() = runTest {
+        val errorJson = """{"status_message":"error occurred","status_code":7}"""
+        val client = createMockClient(errorJson, HttpStatusCode.Unauthorized)
+        val tmdbApi = TmdbApi(client)
 
         try {
             tmdbApi.validateWithLogin(LoginRequest("", "", ""))
-            mockWebServer.takeRequest()
-        } catch (e: HttpException) {
-            assertEquals(errorMessage.statusMessage, getErrorMessage(e))
+            assert(false) { "Expected NetworkError.Unauthorized to be thrown" }
+        } catch (e: NetworkError.Unauthorized) {
+            // Expected
         }
-    }
-
-    @After
-    fun tearDown() {
-        mockWebServer.close()
     }
 }
 

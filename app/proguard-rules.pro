@@ -21,16 +21,6 @@
 -dontwarn androidx.room.paging.**
 
 # ========================
-# Moshi
-# ========================
--keep @com.squareup.moshi.JsonClass class * { *; }
--keep class **JsonAdapter { *; }
--keepclassmembers class * {
-    @com.squareup.moshi.Json <fields>;
-}
--keepnames @com.squareup.moshi.JsonClass class *
-
-# ========================
 # Kotlin Serialization
 # ========================
 -keepattributes *Annotation*, InnerClasses
@@ -51,15 +41,6 @@
 -keepclassmembers class <2>$<3> {
     kotlinx.serialization.KSerializer serializer(...);
 }
-
-# ========================
-# Retrofit
-# ========================
--dontwarn retrofit2.**
--keep,allowobfuscation,allowshrinking interface * {
-    @retrofit2.http.* <methods>;
-}
--keep,allowobfuscation,allowshrinking class retrofit2.Response
 
 # ========================
 # Ktor

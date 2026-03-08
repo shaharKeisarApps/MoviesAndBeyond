@@ -3,8 +3,8 @@ package com.keisardev.moviesandbeyond.data.store
 import com.keisardev.moviesandbeyond.core.local.database.dao.AccountDetailsDao
 import com.keisardev.moviesandbeyond.core.local.database.dao.CachedContentDao
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.map

@@ -23,14 +23,11 @@ haze = "1.7.2"
 hilt = "2.59.2"
 junit = "4.13.2"
 ksp = "2.3.6"
-moshi = "1.15.2"
-okhttp3 = "5.3.2"
 kotlin = "2.3.10"
 kotlinx-serialization = "1.10.0"
 ktor = "3.4.0"
 protobuf = "4.33.5"
 protobufPlugin = "0.9.6"
-retrofit = "3.0.0"
 room = "2.8.4"
 spotless = "8.2.1"
 detekt = "1.23.8"
@@ -76,7 +73,6 @@ landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholde
 landscapist-palette = { module = "com.github.skydoves:landscapist-palette", version.ref = "landscapist" }
 compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "compose-bom" }
 compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
-converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
@@ -87,26 +83,18 @@ hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testi
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
-
-# Optional testing libraries for Ktor
-ktor-server-tests = { module = "io.ktor:ktor-server-tests", version.ref = "ktor" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
-moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
-okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3" }
-okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp3" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "store5" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }

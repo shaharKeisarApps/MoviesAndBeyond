@@ -1,20 +1,20 @@
 package com.keisardev.moviesandbeyond.core.network.model.content
 
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class NetworkContentItem(
     val id: Int,
-    val name: String?,
-    @Json(name = "poster_path") val posterPath: String?,
-    val title: String?,
-    @Json(name = "backdrop_path") val backdropPath: String?,
-    @Json(name = "vote_average") val voteAverage: Double?,
-    @Json(name = "release_date") val releaseDate: String?,
-    @Json(name = "first_air_date") val firstAirDate: String?,
-    val overview: String?,
+    val name: String? = null,
+    @SerialName("poster_path") val posterPath: String? = null,
+    val title: String? = null,
+    @SerialName("backdrop_path") val backdropPath: String? = null,
+    @SerialName("vote_average") val voteAverage: Double? = null,
+    @SerialName("release_date") val releaseDate: String? = null,
+    @SerialName("first_air_date") val firstAirDate: String? = null,
+    val overview: String? = null,
 ) {
     fun asModel() =
         ContentItem(
