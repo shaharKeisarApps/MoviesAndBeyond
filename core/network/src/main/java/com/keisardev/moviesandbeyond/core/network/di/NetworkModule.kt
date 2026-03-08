@@ -33,7 +33,7 @@ internal object NetworkModule {
             defaultRequest {
                 url(BuildConfig.BASE_URL)
                 contentType(ContentType.Application.Json)
-                headers.append("Authorization", "Bearer ${BuildConfig.ACCESS_TOKEN}")
+                headers.append("Authorization", BuildConfig.ACCESS_TOKEN)
             }
             installNetworkErrorMapping()
         }
