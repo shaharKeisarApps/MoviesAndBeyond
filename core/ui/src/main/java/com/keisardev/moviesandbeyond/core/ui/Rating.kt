@@ -5,14 +5,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.unit.dp
-
-private val starColor = Color(0xFFF2D349)
 
 /**
  * Inline star rating display with score and vote count.
@@ -24,9 +22,13 @@ private val starColor = Color(0xFFF2D349)
 fun Rating(rating: Double, count: Int) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.weight(1f, fill = false)) {
-            Icon(imageVector = Icons.Rounded.Star, contentDescription = null, tint = starColor)
-            Text(text = "${String.format(LocalLocale.current.platformLocale,"%.1f", rating)}/5")
+            Icon(
+                imageVector = Icons.Rounded.Star,
+                contentDescription = null,
+                tint = RatingColors.Star,
+            )
+            Text(text = "${String.format(LocalLocale.current.platformLocale, "%.1f", rating)}/5")
         }
-        Text(text = "($count)", color = Color.Gray)
+        Text(text = "($count)", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

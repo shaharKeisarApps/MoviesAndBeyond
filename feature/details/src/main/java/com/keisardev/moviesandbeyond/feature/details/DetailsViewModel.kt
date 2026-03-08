@@ -12,6 +12,7 @@ import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
 import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.toUserFriendlyMessage
 import com.keisardev.moviesandbeyond.data.repository.AuthRepository
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
@@ -172,7 +173,19 @@ constructor(
             }
 
             is Result.Error -> {
-                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
+                _uiState.update {
+                    it.copy(
+                        errorMessage =
+                            result.toUserFriendlyMessage(
+                                fallback = "Failed to load details. Please try again.",
+                                overrides =
+                                    mapOf(
+                                        NetworkError.Unauthorized::class.java to
+                                            "Please sign in to view this content."
+                                    ),
+                            )
+                    )
+                }
                 ContentDetailUiState.Empty
             }
 
@@ -202,7 +215,19 @@ constructor(
             }
 
             is Result.Error -> {
-                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
+                _uiState.update {
+                    it.copy(
+                        errorMessage =
+                            result.toUserFriendlyMessage(
+                                fallback = "Failed to load details. Please try again.",
+                                overrides =
+                                    mapOf(
+                                        NetworkError.Unauthorized::class.java to
+                                            "Please sign in to view this content."
+                                    ),
+                            )
+                    )
+                }
                 ContentDetailUiState.Empty
             }
 
@@ -215,23 +240,25 @@ constructor(
             is Result.Success -> ContentDetailUiState.Person(data = result.data)
 
             is Result.Error -> {
-                _uiState.update { it.copy(errorMessage = toUserFriendlyMessage(result)) }
+                _uiState.update {
+                    it.copy(
+                        errorMessage =
+                            result.toUserFriendlyMessage(
+                                fallback = "Failed to load details. Please try again.",
+                                overrides =
+                                    mapOf(
+                                        NetworkError.Unauthorized::class.java to
+                                            "Please sign in to view this content."
+                                    ),
+                            )
+                    )
+                }
                 ContentDetailUiState.Empty
             }
 
             is Result.Loading -> ContentDetailUiState.Loading
         }
     }
-
-    private fun toUserFriendlyMessage(error: Result.Error): String =
-        when (val ex = error.exception) {
-            is NetworkError.NotFound -> "This content could not be found."
-            is NetworkError.Unauthorized -> "Please sign in to view this content."
-            is NetworkError.RateLimited -> "Too many requests. Please wait and try again."
-            is NetworkError.ConnectionError -> "No internet connection. Please check your network."
-            is NetworkError.ServerError -> "Server error (${ex.code}). Please try again later."
-            else -> error.message ?: "Failed to load details. Please try again."
-        }
 }
 
 @Immutable

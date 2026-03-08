@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -116,6 +115,8 @@ fun TmdbImage(
                 modifier = Modifier.align(Alignment.Center),
             )
         } else {
+            val shimmerBaseColor = MaterialTheme.colorScheme.surfaceVariant
+            val shimmerHighlightColor = MaterialTheme.colorScheme.surfaceContainerHighest
             LandscapistImage(
                 imageModel = { "https://image.tmdb.org/t/p/w${width}$imageUrl" },
                 imageOptions =
@@ -130,7 +131,10 @@ fun TmdbImage(
                 component =
                     rememberImageComponent {
                         +ShimmerPlugin(
-                            Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray)
+                            Shimmer.Flash(
+                                baseColor = shimmerBaseColor,
+                                highlightColor = shimmerHighlightColor,
+                            )
                         )
                         // CrossfadePlugin removed - cached images display instantly
                     },
@@ -183,8 +187,12 @@ fun TmdbListImage(
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w500$imageUrl" }
 
         // STABLE: Plugin component with shimmer only (no crossfade for instant cache display)
+        val shimmerBase = MaterialTheme.colorScheme.surfaceVariant
+        val shimmerHighlight = MaterialTheme.colorScheme.surfaceContainerHighest
         val component = rememberImageComponent {
-            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+            +ShimmerPlugin(
+                Shimmer.Flash(baseColor = shimmerBase, highlightColor = shimmerHighlight)
+            )
             // No CrossfadePlugin - cached images display instantly without animation delay
         }
 
@@ -203,7 +211,11 @@ fun TmdbListImage(
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = {
-                Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) {
+                Box(
+                    modifier =
+                        Modifier.matchParentSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
                     Text(
                         text = stringResource(id = R.string.no_image_available),
                         textAlign = TextAlign.Center,
@@ -246,8 +258,12 @@ fun TmdbBackdropImage(
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w1280$imageUrl" }
 
         // PERFORMANCE: No crossfade for cached images - instant display
+        val shimmerBase = MaterialTheme.colorScheme.surfaceVariant
+        val shimmerHighlight = MaterialTheme.colorScheme.surfaceContainerHighest
         val component = rememberImageComponent {
-            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+            +ShimmerPlugin(
+                Shimmer.Flash(baseColor = shimmerBase, highlightColor = shimmerHighlight)
+            )
             // CrossfadePlugin removed - cached images display instantly without flash/re-render
         }
 
@@ -266,7 +282,11 @@ fun TmdbBackdropImage(
             modifier = modifier.fillMaxSize(),
             component = component,
             failure = {
-                Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) {
+                Box(
+                    modifier =
+                        Modifier.matchParentSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
                     Text(
                         text = stringResource(id = R.string.no_image_available),
                         textAlign = TextAlign.Center,
@@ -300,8 +320,12 @@ fun TmdbProfileImage(
     } else {
         val fullUrl = remember(imageUrl) { "https://image.tmdb.org/t/p/w185$imageUrl" }
 
+        val shimmerBase = MaterialTheme.colorScheme.surfaceVariant
+        val shimmerHighlight = MaterialTheme.colorScheme.surfaceContainerHighest
         val component = rememberImageComponent {
-            +ShimmerPlugin(Shimmer.Flash(baseColor = Color.DarkGray, highlightColor = Color.Gray))
+            +ShimmerPlugin(
+                Shimmer.Flash(baseColor = shimmerBase, highlightColor = shimmerHighlight)
+            )
             +CircularRevealPlugin(duration = 250)
         }
 
@@ -319,7 +343,13 @@ fun TmdbProfileImage(
             imageOptions = imageOptions,
             modifier = modifier.fillMaxSize(),
             component = component,
-            failure = { Box(modifier = Modifier.matchParentSize().background(Color.DarkGray)) },
+            failure = {
+                Box(
+                    modifier =
+                        Modifier.matchParentSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                )
+            },
         )
     }
 }

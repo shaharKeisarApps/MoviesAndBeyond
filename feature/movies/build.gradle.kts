@@ -14,8 +14,8 @@ dependencies {
     implementation(projects.data)
 
     testImplementation(projects.core.testing)
-    api(libs.haze)
-    api(libs.haze.materials)
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
     androidTestImplementation(projects.core.testing)
 
     screenshotTestImplementation(libs.screenshot.validation.api)

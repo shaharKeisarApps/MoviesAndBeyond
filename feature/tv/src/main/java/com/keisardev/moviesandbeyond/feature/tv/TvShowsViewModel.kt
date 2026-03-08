@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
-import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.ui.coroutines.stateInWhileSubscribed
+import com.keisardev.moviesandbeyond.core.ui.toUserFriendlyMessage
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -155,7 +155,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 )
             }
             is Result.Error -> {
-                _errorMessage.update { toUserFriendlyMessage(result) }
+                _errorMessage.update { result.toUserFriendlyMessage() }
                 ContentUiState(
                     items = accumulatedFlow.value,
                     isLoading = false,
@@ -166,15 +166,6 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
             }
         }
     }
-
-    private fun toUserFriendlyMessage(error: Result.Error): String =
-        when (val ex = error.exception) {
-            is NetworkError.RateLimited -> "Too many requests. Please wait and try again."
-            is NetworkError.Unauthorized -> "Session expired. Please sign in again."
-            is NetworkError.ConnectionError -> "No internet connection. Please check your network."
-            is NetworkError.ServerError -> "Server error (${ex.code}). Please try again later."
-            else -> error.message ?: "Something went wrong. Please try again."
-        }
 
     /** Loads the next page of items for the specified category. */
     fun appendItems(category: TvShowListCategory) {
