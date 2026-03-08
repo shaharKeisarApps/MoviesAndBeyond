@@ -7,13 +7,13 @@ import com.keisardev.moviesandbeyond.core.model.SeedColor
 import com.keisardev.moviesandbeyond.core.model.SelectedDarkMode
 import com.keisardev.moviesandbeyond.core.model.user.AccountDetails
 import com.keisardev.moviesandbeyond.core.model.user.UserData
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.data.model.asEntity
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import retrofit2.HttpException
 
 internal class UserRepositoryImpl
 @Inject
@@ -51,7 +51,7 @@ constructor(
             Result.Success(Unit)
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)

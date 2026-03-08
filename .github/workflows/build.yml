@@ -132,9 +132,7 @@ jobs:
     needs: code-quality
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Screenshot tests may fail due to platform rendering differences
-    # Reference images need to be generated on same platform as CI
-    continue-on-error: true
+    # Reference images must be generated on Ubuntu via the update-screenshots workflow
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -155,6 +153,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Validate screenshot tests
+        # TODO: Remove continue-on-error after running update-screenshots workflow on main
+        # Reference images were generated on macOS; need to regenerate on Ubuntu post-merge
+        continue-on-error: true
         run: ./gradlew validateDebugScreenshotTest
 
       - name: Upload screenshot reports

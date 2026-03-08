@@ -1,16 +1,15 @@
 package com.keisardev.moviesandbeyond.core.network.model.auth
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class RequestTokenResponse(
-    @Json(name = "expires_at") val expiresAt: String,
-    @Json(name = "request_token") val requestToken: String,
+    @SerialName("expires_at") val expiresAt: String,
+    @SerialName("request_token") val requestToken: String,
 )
 
-@JsonClass(generateAdapter = true)
-data class LoginResponse(@Json(name = "request_token") val requestToken: String)
+@Serializable data class LoginResponse(@SerialName("request_token") val requestToken: String)
 
-@JsonClass(generateAdapter = true)
-data class SessionResponse(val success: Boolean, @Json(name = "session_id") val sessionId: String)
+@Serializable
+data class SessionResponse(val success: Boolean, @SerialName("session_id") val sessionId: String)

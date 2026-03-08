@@ -41,7 +41,7 @@ This isn't just a TMDB client — it's a learning lab. Here's what I'm experimen
 - Edge-to-edge design with system bar handling
 
 **Data & Networking**
-- Dual networking stack: Retrofit 3.0 + Ktor 3.3 side by side
+- Ktor 3.4 with Kotlinx Serialization for all networking
 - Store5 for offline-first caching with Fetcher + SourceOfTruth
 - Room database + DataStore (Proto) for local persistence
 - WorkManager for background sync
@@ -76,7 +76,7 @@ app                     Application entry, navigation, theme
 core/
   local                 Room, DataStore, SharedPreferences
   model                 Shared domain models
-  network               Retrofit + Ktor API clients
+  network               Ktor API client + Kotlinx Serialization
   testing               Test utilities (MainDispatcherRule)
   ui                    Reusable Compose components
 data/                   Repository implementations + test doubles
@@ -100,7 +100,7 @@ build-logic/            Custom Gradle convention plugins
 | Language | [Kotlin](https://kotlinlang.org/) | 2.2.21 |
 | UI | [Jetpack Compose](https://developer.android.com/jetpack/compose) (BOM) | 2025.12.01 |
 | DI | [Hilt](https://dagger.dev/hilt/) | 2.57.2 |
-| Networking | [Retrofit](https://square.github.io/retrofit/) + [Ktor](https://ktor.io/) | 3.0.0 / 3.3.3 |
+| Networking | [Ktor](https://ktor.io/) | 3.4.0 |
 | Caching | [Store5](https://github.com/MobileNativeFoundation/Store) | 5.1.0-alpha03 |
 | Database | [Room](https://developer.android.com/training/data-storage/room) | 2.8.4 |
 | Preferences | [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (Proto) | 1.2.0 |
@@ -180,7 +180,7 @@ Key architectural decisions are documented in [`docs/adr/`](docs/adr/):
 | [003](docs/adr/003-hilt-dependency-injection.md) | Hilt for dependency injection |
 | [004](docs/adr/004-compose-navigation.md) | Type-safe Compose Navigation |
 | [005](docs/adr/005-haze-blur-effects.md) | Haze for frosted-glass blur effects |
-| [006](docs/adr/006-dual-networking-stack.md) | Dual networking stack (Retrofit + Ktor) |
+| [006](docs/adr/006-ktor-networking.md) | Ktor networking with Kotlinx Serialization |
 
 ## Contributing
 

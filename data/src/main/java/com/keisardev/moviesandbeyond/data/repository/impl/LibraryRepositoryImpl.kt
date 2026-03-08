@@ -13,10 +13,11 @@ import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryTask
 import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import com.keisardev.moviesandbeyond.core.network.model.library.FavoriteRequest
 import com.keisardev.moviesandbeyond.core.network.model.library.WatchlistRequest
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.data.repository.SyncResult
 import com.keisardev.moviesandbeyond.data.util.SyncScheduler
@@ -25,7 +26,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import retrofit2.HttpException
 
 internal class LibraryRepositoryImpl
 @Inject
@@ -330,7 +330,7 @@ constructor(
             true
         } catch (e: IOException) {
             false
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             false
         }
     }

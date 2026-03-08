@@ -98,7 +98,7 @@ The project uses a hybrid modularization approach combining feature-based and la
 **Core Modules (Layer-based):**
 - `core:local` - Local data storage (Room database, DataStore, SharedPreferences, SessionManager)
 - `core:model` - Domain models shared across modules
-- `core:network` - Network layer (Retrofit, Ktor, TMDB API interface)
+- `core:network` - Network layer (Ktor, Kotlinx Serialization, TMDB API)
 - `core:testing` - Shared testing utilities (MainDispatcherRule)
 - `core:ui` - Reusable UI components and Compose utilities
 
@@ -151,7 +151,7 @@ Navigation follows type-safe Compose Navigation patterns:
 
 ### Data Flow
 ```
-Network (TMDB API via Retrofit/Ktor)
+Network (TMDB API via Ktor)
     ↓
 Repository Layer (data module)
     ↓
@@ -187,8 +187,7 @@ Obtain your access token from [TMDB API](https://api.themoviedb.org/).
 - **Jetpack Compose BOM Alpha**: 2026.02.00
 - **Hilt**: 2.58
 - **Room**: 2.8.4
-- **Retrofit**: 3.0.0 (with Moshi converter)
-- **Ktor**: 3.4.0
+- **Ktor**: 3.4.0 (with Kotlinx Serialization)
 - **Kotlin Serialization**: 1.9.0
 - **Navigation Compose**: 2.9.7
 - **Landscapist**: 2.9.5 (image loading)
@@ -325,7 +324,7 @@ Use `/skills` to see all available skills.
 **Project-Specific Agents (8):**
 - `bug-fixer` - Bug investigation and fixing
 - `code-reviewer` - Code quality review
-- `data-layer-specialist` - Repository, Room, Store5, Retrofit
+- `data-layer-specialist` - Repository, Room, Store5, Ktor
 - `di-layer-specialist` - Hilt dependency injection
 - `presentation-layer-specialist` - ViewModel, Compose UI, StateFlow
 - `refactor-expert` - Safe code transformations

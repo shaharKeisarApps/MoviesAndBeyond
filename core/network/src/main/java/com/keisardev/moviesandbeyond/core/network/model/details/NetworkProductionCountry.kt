@@ -1,6 +1,10 @@
 package com.keisardev.moviesandbeyond.core.network.model.details
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
-data class NetworkProductionCountry(val iso_3166_1: String, val name: String)
+@Serializable
+data class NetworkProductionCountry(
+    @SerialName("iso_3166_1") val iso31661: String,
+    val name: String,
+)

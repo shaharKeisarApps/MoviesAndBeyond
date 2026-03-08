@@ -4,19 +4,20 @@ import com.keisardev.moviesandbeyond.core.model.Result
 import com.keisardev.moviesandbeyond.core.model.details.MovieDetails
 import com.keisardev.moviesandbeyond.core.model.details.people.PersonDetails
 import com.keisardev.moviesandbeyond.core.model.details.tv.TvDetails
-import com.keisardev.moviesandbeyond.core.network.retrofit.TmdbApi
+import com.keisardev.moviesandbeyond.core.network.error.NetworkError
+import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.data.repository.DetailsRepository
 import java.io.IOException
 import javax.inject.Inject
-import retrofit2.HttpException
 
-class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) : DetailsRepository {
+internal class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) :
+    DetailsRepository {
     override suspend fun getMovieDetails(id: Int): Result<MovieDetails> {
         return try {
             Result.Success(tmdbApi.getMovieDetails(id).asModel())
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)
@@ -28,7 +29,7 @@ class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) : 
             Result.Success(tmdbApi.getTvShowDetails(id).asModel())
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)
@@ -40,7 +41,7 @@ class DetailsRepositoryImpl @Inject constructor(private val tmdbApi: TmdbApi) : 
             Result.Success(tmdbApi.getPersonDetails(id).asModel())
         } catch (e: IOException) {
             Result.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: NetworkError) {
             Result.Error(e, e.message)
         } catch (e: Exception) {
             Result.Error(e)

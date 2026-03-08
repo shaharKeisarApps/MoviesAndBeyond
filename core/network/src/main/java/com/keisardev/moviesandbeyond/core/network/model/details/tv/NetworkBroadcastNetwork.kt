@@ -1,5 +1,5 @@
 package com.keisardev.moviesandbeyond.core.network.model.details.tv
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true) data class NetworkBroadcastNetwork(val name: String)
+@Serializable data class NetworkBroadcastNetwork(val name: String)
