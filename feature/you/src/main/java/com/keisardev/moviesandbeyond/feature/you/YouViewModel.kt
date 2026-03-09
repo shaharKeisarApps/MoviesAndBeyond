@@ -16,8 +16,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -42,11 +43,21 @@ constructor(
     /** Profile screen UI state (account details, loading indicators, errors). */
     val uiState = _uiState.asStateFlow()
 
-    /** Emits the current authentication state; triggers account detail fetch on login. */
+    /** Emits the current authentication state. */
     val isLoggedIn =
-        authRepository.isLoggedIn
-            .onEach { isLoggedIn -> if (isLoggedIn) getAccountDetails() }
-            .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
+        authRepository.isLoggedIn.stateInWhileSubscribed(
+            scope = viewModelScope,
+            initialValue = null,
+        )
+
+    init {
+        viewModelScope.launch {
+            authRepository.isLoggedIn
+                .distinctUntilChanged()
+                .filter { it }
+                .collect { getAccountDetails() }
+        }
+    }
 
     /** Current user preferences for theme, content filters, and local-only mode. */
     val userSettings: StateFlow<UserSettings?> =

@@ -20,11 +20,7 @@ dependencies {
     api(libs.compose.material3.windowSizeClass)
 
     // Landscapist image loading (KMP core - no Coil/Glide)
-    api(libs.landscapist.core)
-    api(libs.landscapist.image)
-    api(libs.landscapist.animation)
-    api(libs.landscapist.placeholder)
-    api(libs.landscapist.palette)
+    api(libs.bundles.landscapist)
 
     api(libs.haze)
     api(libs.haze.materials)

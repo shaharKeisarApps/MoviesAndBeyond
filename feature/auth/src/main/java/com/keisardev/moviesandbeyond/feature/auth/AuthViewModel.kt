@@ -11,10 +11,11 @@ import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,16 +37,16 @@ constructor(
     /** The current authentication UI state (form fields, loading, errors). */
     val uiState = _uiState.asStateFlow()
 
-    private val _hideOnboarding = MutableStateFlow<Boolean?>(null)
-
-    /** Whether to skip the onboarding screen; null while loading. */
-    val hideOnboarding: StateFlow<Boolean?> = _hideOnboarding.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _hideOnboarding.value = userRepository.userData.map { it.hideOnboarding }.first()
-        }
-    }
+    /**
+     * Whether to skip the onboarding screen; null while loading.
+     *
+     * Uses [SharingStarted.Eagerly] so the value is always current when [logIn] reads it,
+     * regardless of whether the UI is actively subscribed to this flow.
+     */
+    val hideOnboarding: StateFlow<Boolean?> =
+        userRepository.userData
+            .map { it.hideOnboarding }
+            .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     fun logIn() {
         viewModelScope.launch {
@@ -58,7 +59,7 @@ constructor(
                 )
             when (result) {
                 is Result.Success -> {
-                    if (_hideOnboarding.value == false) {
+                    if (hideOnboarding.value == false) {
                         /**
                          * User has opened app for first time. This will recompose the NavHost and
                          * user will be automatically navigated from AuthScreen.

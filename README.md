@@ -53,9 +53,9 @@ This isn't just a TMDB client — it's a learning lab. Here's what I'm experimen
 - CI pipeline with GitHub Actions (quality gate + build + tests)
 
 **Experimental / Alpha**
-- Navigation 3 — developer-owned back stack (1.0.0)
-- Store5 alpha — offline-first caching (5.1.0-alpha03)
-- Compose Screenshot Testing (0.0.1-alpha12)
+- Navigation 3 — developer-owned back stack (1.0.1)
+- Store5 alpha — offline-first caching (5.1.0-alpha08)
+- Compose Screenshot Testing (0.0.1-alpha13)
 
 ## Features
 
@@ -97,25 +97,25 @@ build-logic/            Custom Gradle convention plugins
 
 | Category | Library | Version |
 |----------|---------|---------|
-| Language | [Kotlin](https://kotlinlang.org/) | 2.2.21 |
-| UI | [Jetpack Compose](https://developer.android.com/jetpack/compose) (BOM) | 2025.12.01 |
-| DI | [Hilt](https://dagger.dev/hilt/) | 2.57.2 |
+| Language | [Kotlin](https://kotlinlang.org/) | 2.3.10 |
+| UI | [Jetpack Compose](https://developer.android.com/jetpack/compose) (BOM) | 2026.02.00 |
+| DI | [Hilt](https://dagger.dev/hilt/) | 2.59.2 |
 | Networking | [Ktor](https://ktor.io/) | 3.4.0 |
-| Caching | [Store5](https://github.com/MobileNativeFoundation/Store) | 5.1.0-alpha03 |
+| Caching | [Store5](https://github.com/MobileNativeFoundation/Store) | 5.1.0-alpha08 |
 | Database | [Room](https://developer.android.com/training/data-storage/room) | 2.8.4 |
 | Preferences | [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (Proto) | 1.2.0 |
-| Image Loading | [Landscapist](https://github.com/skydoves/landscapist) | 2.8.2 |
-| Navigation | [Navigation Compose](https://developer.android.com/jetpack/compose/navigation) + [Navigation 3](https://developer.android.com/develop/ui/compose/navigation#navigation3) | 2.9.6 / 1.0.0 |
-| Blur Effects | [Haze](https://github.com/chrisbanes/haze) | 1.7.1 |
-| Theming | [Material Kolor](https://github.com/jordond/materialkolor) | 4.0.0 |
-| Color Picker | [colorpicker-compose](https://github.com/skydoves/colorpicker-compose) | 1.1.2 |
-| Background Work | [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) | 2.11.0 |
-| Serialization | [Kotlin Serialization](https://github.com/Kotlin/kotlinx.serialization) | 1.9.0 |
-| Benchmarks | [Macrobenchmark](https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview) | 1.3.3 |
-| Screenshot Tests | [Compose Screenshot Testing](https://developer.android.com/studio/preview/compose-screenshot-testing) | 0.0.1-alpha12 |
-| Formatting | [Spotless](https://github.com/diffplug/spotless) + [ktfmt](https://github.com/facebook/ktfmt) | 8.1.0 / 0.51 |
+| Image Loading | [Landscapist](https://github.com/skydoves/landscapist) | 2.9.5 |
+| Navigation | [Navigation Compose](https://developer.android.com/jetpack/compose/navigation) + [Navigation 3](https://developer.android.com/develop/ui/compose/navigation#navigation3) | 2.9.7 / 1.0.1 |
+| Blur Effects | [Haze](https://github.com/chrisbanes/haze) | 1.7.2 |
+| Theming | [Material Kolor](https://github.com/jordond/materialkolor) | 4.1.1 |
+| Color Picker | [colorpicker-compose](https://github.com/skydoves/colorpicker-compose) | 1.1.3 |
+| Background Work | [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) | 2.11.1 |
+| Serialization | [Kotlin Serialization](https://github.com/Kotlin/kotlinx.serialization) | 1.10.0 |
+| Benchmarks | [Macrobenchmark](https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview) | 1.4.1 |
+| Screenshot Tests | [Compose Screenshot Testing](https://developer.android.com/studio/preview/compose-screenshot-testing) | 0.0.1-alpha13 |
+| Formatting | [Spotless](https://github.com/diffplug/spotless) + [ktfmt](https://github.com/facebook/ktfmt) | 8.2.1 / 0.61 |
 | Static Analysis | [Detekt](https://detekt.dev/) | 1.23.8 |
-| Build | Gradle with Kotlin DSL + convention plugins | AGP 8.13.2 |
+| Build | Gradle with Kotlin DSL + convention plugins | AGP 9.0.1 |
 
 ## Getting Started
 

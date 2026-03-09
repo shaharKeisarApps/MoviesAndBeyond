@@ -19,6 +19,8 @@ import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -155,19 +157,24 @@ constructor(
         return when (result) {
             is Result.Success -> {
                 val data = result.data
-                _uiState.update {
-                    it.copy(
-                        markedFavorite =
+                val (inFavorites, inWatchlist) =
+                    coroutineScope {
+                        val favoritesDeferred = async {
                             libraryRepository.itemInFavoritesExists(
                                 mediaId = data.id,
                                 mediaType = MediaType.MOVIE,
-                            ),
-                        savedInWatchlist =
+                            )
+                        }
+                        val watchlistDeferred = async {
                             libraryRepository.itemInWatchlistExists(
                                 mediaId = data.id,
                                 mediaType = MediaType.MOVIE,
-                            ),
-                    )
+                            )
+                        }
+                        Pair(favoritesDeferred.await(), watchlistDeferred.await())
+                    }
+                _uiState.update {
+                    it.copy(markedFavorite = inFavorites, savedInWatchlist = inWatchlist)
                 }
                 ContentDetailUiState.Movie(data = data)
             }
@@ -197,19 +204,24 @@ constructor(
         return when (result) {
             is Result.Success -> {
                 val data = result.data
-                _uiState.update {
-                    it.copy(
-                        markedFavorite =
+                val (inFavorites, inWatchlist) =
+                    coroutineScope {
+                        val favoritesDeferred = async {
                             libraryRepository.itemInFavoritesExists(
                                 mediaId = data.id,
                                 mediaType = MediaType.TV,
-                            ),
-                        savedInWatchlist =
+                            )
+                        }
+                        val watchlistDeferred = async {
                             libraryRepository.itemInWatchlistExists(
                                 mediaId = data.id,
                                 mediaType = MediaType.TV,
-                            ),
-                    )
+                            )
+                        }
+                        Pair(favoritesDeferred.await(), watchlistDeferred.await())
+                    }
+                _uiState.update {
+                    it.copy(markedFavorite = inFavorites, savedInWatchlist = inWatchlist)
                 }
                 ContentDetailUiState.TV(data = data)
             }

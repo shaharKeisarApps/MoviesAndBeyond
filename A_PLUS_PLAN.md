@@ -247,51 +247,48 @@ git branch -d feature/immutable-list-migration
 
 ---
 
-## Phase 2C: LibraryRepositoryImpl Split (~30 min)
+## Phase 2C: LibraryRepositoryImpl DRY Refactor (~30 min)
 
-Single focused agent — refactoring with high blast radius needs care.
+Single focused agent — reducing duplication with Kotlin higher-order functions.
+
+**Design decision (GDE-validated):** The original plan to extract `FavoriteSyncManager`
+and `WatchlistSyncManager` was REJECTED — it would create two nearly-identical classes.
+The real code smell is **duplication**, not SRP. The existing interfaces
+(`Synchronizer`, `UserLibrarySyncOperations`, `LibraryTaskSyncOperation`) are already
+well-designed. Fix: reduce duplication with shared private helpers.
 
 ### Agent: data-refactor
 
 ```
 Prompt for agent (subagent_type: refactor-expert):
 
-Refactor LibraryRepositoryImpl (540 lines) by extracting sync logic.
+Refactor LibraryRepositoryImpl (517 lines) to reduce duplication using Kotlin
+higher-order functions. Do NOT extract separate manager classes.
 
 File: `data/src/main/java/com/keisardev/moviesandbeyond/data/repository/impl/LibraryRepositoryImpl.kt`
 
-Current responsibilities (SRP violation):
-1. CRUD operations (add/remove favorites + watchlist)
-2. Favorite sync with TMDB API
-3. Watchlist sync with TMDB API
-4. Task execution helper
-5. Status tracking
+The problem is DUPLICATION, not SRP:
+- addOrRemoveFavorite ≈ addOrRemoveFromWatchlist (same logic, different DAO)
+- syncFavorites ≈ syncWatchlist (same logic, different DAO)
 
-Plan:
-1. Create `data/.../sync/FavoriteSyncManager.kt`:
-   - Extract favorite sync methods from LibraryRepositoryImpl
-   - Takes FavoriteContentDao, TmdbApi (or network service), Dispatchers as deps
-   - Injectable via Hilt @Inject constructor
+Fix:
+1. Create private helper `addOrRemoveCollectionItem()` with DAO operations as lambdas:
+   - checkExists, markForDeletion, deleteItem, insertItem params
+   - createTask lambda for LibraryTask creation
+   - Both addOrRemoveFavorite and addOrRemoveFromWatchlist delegate to it
 
-2. Create `data/.../sync/WatchlistSyncManager.kt`:
-   - Extract watchlist sync methods
-   - Same pattern as FavoriteSyncManager
+2. Create private helper `syncCollection()` with DAO operations as lambdas:
+   - fetchItems, getItem, syncItems params matching the DAO-specific calls
+   - LibraryItemType param to distinguish favorites vs watchlist
+   - Both syncFavorites and syncWatchlist delegate to it
 
-3. Create `data/.../sync/LibraryTaskExecutor.kt` (if task execution is complex enough):
-   - Extract the executeLibraryTask helper
+3. Remove the pointless `catch (e: IOException) { throw e }` in addOrRemoveFavorite
+   (line 116-118) and addOrRemoveFromWatchlist (line 167-169).
 
-4. Slim down LibraryRepositoryImpl:
-   - Inject FavoriteSyncManager and WatchlistSyncManager
-   - Delegate sync calls to managers
-   - Keep CRUD as direct repo responsibility
-   - Target: <200 lines
+4. Do NOT change LibraryRepository interface or any external callers.
+5. Do NOT create new classes or files — keep everything in LibraryRepositoryImpl.
 
-5. Update Hilt bindings in `data/di/RepositoryModule.kt` if needed.
-
-6. Update `data/testdoubles/repository/TestLibraryRepository.kt` if interface changes.
-
-CRITICAL: Do NOT change the LibraryRepository interface or any external callers.
-The refactoring must be internal to the data module.
+Target: 517 lines → ~350 lines, zero behavior change.
 
 Run: `./gradlew spotlessApply && ./gradlew spotlessCheck detekt lintDebug :data:test :feature:details:test :feature:you:test`
 ```

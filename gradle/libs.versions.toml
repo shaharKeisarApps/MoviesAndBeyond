@@ -148,4 +148,27 @@ moviesandbeyond-android-jacoco = { id = "moviesandbeyond.android.jacoco", versio
 moviesandbeyond-android-screenshot-test = { id = "moviesandbeyond.android.screenshot.test", version = "unspecified" }
 
 [bundles]
+# Ktor client stack — always used together in core:network
+ktor = [
+    "ktor-client-core",
+    "ktor-client-android",
+    "ktor-client-logging",
+    "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-json",
+]
+
+# Landscapist image-loading suite — always used together in core:ui
+landscapist = [
+    "landscapist-core",
+    "landscapist-image",
+    "landscapist-animation",
+    "landscapist-placeholder",
+    "landscapist-palette",
+]
+
+# Room database — runtime + ktx always required together in core:local
+room = [
+    "androidx-room-ktx",
+    "androidx-room-runtime",
+]
 

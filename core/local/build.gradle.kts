@@ -57,8 +57,7 @@ dependencies {
     implementation(projects.core.model)
 
     implementation(libs.androidx.datastore)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.runtime)
+    implementation(libs.bundles.room)
     implementation(libs.androidx.security.crypto)
     implementation(libs.protobuf.kotlin.lite)
     ksp(libs.androidx.room.compiler)
