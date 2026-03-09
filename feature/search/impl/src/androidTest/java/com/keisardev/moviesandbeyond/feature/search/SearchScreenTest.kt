@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.keisardev.moviesandbeyond.core.model.SearchItem
 import com.keisardev.moviesandbeyond.core.ui.LocalWindowSizeClass
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Rule
 import org.junit.Test
 
@@ -28,7 +29,7 @@ class SearchScreenTest {
                 SearchScreen(
                     searchQuery = "",
                     errorMessage = null,
-                    searchSuggestions = emptyList(),
+                    searchSuggestions = persistentListOf(),
                     onSearchQueryChange = {},
                     onBack = {},
                     onSearchResultClick = {},
@@ -51,7 +52,7 @@ class SearchScreenTest {
                 SearchScreen(
                     searchQuery = "inc",
                     errorMessage = null,
-                    searchSuggestions = listOf(testItem),
+                    searchSuggestions = persistentListOf(testItem),
                     onSearchQueryChange = {},
                     onBack = {},
                     onSearchResultClick = {},
@@ -74,7 +75,7 @@ class SearchScreenTest {
                 SearchScreen(
                     searchQuery = "test",
                     errorMessage = errorMessage,
-                    searchSuggestions = emptyList(),
+                    searchSuggestions = persistentListOf(),
                     onSearchQueryChange = {},
                     onBack = {},
                     onSearchResultClick = {},
@@ -97,7 +98,7 @@ class SearchScreenTest {
                 SearchScreen(
                     searchQuery = "xyznonexistent",
                     errorMessage = null,
-                    searchSuggestions = emptyList(),
+                    searchSuggestions = persistentListOf(),
                     onSearchQueryChange = {},
                     onBack = {},
                     onSearchResultClick = {},

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Rule
 import org.junit.Test
 
@@ -44,7 +45,7 @@ class FeedScreenTest {
                 topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
                 popularTvShows =
                     ContentUiState(
-                        items = listOf(testShow),
+                        items = persistentListOf(testShow),
                         isLoading = false,
                         endReached = false,
                         page = 1,
