@@ -24,8 +24,8 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-class TmdbApi(private val client: HttpClient) {
-    suspend fun getMovieLists(
+open class TmdbApi(private val client: HttpClient) {
+    open suspend fun getMovieLists(
         category: String,
         language: String = "en-US",
         page: Int,
@@ -39,7 +39,7 @@ class TmdbApi(private val client: HttpClient) {
             }
             .body()
 
-    suspend fun getTvShowLists(
+    open suspend fun getTvShowLists(
         category: String,
         language: String = "en-US",
         page: Int,
@@ -51,7 +51,11 @@ class TmdbApi(private val client: HttpClient) {
             }
             .body()
 
-    suspend fun multiSearch(page: Int = 1, query: String, includeAdult: Boolean): SearchResponse =
+    open suspend fun multiSearch(
+        page: Int = 1,
+        query: String,
+        includeAdult: Boolean,
+    ): SearchResponse =
         client
             .get("search/multi") {
                 parameter("page", page)
@@ -60,21 +64,22 @@ class TmdbApi(private val client: HttpClient) {
             }
             .body()
 
-    suspend fun getMovieDetails(
+    open suspend fun getMovieDetails(
         id: Int,
         appendToResponse: String = "recommendations,credits",
     ): NetworkMovieDetails =
         client.get("movie/$id") { parameter("append_to_response", appendToResponse) }.body()
 
-    suspend fun getTvShowDetails(
+    open suspend fun getTvShowDetails(
         id: Int,
         appendToResponse: String = "recommendations,credits",
     ): NetworkTvDetails =
         client.get("tv/$id") { parameter("append_to_response", appendToResponse) }.body()
 
-    suspend fun getPersonDetails(id: Int): NetworkPersonDetails = client.get("person/$id").body()
+    open suspend fun getPersonDetails(id: Int): NetworkPersonDetails =
+        client.get("person/$id").body()
 
-    suspend fun getLibraryItems(
+    open suspend fun getLibraryItems(
         accountId: Int,
         itemType: String,
         mediaType: String,
@@ -82,24 +87,24 @@ class TmdbApi(private val client: HttpClient) {
     ): NetworkContentResponse =
         client.get("account/$accountId/$itemType/$mediaType") { parameter("page", page) }.body()
 
-    suspend fun addOrRemoveFavorite(accountId: Int, favoriteRequest: FavoriteRequest) {
+    open suspend fun addOrRemoveFavorite(accountId: Int, favoriteRequest: FavoriteRequest) {
         client.post("account/$accountId/favorite") {
             contentType(ContentType.Application.Json)
             setBody(favoriteRequest)
         }
     }
 
-    suspend fun addOrRemoveFromWatchlist(accountId: Int, watchlistRequest: WatchlistRequest) {
+    open suspend fun addOrRemoveFromWatchlist(accountId: Int, watchlistRequest: WatchlistRequest) {
         client.post("account/$accountId/watchlist") {
             contentType(ContentType.Application.Json)
             setBody(watchlistRequest)
         }
     }
 
-    suspend fun createRequestToken(): RequestTokenResponse =
+    open suspend fun createRequestToken(): RequestTokenResponse =
         client.get("authentication/token/new").body()
 
-    suspend fun validateWithLogin(loginRequest: LoginRequest): LoginResponse =
+    open suspend fun validateWithLogin(loginRequest: LoginRequest): LoginResponse =
         client
             .post("authentication/token/validate_with_login") {
                 contentType(ContentType.Application.Json)
@@ -107,7 +112,7 @@ class TmdbApi(private val client: HttpClient) {
             }
             .body()
 
-    suspend fun createSession(sessionRequest: SessionRequest): SessionResponse =
+    open suspend fun createSession(sessionRequest: SessionRequest): SessionResponse =
         client
             .post("authentication/session/new") {
                 contentType(ContentType.Application.Json)
@@ -115,13 +120,13 @@ class TmdbApi(private val client: HttpClient) {
             }
             .body()
 
-    suspend fun getAccountDetails(sessionId: String): NetworkAccountDetails =
+    open suspend fun getAccountDetails(sessionId: String): NetworkAccountDetails =
         client.get("account") { parameter("session_id", sessionId) }.body()
 
-    suspend fun getAccountDetailsWithId(accountId: Int): NetworkAccountDetails =
+    open suspend fun getAccountDetailsWithId(accountId: Int): NetworkAccountDetails =
         client.get("account/$accountId").body()
 
-    suspend fun deleteSession(deleteSessionRequest: DeleteSessionRequest) {
+    open suspend fun deleteSession(deleteSessionRequest: DeleteSessionRequest) {
         client.delete("authentication/session") {
             contentType(ContentType.Application.Json)
             setBody(deleteSessionRequest)
