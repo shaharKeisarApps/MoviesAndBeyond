@@ -6,6 +6,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.keisardev.moviesandbeyond.core.model.content.ContentItem
 import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * Screenshot tests for the Movies Feed screen.
@@ -13,8 +15,8 @@ import com.keisardev.moviesandbeyond.core.model.content.MovieListCategory
  * These tests capture visual snapshots of the FeedScreen in various states.
  *
  * Run commands:
- * - Generate reference images: ./gradlew :feature:movies:updateDebugScreenshotTest
- * - Validate against references: ./gradlew :feature:movies:validateDebugScreenshotTest
+ * - Generate reference images: ./gradlew :feature:movies:impl:updateDebugScreenshotTest
+ * - Validate against references: ./gradlew :feature:movies:impl:validateDebugScreenshotTest
  */
 private val previewItems =
     listOf(
@@ -67,7 +69,7 @@ private val previewItems =
 
 private fun createPreviewContentState(category: MovieListCategory) =
     ContentUiState(
-        items = previewItems,
+        items = previewItems.toImmutableList(),
         isLoading = false,
         endReached = false,
         page = 1,
@@ -118,7 +120,7 @@ fun FeedScreenEmpty() {
         FeedScreen(
             nowPlayingMovies =
                 ContentUiState(
-                    items = emptyList(),
+                    items = persistentListOf(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
@@ -126,7 +128,7 @@ fun FeedScreenEmpty() {
                 ),
             popularMovies =
                 ContentUiState(
-                    items = emptyList(),
+                    items = persistentListOf(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
@@ -134,7 +136,7 @@ fun FeedScreenEmpty() {
                 ),
             topRatedMovies =
                 ContentUiState(
-                    items = emptyList(),
+                    items = persistentListOf(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
@@ -142,7 +144,7 @@ fun FeedScreenEmpty() {
                 ),
             upcomingMovies =
                 ContentUiState(
-                    items = emptyList(),
+                    items = persistentListOf(),
                     isLoading = false,
                     endReached = true,
                     page = 1,
