@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.update
 
 val testUserData =
     UserData(
-        useDynamicColor = false,
+        useDynamicColor = true,
         includeAdultResults = false,
-        darkMode = SelectedDarkMode.SYSTEM,
+        darkMode = SelectedDarkMode.DARK,
         hideOnboarding = false,
         seedColor = SeedColor.DEFAULT,
         useLocalOnly = false,

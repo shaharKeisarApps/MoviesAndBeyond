@@ -1,6 +1,7 @@
 plugins {
     id("moviesandbeyond.android.library")
     id("moviesandbeyond.android.library.compose")
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.screenshot)
 }
 
@@ -19,14 +20,15 @@ dependencies {
     api(libs.compose.material3.windowSizeClass)
 
     // Landscapist image loading (KMP core - no Coil/Glide)
-    api(libs.landscapist.core)
-    api(libs.landscapist.image)
-    api(libs.landscapist.animation)
-    api(libs.landscapist.placeholder)
-    api(libs.landscapist.palette)
+    api(libs.bundles.landscapist)
 
     api(libs.haze)
     api(libs.haze.materials)
+
+    // Navigation 3 contracts (NavKey, EntryProviderScope)
+    api(libs.androidx.navigation3.runtime)
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.collections.immutable)
 
     // Color picker for theme customization
     api(libs.colorpicker.compose)

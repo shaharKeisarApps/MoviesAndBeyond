@@ -9,11 +9,11 @@ import com.keisardev.moviesandbeyond.core.local.database.entity.WatchlistContent
 import com.keisardev.moviesandbeyond.core.local.database.entity.asFavoriteContentEntity
 import com.keisardev.moviesandbeyond.core.local.database.entity.asWatchlistContentEntity
 import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryTask
 import com.keisardev.moviesandbeyond.core.model.library.SyncStatus
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.ktor.TmdbApi
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import com.keisardev.moviesandbeyond.core.network.model.library.FavoriteRequest
@@ -71,102 +71,38 @@ constructor(
     }
 
     override suspend fun addOrRemoveFavorite(libraryItem: LibraryItem, isAuthenticated: Boolean) {
-        try {
-            val itemExists =
-                favoriteContentDao.checkFavoriteItemExists(
-                    mediaId = libraryItem.id,
-                    mediaType = libraryItem.mediaType,
-                )
-            if (itemExists) {
-                if (isAuthenticated) {
-                    // Mark for deletion and schedule sync
-                    favoriteContentDao.markForDeletion(libraryItem.id, libraryItem.mediaType)
-                    val libraryTask =
-                        LibraryTask.favoriteItemTask(
-                            mediaId = libraryItem.id,
-                            mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                            itemExists = false,
-                        )
-                    syncScheduler.scheduleLibraryTaskWork(libraryTask)
-                } else {
-                    // Guest mode: delete locally immediately
-                    favoriteContentDao.deleteFavoriteItem(
-                        mediaId = libraryItem.id,
-                        mediaType = libraryItem.mediaType,
-                    )
-                }
-            } else {
-                // Determine sync status based on authentication
-                val syncStatus =
-                    if (isAuthenticated) SyncStatus.PENDING_PUSH else SyncStatus.LOCAL_ONLY
-                favoriteContentDao.insertFavoriteItem(
-                    libraryItem.asFavoriteContentEntity(syncStatus)
-                )
-
-                if (isAuthenticated) {
-                    val libraryTask =
-                        LibraryTask.favoriteItemTask(
-                            mediaId = libraryItem.id,
-                            mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                            itemExists = true,
-                        )
-                    syncScheduler.scheduleLibraryTaskWork(libraryTask)
-                }
-            }
-        } catch (e: IOException) {
-            throw e
-        }
+        addOrRemoveCollectionItem(
+            libraryItem = libraryItem,
+            isAuthenticated = isAuthenticated,
+            checkExists = { id, type ->
+                favoriteContentDao.checkFavoriteItemExists(mediaId = id, mediaType = type)
+            },
+            markForDeletion = { id, type -> favoriteContentDao.markForDeletion(id, type) },
+            deleteItem = { id, type -> favoriteContentDao.deleteFavoriteItem(id, type) },
+            insertItem = { item, status ->
+                favoriteContentDao.insertFavoriteItem(item.asFavoriteContentEntity(status))
+            },
+            createTask = { id, type, exists -> LibraryTask.favoriteItemTask(id, type, exists) },
+        )
     }
 
     override suspend fun addOrRemoveFromWatchlist(
         libraryItem: LibraryItem,
         isAuthenticated: Boolean,
     ) {
-        try {
-            val itemExists =
-                watchlistContentDao.checkWatchlistItemExists(
-                    mediaId = libraryItem.id,
-                    mediaType = libraryItem.mediaType,
-                )
-            if (itemExists) {
-                if (isAuthenticated) {
-                    // Mark for deletion and schedule sync
-                    watchlistContentDao.markForDeletion(libraryItem.id, libraryItem.mediaType)
-                    val libraryTask =
-                        LibraryTask.watchlistItemTask(
-                            mediaId = libraryItem.id,
-                            mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                            itemExists = false,
-                        )
-                    syncScheduler.scheduleLibraryTaskWork(libraryTask)
-                } else {
-                    // Guest mode: delete locally immediately
-                    watchlistContentDao.deleteWatchlistItem(
-                        mediaId = libraryItem.id,
-                        mediaType = libraryItem.mediaType,
-                    )
-                }
-            } else {
-                // Determine sync status based on authentication
-                val syncStatus =
-                    if (isAuthenticated) SyncStatus.PENDING_PUSH else SyncStatus.LOCAL_ONLY
-                watchlistContentDao.insertWatchlistItem(
-                    libraryItem.asWatchlistContentEntity(syncStatus)
-                )
-
-                if (isAuthenticated) {
-                    val libraryTask =
-                        LibraryTask.watchlistItemTask(
-                            mediaId = libraryItem.id,
-                            mediaType = enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
-                            itemExists = true,
-                        )
-                    syncScheduler.scheduleLibraryTaskWork(libraryTask)
-                }
-            }
-        } catch (e: IOException) {
-            throw e
-        }
+        addOrRemoveCollectionItem(
+            libraryItem = libraryItem,
+            isAuthenticated = isAuthenticated,
+            checkExists = { id, type ->
+                watchlistContentDao.checkWatchlistItemExists(mediaId = id, mediaType = type)
+            },
+            markForDeletion = { id, type -> watchlistContentDao.markForDeletion(id, type) },
+            deleteItem = { id, type -> watchlistContentDao.deleteWatchlistItem(id, type) },
+            insertItem = { item, status ->
+                watchlistContentDao.insertWatchlistItem(item.asWatchlistContentEntity(status))
+            },
+            createTask = { id, type, exists -> LibraryTask.watchlistItemTask(id, type, exists) },
+        )
     }
 
     @Suppress("LongMethod") // Sync logic is cohesive and reads better as a single method
@@ -181,21 +117,19 @@ constructor(
                 )
 
         var pushed = 0
-        var pulled = 0
-        var conflicts = 0
         val errors = mutableListOf<String>()
 
-        // Push local-only favorites to TMDB
-        val pendingFavorites = favoriteContentDao.getPendingSyncItems()
-        for (item in pendingFavorites) {
+        // Push pending favorites to TMDB
+        for (item in favoriteContentDao.getPendingSyncItems()) {
             try {
-                val favoriteRequest =
+                tmdbApi.addOrRemoveFavorite(
+                    accountId,
                     FavoriteRequest(
                         mediaType = item.mediaType,
                         mediaId = item.mediaId,
                         favorite = true,
-                    )
-                tmdbApi.addOrRemoveFavorite(accountId, favoriteRequest)
+                    ),
+                )
                 favoriteContentDao.updateSyncStatus(item.mediaId, item.mediaType, SyncStatus.SYNCED)
                 pushed++
             } catch (e: Exception) {
@@ -204,17 +138,17 @@ constructor(
             }
         }
 
-        // Push local-only watchlist to TMDB
-        val pendingWatchlist = watchlistContentDao.getPendingSyncItems()
-        for (item in pendingWatchlist) {
+        // Push pending watchlist to TMDB
+        for (item in watchlistContentDao.getPendingSyncItems()) {
             try {
-                val watchlistRequest =
+                tmdbApi.addOrRemoveFromWatchlist(
+                    accountId,
                     WatchlistRequest(
                         mediaType = item.mediaType,
                         mediaId = item.mediaId,
                         watchlist = true,
-                    )
-                tmdbApi.addOrRemoveFromWatchlist(accountId, watchlistRequest)
+                    ),
+                )
                 watchlistContentDao.updateSyncStatus(
                     item.mediaId,
                     item.mediaType,
@@ -228,16 +162,16 @@ constructor(
         }
 
         // Handle pending deletes for favorites
-        val pendingDeleteFavorites = favoriteContentDao.getPendingDeleteItems()
-        for (item in pendingDeleteFavorites) {
+        for (item in favoriteContentDao.getPendingDeleteItems()) {
             try {
-                val favoriteRequest =
+                tmdbApi.addOrRemoveFavorite(
+                    accountId,
                     FavoriteRequest(
                         mediaType = item.mediaType,
                         mediaId = item.mediaId,
                         favorite = false,
-                    )
-                tmdbApi.addOrRemoveFavorite(accountId, favoriteRequest)
+                    ),
+                )
                 favoriteContentDao.deleteFavoriteItem(item.mediaId, item.mediaType)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to delete favorite ${item.mediaId} from TMDB", e)
@@ -246,16 +180,16 @@ constructor(
         }
 
         // Handle pending deletes for watchlist
-        val pendingDeleteWatchlist = watchlistContentDao.getPendingDeleteItems()
-        for (item in pendingDeleteWatchlist) {
+        for (item in watchlistContentDao.getPendingDeleteItems()) {
             try {
-                val watchlistRequest =
+                tmdbApi.addOrRemoveFromWatchlist(
+                    accountId,
                     WatchlistRequest(
                         mediaType = item.mediaType,
                         mediaId = item.mediaId,
                         watchlist = false,
-                    )
-                tmdbApi.addOrRemoveFromWatchlist(accountId, watchlistRequest)
+                    ),
+                )
                 watchlistContentDao.deleteWatchlistItem(item.mediaId, item.mediaType)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to delete watchlist ${item.mediaId} from TMDB", e)
@@ -267,7 +201,7 @@ constructor(
         syncFavorites()
         syncWatchlist()
 
-        return SyncResult(pushed = pushed, pulled = pulled, conflicts = conflicts, errors = errors)
+        return SyncResult(pushed = pushed, pulled = 0, conflicts = 0, errors = errors)
     }
 
     override suspend fun getFavoriteSyncStatus(mediaId: Int, mediaType: MediaType): SyncStatus? {
@@ -341,84 +275,31 @@ constructor(
      */
     override suspend fun syncFavorites(): Boolean {
         val accountId = accountDetailsDao.getAccountDetails()?.id ?: return false
-
-        val favoriteItemTypeString = LibraryItemType.FAVORITE.name.lowercase()
-        return syncFromLocalAndNetwork(
-            fetchFromNetwork = { mediaTypeString ->
-                val favoriteItemsNetworkResults = mutableListOf<NetworkContentItem>()
-
-                var favoriteItemsPage = 1
-                do {
-                    val result =
-                        tmdbApi
-                            .getLibraryItems(
-                                accountId = accountId,
-                                itemType = favoriteItemTypeString,
-                                mediaType = mediaTypeString,
-                                page = favoriteItemsPage++,
-                            )
-                            .results
-
-                    favoriteItemsNetworkResults.addAll(result)
-                } while (result.isNotEmpty())
-
-                favoriteItemsNetworkResults
+        val itemTypeString = LibraryItemType.FAVORITE.name.lowercase()
+        return syncCollection(
+            accountId = accountId,
+            itemTypeString = itemTypeString,
+            itemType = LibraryItemType.FAVORITE,
+            fetchLocalByMediaType = { mediaType ->
+                when (mediaType) {
+                    MediaType.MOVIE ->
+                        favoriteContentDao.getFavoriteMovies().first().map { entity ->
+                            LocalItem(entity.mediaId, entity.mediaType, entity.syncStatus)
+                        }
+                    MediaType.TV ->
+                        favoriteContentDao.getFavoriteTvShows().first().map { entity ->
+                            LocalItem(entity.mediaId, entity.mediaType, entity.syncStatus)
+                        }
+                    else -> emptyList()
+                }
             },
-            fetchStaleItemsFromLocalSource = { mediaType, networkResultsPair ->
-                val favoriteItems =
-                    when (mediaType) {
-                        MediaType.MOVIE -> favoriteContentDao.getFavoriteMovies().first()
-                        MediaType.TV -> favoriteContentDao.getFavoriteTvShows().first()
-                        else -> emptyList() // Unreachable
-                    }
-
-                favoriteItems
-                    .filter {
-                        // Only consider SYNCED items as stale (not LOCAL_ONLY or PENDING_PUSH)
-                        it.syncStatus == SyncStatus.SYNCED &&
-                            Pair(it.mediaId, it.mediaType) !in networkResultsPair &&
-                            syncScheduler.isWorkNotScheduled(
-                                mediaId = it.mediaId,
-                                mediaType = mediaType,
-                                itemType = LibraryItemType.FAVORITE,
-                            )
-                    }
-                    .map { Pair(it.mediaId, it.mediaType) }
-            },
-            fetchFromLocalSource = { mediaType, mediaTypeString, networkResults ->
-                networkResults
-                    .filter {
-                        syncScheduler.isWorkNotScheduled(
-                            mediaId = it.id,
-                            mediaType = mediaType,
-                            itemType = LibraryItemType.FAVORITE,
-                        )
-                    }
-                    .map {
-                        val contentItem = it.asModel()
-                        val item =
-                            favoriteContentDao
-                                .getFavoriteItem(
-                                    mediaId = contentItem.id,
-                                    mediaType = mediaTypeString,
-                                )
-                                ?.asLibraryItem()
-
-                        item?.copy(imagePath = contentItem.imagePath, name = contentItem.name)
-                            ?: LibraryItem(
-                                id = contentItem.id,
-                                mediaType = mediaTypeString,
-                                imagePath = contentItem.imagePath,
-                                name = contentItem.name,
-                            )
-                    }
+            fetchLocalItem = { mediaId, mediaTypeString ->
+                favoriteContentDao.getFavoriteItem(mediaId, mediaTypeString)?.asLibraryItem()
             },
             updateLocalSource = { libraryItems, staleItems ->
                 favoriteContentDao.syncFavoriteItems(
                     upsertItems =
-                        libraryItems.map { item ->
-                            item.asFavoriteContentEntity(SyncStatus.SYNCED)
-                        },
+                        libraryItems.map { it.asFavoriteContentEntity(SyncStatus.SYNCED) },
                     deleteItems = staleItems,
                 )
             },
@@ -431,38 +312,119 @@ constructor(
      */
     override suspend fun syncWatchlist(): Boolean {
         val accountId = accountDetailsDao.getAccountDetails()?.id ?: return false
+        val itemTypeString = LibraryItemType.WATCHLIST.name.lowercase()
+        return syncCollection(
+            accountId = accountId,
+            itemTypeString = itemTypeString,
+            itemType = LibraryItemType.WATCHLIST,
+            fetchLocalByMediaType = { mediaType ->
+                when (mediaType) {
+                    MediaType.MOVIE ->
+                        watchlistContentDao.getMoviesWatchlist().first().map { entity ->
+                            LocalItem(entity.mediaId, entity.mediaType, entity.syncStatus)
+                        }
+                    MediaType.TV ->
+                        watchlistContentDao.getTvShowsWatchlist().first().map { entity ->
+                            LocalItem(entity.mediaId, entity.mediaType, entity.syncStatus)
+                        }
+                    else -> emptyList()
+                }
+            },
+            fetchLocalItem = { mediaId, mediaTypeString ->
+                watchlistContentDao.getWatchlistItem(mediaId, mediaTypeString)?.asLibraryItem()
+            },
+            updateLocalSource = { libraryItems, staleItems ->
+                watchlistContentDao.syncWatchlistItems(
+                    upsertItems =
+                        libraryItems.map { it.asWatchlistContentEntity(SyncStatus.SYNCED) },
+                    deleteItems = staleItems,
+                )
+            },
+        )
+    }
 
-        val watchlistItemTypeString = LibraryItemType.WATCHLIST.name.lowercase()
+    // region Private helpers
+
+    /**
+     * Shared logic for adding or removing an item from a collection (favorites or watchlist). The
+     * caller supplies DAO-specific lambdas; this function handles the branching on existence and
+     * authentication state.
+     */
+    private suspend fun addOrRemoveCollectionItem(
+        libraryItem: LibraryItem,
+        isAuthenticated: Boolean,
+        checkExists: suspend (mediaId: Int, mediaType: String) -> Boolean,
+        markForDeletion: suspend (mediaId: Int, mediaType: String) -> Unit,
+        deleteItem: suspend (mediaId: Int, mediaType: String) -> Unit,
+        insertItem: suspend (item: LibraryItem, status: SyncStatus) -> Unit,
+        createTask: (mediaId: Int, mediaType: MediaType, itemExists: Boolean) -> LibraryTask,
+    ) {
+        val itemExists = checkExists(libraryItem.id, libraryItem.mediaType)
+        if (itemExists) {
+            if (isAuthenticated) {
+                // Mark for deletion and schedule sync
+                markForDeletion(libraryItem.id, libraryItem.mediaType)
+                syncScheduler.scheduleLibraryTaskWork(
+                    createTask(
+                        libraryItem.id,
+                        enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
+                        false,
+                    )
+                )
+            } else {
+                // Guest mode: delete locally immediately
+                deleteItem(libraryItem.id, libraryItem.mediaType)
+            }
+        } else {
+            val syncStatus = if (isAuthenticated) SyncStatus.PENDING_PUSH else SyncStatus.LOCAL_ONLY
+            insertItem(libraryItem, syncStatus)
+            if (isAuthenticated) {
+                syncScheduler.scheduleLibraryTaskWork(
+                    createTask(
+                        libraryItem.id,
+                        enumValueOf<MediaType>(libraryItem.mediaType.uppercase()),
+                        true,
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Shared sync logic for a collection (favorites or watchlist). Delegates to
+     * [syncFromLocalAndNetwork] with DAO-specific lambdas supplied by the caller.
+     *
+     * [fetchLocalByMediaType] returns a list of [LocalItem] — a lightweight, entity-agnostic
+     * projection of the fields needed for staleness detection.
+     */
+    private suspend fun syncCollection(
+        accountId: Int,
+        itemTypeString: String,
+        itemType: LibraryItemType,
+        fetchLocalByMediaType: suspend (MediaType) -> List<LocalItem>,
+        fetchLocalItem: suspend (mediaId: Int, mediaTypeString: String) -> LibraryItem?,
+        updateLocalSource: suspend (List<LibraryItem>, List<Pair<Int, String>>) -> Unit,
+    ): Boolean {
         return syncFromLocalAndNetwork(
             fetchFromNetwork = { mediaTypeString ->
-                val watchlistItemsNetworkResults = mutableListOf<NetworkContentItem>()
-
-                var watchlistItemsPage = 1
+                val networkResults = mutableListOf<NetworkContentItem>()
+                var page = 1
                 do {
                     val result =
                         tmdbApi
                             .getLibraryItems(
                                 accountId = accountId,
-                                itemType = watchlistItemTypeString,
+                                itemType = itemTypeString,
                                 mediaType = mediaTypeString,
-                                page = watchlistItemsPage++,
+                                page = page++,
                             )
                             .results
-
-                    watchlistItemsNetworkResults.addAll(result)
+                    networkResults.addAll(result)
                 } while (result.isNotEmpty())
-
-                watchlistItemsNetworkResults
+                networkResults
             },
             fetchStaleItemsFromLocalSource = { mediaType, networkResultsPair ->
-                val watchlistItems =
-                    when (mediaType) {
-                        MediaType.MOVIE -> watchlistContentDao.getMoviesWatchlist().first()
-                        MediaType.TV -> watchlistContentDao.getTvShowsWatchlist().first()
-                        else -> emptyList() // Unreachable
-                    }
-
-                watchlistItems
+                fetchLocalByMediaType(mediaType)
                     .filter {
                         // Only consider SYNCED items as stale (not LOCAL_ONLY or PENDING_PUSH)
                         it.syncStatus == SyncStatus.SYNCED &&
@@ -470,7 +432,7 @@ constructor(
                             syncScheduler.isWorkNotScheduled(
                                 mediaId = it.mediaId,
                                 mediaType = mediaType,
-                                itemType = LibraryItemType.WATCHLIST,
+                                itemType = itemType,
                             )
                     }
                     .map { Pair(it.mediaId, it.mediaType) }
@@ -481,20 +443,13 @@ constructor(
                         syncScheduler.isWorkNotScheduled(
                             mediaId = it.id,
                             mediaType = mediaType,
-                            itemType = LibraryItemType.WATCHLIST,
+                            itemType = itemType,
                         )
                     }
                     .map {
                         val contentItem = it.asModel()
-                        val item =
-                            watchlistContentDao
-                                .getWatchlistItem(
-                                    mediaId = contentItem.id,
-                                    mediaType = mediaTypeString,
-                                )
-                                ?.asLibraryItem()
-
-                        item?.copy(imagePath = contentItem.imagePath, name = contentItem.name)
+                        val existing = fetchLocalItem(contentItem.id, mediaTypeString)
+                        existing?.copy(imagePath = contentItem.imagePath, name = contentItem.name)
                             ?: LibraryItem(
                                 id = contentItem.id,
                                 mediaType = mediaTypeString,
@@ -503,15 +458,19 @@ constructor(
                             )
                     }
             },
-            updateLocalSource = { libraryItems, staleItems ->
-                watchlistContentDao.syncWatchlistItems(
-                    upsertItems =
-                        libraryItems.map { item ->
-                            item.asWatchlistContentEntity(SyncStatus.SYNCED)
-                        },
-                    deleteItems = staleItems,
-                )
-            },
+            updateLocalSource = updateLocalSource,
         )
     }
+
+    /**
+     * Entity-agnostic projection used by [syncCollection] to detect stale items without coupling to
+     * a specific entity type.
+     */
+    private data class LocalItem(
+        val mediaId: Int,
+        val mediaType: String,
+        val syncStatus: SyncStatus,
+    )
+
+    // endregion
 }

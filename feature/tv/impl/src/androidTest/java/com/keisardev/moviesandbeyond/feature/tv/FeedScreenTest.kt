@@ -1,0 +1,83 @@
+package com.keisardev.moviesandbeyond.feature.tv
+
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import com.keisardev.moviesandbeyond.core.model.content.ContentItem
+import com.keisardev.moviesandbeyond.core.model.content.TvShowListCategory
+import kotlinx.collections.immutable.persistentListOf
+import org.junit.Rule
+import org.junit.Test
+
+class FeedScreenTest {
+
+    @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun feedScreen_whenLoading_showsSectionTitles() {
+        val airingTodayText = composeTestRule.activity.getString(R.string.airing_today)
+
+        composeTestRule.setContent {
+            FeedScreen(
+                airingTodayTvShows = ContentUiState(category = TvShowListCategory.AIRING_TODAY),
+                onAirTvShows = ContentUiState(category = TvShowListCategory.ON_THE_AIR),
+                topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
+                popularTvShows = ContentUiState(category = TvShowListCategory.POPULAR),
+                errorMessage = null,
+                onItemClick = {},
+                onSeeAllClick = {},
+                onErrorShown = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText(airingTodayText).assertIsDisplayed()
+    }
+
+    @Test
+    fun feedScreen_withContent_showsHeroTitle() {
+        val testShow = ContentItem(id = 1, imagePath = "", name = "Test TV Show", rating = 9.0)
+
+        composeTestRule.setContent {
+            FeedScreen(
+                airingTodayTvShows = ContentUiState(category = TvShowListCategory.AIRING_TODAY),
+                onAirTvShows = ContentUiState(category = TvShowListCategory.ON_THE_AIR),
+                topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
+                popularTvShows =
+                    ContentUiState(
+                        items = persistentListOf(testShow),
+                        isLoading = false,
+                        endReached = false,
+                        page = 1,
+                        category = TvShowListCategory.POPULAR,
+                    ),
+                errorMessage = null,
+                onItemClick = {},
+                onSeeAllClick = {},
+                onErrorShown = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Test TV Show").assertIsDisplayed()
+    }
+
+    @Test
+    fun feedScreen_whenError_showsSnackbar() {
+        val errorMessage = "Connection failed"
+
+        composeTestRule.setContent {
+            FeedScreen(
+                airingTodayTvShows = ContentUiState(category = TvShowListCategory.AIRING_TODAY),
+                onAirTvShows = ContentUiState(category = TvShowListCategory.ON_THE_AIR),
+                topRatedTvShows = ContentUiState(category = TvShowListCategory.TOP_RATED),
+                popularTvShows = ContentUiState(category = TvShowListCategory.POPULAR),
+                errorMessage = errorMessage,
+                onItemClick = {},
+                onSeeAllClick = {},
+                onErrorShown = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
+    }
+}

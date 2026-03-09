@@ -1,10 +1,10 @@
 package com.keisardev.moviesandbeyond.data.util
 
 import com.keisardev.moviesandbeyond.core.model.MediaType
+import com.keisardev.moviesandbeyond.core.model.error.NetworkError
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItem
 import com.keisardev.moviesandbeyond.core.model.library.LibraryItemType
 import com.keisardev.moviesandbeyond.core.model.library.LibraryTask
-import com.keisardev.moviesandbeyond.core.network.error.NetworkError
 import com.keisardev.moviesandbeyond.core.network.model.content.NetworkContentItem
 import java.io.IOException
 import kotlinx.coroutines.coroutineScope

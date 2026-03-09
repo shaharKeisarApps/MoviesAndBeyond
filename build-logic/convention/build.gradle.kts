@@ -13,6 +13,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.compose.compiler.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    implementation(libs.kotlinSerialization.gradlePlugin)
 }
 
 gradlePlugin {
@@ -40,6 +41,10 @@ gradlePlugin {
         register("androidFeature") {
             id = "moviesandbeyond.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
+        }
+        register("androidFeatureApi") {
+            id = "moviesandbeyond.android.feature.api"
+            implementationClass = "AndroidFeatureApiConventionPlugin"
         }
         register("androidJacoco") {
             id = "moviesandbeyond.android.jacoco"

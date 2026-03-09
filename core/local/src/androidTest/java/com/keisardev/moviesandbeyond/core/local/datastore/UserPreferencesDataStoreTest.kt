@@ -20,7 +20,7 @@ class UserPreferencesDataStoreTest {
             UserPreferencesDataStore(
                 DataStoreFactory.create(
                     serializer = UserPreferencesSerializer,
-                    produceFile = { tmpFolder.newFile("user_prefs_test.pb") },
+                    produceFile = { tmpFolder.root.resolve("user_prefs_test.pb") },
                 )
             )
     }
@@ -37,10 +37,10 @@ class UserPreferencesDataStoreTest {
     }
 
     @Test
-    fun darkModeDefaultIsSystem() = runTest {
+    fun darkModeDefaultIsDark() = runTest {
         TestCase.assertEquals(
             userPreferencesDataStore.userData.first().darkMode,
-            com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.SYSTEM,
+            com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK,
         )
     }
 }

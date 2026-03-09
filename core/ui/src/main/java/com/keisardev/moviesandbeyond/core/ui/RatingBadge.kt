@@ -64,7 +64,19 @@ fun getRatingColor(score: Double): Color {
     }
 }
 
-/** Get the text/icon color for a rating badge ensuring WCAG contrast. */
+/**
+ * Get the text/icon color for a rating badge ensuring WCAG AA contrast.
+ *
+ * The content colors here are intentionally hardcoded rather than pulled from MaterialTheme tokens.
+ * Rating badge backgrounds are semantic fixed colors (green/amber/orange/red — see [RatingColors])
+ * that do not change with the app theme. Pairing them with theme-adaptive text colors would break
+ * contrast in certain theme configurations. Specifically:
+ * - Amber (#FFC107) and orange (#FF9800) are mid-luminance backgrounds. Dark text (`0xFF1C1B1F`,
+ *   ~4.6:1 contrast ratio) satisfies WCAG AA; white text would fail (~1.8:1).
+ * - Green (#4CAF50) and red (#F44336) are dark enough that white text meets WCAG AA.
+ *
+ * Do NOT replace these with MaterialTheme color tokens.
+ */
 fun getRatingContentColor(score: Double): Color {
     return when {
         // Amber and orange backgrounds need dark text for WCAG AA contrast

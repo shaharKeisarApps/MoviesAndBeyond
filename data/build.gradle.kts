@@ -3,7 +3,10 @@ plugins {
     id("moviesandbeyond.android.hilt")
 }
 
-android { namespace = "com.keisardev.moviesandbeyond.data" }
+android {
+    namespace = "com.keisardev.moviesandbeyond.data"
+    testOptions { unitTests.isReturnDefaultValues = true }
+}
 
 dependencies {
     api(projects.core.model)
@@ -15,4 +18,7 @@ dependencies {
     api(libs.store5)
 
     testImplementation(projects.core.testing)
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.androidx.datastore)
+    testImplementation(libs.protobuf.kotlin.lite)
 }

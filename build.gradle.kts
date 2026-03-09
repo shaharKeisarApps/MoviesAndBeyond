@@ -108,12 +108,12 @@ val jacocoModules =
         ":core:testing",
         ":core:ui",
         ":data",
-        ":feature:auth",
-        ":feature:details",
-        ":feature:movies",
-        ":feature:search",
-        ":feature:tv",
-        ":feature:you",
+        ":feature:auth:impl",
+        ":feature:details:impl",
+        ":feature:movies:impl",
+        ":feature:search:impl",
+        ":feature:tv:impl",
+        ":feature:you:impl",
         ":sync",
     )
 

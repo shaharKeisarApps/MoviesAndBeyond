@@ -1,6 +1,6 @@
 package com.keisardev.moviesandbeyond.core.ui.loading
 
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -41,7 +41,7 @@ fun shimmerBrush(): Brush {
     val shimmerColors =
         listOf(
             MaterialTheme.colorScheme.surfaceVariant,
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
             MaterialTheme.colorScheme.surfaceVariant,
         )
 
@@ -52,7 +52,8 @@ fun shimmerBrush(): Brush {
             targetValue = 1000f,
             animationSpec =
                 infiniteRepeatable(
-                    animation = tween(durationMillis = 1200, easing = LinearEasing),
+                    animation =
+                        tween(durationMillis = 1600, delayMillis = 200, easing = EaseInOutCubic),
                     repeatMode = RepeatMode.Restart,
                 ),
             label = "shimmerTranslate",

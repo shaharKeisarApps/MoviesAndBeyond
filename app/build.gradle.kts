@@ -70,12 +70,12 @@ android {
 dependencies {
     implementation(projects.core.ui)
     implementation(projects.data)
-    implementation(projects.feature.auth)
-    implementation(projects.feature.details)
-    implementation(projects.feature.movies)
-    implementation(projects.feature.search)
-    implementation(projects.feature.tv)
-    implementation(projects.feature.you)
+    implementation(projects.feature.auth.impl)
+    implementation(projects.feature.details.impl)
+    implementation(projects.feature.movies.impl)
+    implementation(projects.feature.search.impl)
+    implementation(projects.feature.tv.impl)
+    implementation(projects.feature.you.impl)
     implementation(projects.sync)
 
     implementation(libs.activity.compose)
@@ -104,4 +104,7 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(projects.core.testing)
+    testImplementation(projects.data)
 }
