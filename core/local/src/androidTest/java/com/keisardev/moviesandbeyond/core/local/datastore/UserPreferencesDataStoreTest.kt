@@ -37,10 +37,10 @@ class UserPreferencesDataStoreTest {
     }
 
     @Test
-    fun darkModeDefaultIsSystem() = runTest {
+    fun darkModeDefaultIsDark() = runTest {
         TestCase.assertEquals(
             userPreferencesDataStore.userData.first().darkMode,
-            com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.SYSTEM,
+            com.keisardev.moviesandbeyond.core.model.SelectedDarkMode.DARK,
         )
     }
 }

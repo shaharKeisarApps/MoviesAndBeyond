@@ -2,6 +2,7 @@ package com.keisardev.moviesandbeyond.data.repository.impl
 
 import androidx.datastore.core.DataStore
 import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesDataStore
+import com.keisardev.moviesandbeyond.core.local.datastore.UserPreferencesSerializer
 import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,7 @@ fun FakeUserPreferencesDataStore(): UserPreferencesDataStore {
  * is performed.
  */
 private class InMemoryUserPreferencesDataStore : DataStore<UserPreferences> {
-    private val state = MutableStateFlow(UserPreferences.getDefaultInstance())
+    private val state = MutableStateFlow(UserPreferencesSerializer.defaultValue)
 
     override val data: Flow<UserPreferences> = state
 

@@ -43,9 +43,9 @@ class UserRepositoryImplTest {
     fun `userData emits default preferences initially`() = runTest {
         val userData = repository.userData.first()
 
-        assertFalse(userData.useDynamicColor)
+        assertTrue(userData.useDynamicColor)
         assertFalse(userData.includeAdultResults)
-        assertEquals(SelectedDarkMode.SYSTEM, userData.darkMode)
+        assertEquals(SelectedDarkMode.DARK, userData.darkMode)
         assertFalse(userData.hideOnboarding)
     }
 

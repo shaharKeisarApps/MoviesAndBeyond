@@ -200,7 +200,7 @@ jobs:
           arch: x86_64
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest :core:local:connectedDebugAndroidTest :core:ui:connectedDebugAndroidTest :feature:auth:connectedDebugAndroidTest :feature:details:connectedDebugAndroidTest :feature:movies:connectedDebugAndroidTest :feature:search:connectedDebugAndroidTest :feature:tv:connectedDebugAndroidTest :feature:you:connectedDebugAndroidTest
+          script: ./gradlew :app:connectedDebugAndroidTest :core:local:connectedDebugAndroidTest :core:ui:connectedDebugAndroidTest :feature:auth:impl:connectedDebugAndroidTest :feature:details:impl:connectedDebugAndroidTest :feature:movies:impl:connectedDebugAndroidTest :feature:search:impl:connectedDebugAndroidTest :feature:tv:impl:connectedDebugAndroidTest :feature:you:impl:connectedDebugAndroidTest
 
       - name: Upload test reports
         if: always()

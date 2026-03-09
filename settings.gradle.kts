@@ -34,17 +34,29 @@ include(":core:ui")
 
 include(":data")
 
-include(":feature:auth")
+include(":feature:auth:api")
 
-include(":feature:details")
+include(":feature:auth:impl")
 
-include(":feature:movies")
+include(":feature:details:api")
 
-include(":feature:search")
+include(":feature:details:impl")
 
-include(":feature:tv")
+include(":feature:movies:api")
 
-include(":feature:you")
+include(":feature:movies:impl")
+
+include(":feature:search:api")
+
+include(":feature:search:impl")
+
+include(":feature:tv:api")
+
+include(":feature:tv:impl")
+
+include(":feature:you:api")
+
+include(":feature:you:impl")
 
 include(":sync")
 

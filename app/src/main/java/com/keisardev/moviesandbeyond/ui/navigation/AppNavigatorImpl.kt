@@ -7,13 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.NavKey
 import com.keisardev.moviesandbeyond.core.ui.navigation.AppNavigator
-import com.keisardev.moviesandbeyond.core.ui.navigation.AuthRoute
-import com.keisardev.moviesandbeyond.core.ui.navigation.MoviesFeedRoute
 import com.keisardev.moviesandbeyond.core.ui.navigation.OnboardingRoute
-import com.keisardev.moviesandbeyond.core.ui.navigation.SearchRoute
 import com.keisardev.moviesandbeyond.core.ui.navigation.TopLevelRoute
-import com.keisardev.moviesandbeyond.core.ui.navigation.TvShowsFeedRoute
-import com.keisardev.moviesandbeyond.core.ui.navigation.YouRoute
+import com.keisardev.moviesandbeyond.feature.auth.AuthRoute
+import com.keisardev.moviesandbeyond.feature.movies.MoviesFeedRoute
+import com.keisardev.moviesandbeyond.feature.search.SearchRoute
+import com.keisardev.moviesandbeyond.feature.tv.TvShowsFeedRoute
+import com.keisardev.moviesandbeyond.feature.you.YouRoute
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import javax.inject.Inject
 

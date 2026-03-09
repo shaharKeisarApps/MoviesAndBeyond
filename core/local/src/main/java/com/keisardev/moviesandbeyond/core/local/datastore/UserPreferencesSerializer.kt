@@ -3,13 +3,18 @@ package com.keisardev.moviesandbeyond.core.local.datastore
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
+import com.keisardev.moviesandbeyond.core.local.proto.DarkMode
 import com.keisardev.moviesandbeyond.core.local.proto.UserPreferences
 import java.io.InputStream
 import java.io.OutputStream
 
 object UserPreferencesSerializer : Serializer<UserPreferences> {
     override val defaultValue: UserPreferences =
-        UserPreferences.getDefaultInstance().toBuilder().setUseDynamicColor(true).build()
+        UserPreferences.getDefaultInstance()
+            .toBuilder()
+            .setUseDynamicColor(true)
+            .setDarkMode(DarkMode.DARK_MODE_DARK)
+            .build()
 
     override suspend fun readFrom(input: InputStream): UserPreferences {
         try {
