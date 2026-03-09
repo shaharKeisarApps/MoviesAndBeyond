@@ -85,6 +85,7 @@ import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
 import com.keisardev.moviesandbeyond.feature.you.R
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
 @Composable
@@ -117,8 +118,8 @@ fun LibraryItemsRoute(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun LibraryItemsScreen(
-    movieItems: List<LibraryItem>,
-    tvItems: List<LibraryItem>,
+    movieItems: ImmutableList<LibraryItem>,
+    tvItems: ImmutableList<LibraryItem>,
     libraryItemType: LibraryItemType?,
     errorMessage: String?,
     onDeleteItem: (LibraryItem) -> Unit,
@@ -227,7 +228,7 @@ internal fun LibraryItemsScreen(
 
 @Composable
 private fun LibraryContent(
-    content: List<LibraryItem>,
+    content: ImmutableList<LibraryItem>,
     libraryItemType: LibraryItemType?,
     onItemClick: (String) -> Unit,
     onDeleteClick: (LibraryItem) -> Unit,

@@ -11,6 +11,9 @@ import com.keisardev.moviesandbeyond.core.ui.toUserFriendlyMessage
 import com.keisardev.moviesandbeyond.data.repository.ContentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,7 +120,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                 }
             }
             .combine(accumulatedFlow) { currentState, accumulated ->
-                currentState.copy(items = accumulated)
+                currentState.copy(items = accumulated.toImmutableList())
             }
 
     /**
@@ -132,7 +135,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
         return when (result) {
             is Result.Loading -> {
                 ContentUiState(
-                    items = accumulatedFlow.value,
+                    items = accumulatedFlow.value.toImmutableList(),
                     isLoading = true,
                     endReached = false,
                     page = page,
@@ -147,7 +150,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
                     }
                 }
                 ContentUiState(
-                    items = accumulatedFlow.value,
+                    items = accumulatedFlow.value.toImmutableList(),
                     isLoading = false,
                     endReached = newItems.isEmpty(),
                     page = page,
@@ -157,7 +160,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
             is Result.Error -> {
                 _errorMessage.update { result.toUserFriendlyMessage() }
                 ContentUiState(
-                    items = accumulatedFlow.value,
+                    items = accumulatedFlow.value.toImmutableList(),
                     isLoading = false,
                     endReached = false,
                     page = page,
@@ -218,7 +221,7 @@ class TvShowsViewModel @Inject constructor(private val contentRepository: Conten
  */
 @Immutable
 data class ContentUiState(
-    val items: List<ContentItem>,
+    val items: ImmutableList<ContentItem>,
     val isLoading: Boolean,
     val endReached: Boolean,
     val page: Int,
@@ -227,7 +230,7 @@ data class ContentUiState(
     constructor(
         category: TvShowListCategory
     ) : this(
-        items = emptyList(),
+        items = persistentListOf(),
         isLoading = true,
         endReached = false,
         page = 1,

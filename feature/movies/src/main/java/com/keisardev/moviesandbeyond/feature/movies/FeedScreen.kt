@@ -30,6 +30,8 @@ import com.keisardev.moviesandbeyond.core.ui.ShimmerPosterCarousel
 import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun FeedRoute(
@@ -103,17 +105,20 @@ internal fun FeedScreen(
                     if (popularMovies.items.isNotEmpty()) {
                         val heroItems =
                             remember(popularMovies.items) {
-                                popularMovies.items.take(5).map { item ->
-                                    HeroCarouselItem(
-                                        id = item.id,
-                                        title = item.name,
-                                        posterPath = item.imagePath,
-                                        backdropPath = item.backdropPath,
-                                        rating = item.rating,
-                                        releaseYear = item.releaseDate?.take(4),
-                                        overview = item.overview,
-                                    )
-                                }
+                                popularMovies.items
+                                    .take(5)
+                                    .map { item ->
+                                        HeroCarouselItem(
+                                            id = item.id,
+                                            title = item.name,
+                                            posterPath = item.imagePath,
+                                            backdropPath = item.backdropPath,
+                                            rating = item.rating,
+                                            releaseYear = item.releaseDate?.take(4),
+                                            overview = item.overview,
+                                        )
+                                    }
+                                    .toImmutableList()
                             }
                         MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                     } else {
@@ -173,7 +178,7 @@ internal fun FeedScreen(
 
 @Composable
 private fun CarouselSection(
-    items: List<ContentItem>,
+    items: ImmutableList<ContentItem>,
     isLoading: Boolean,
     sectionName: String,
     onItemClick: (Int) -> Unit,
@@ -205,12 +210,20 @@ private fun CarouselSection(
 
 private val previewItems =
     listOf(
-        ContentItem(1, "/poster1.jpg", "Dune: Part Two", "/backdrop1.jpg", 8.5, "2024-03-01"),
-        ContentItem(2, "/poster2.jpg", "Oppenheimer", "/backdrop2.jpg", 8.3, "2023-07-21"),
-        ContentItem(3, "/poster3.jpg", "The Batman", "/backdrop3.jpg", 7.8, "2022-03-04"),
-        ContentItem(4, "/poster4.jpg", "Avatar: The Way of Water", "/backdrop4.jpg", 7.6, "2022"),
-        ContentItem(5, "/poster5.jpg", "Top Gun: Maverick", "/backdrop5.jpg", 8.2, "2022-05-27"),
-    )
+            ContentItem(1, "/poster1.jpg", "Dune: Part Two", "/backdrop1.jpg", 8.5, "2024-03-01"),
+            ContentItem(2, "/poster2.jpg", "Oppenheimer", "/backdrop2.jpg", 8.3, "2023-07-21"),
+            ContentItem(3, "/poster3.jpg", "The Batman", "/backdrop3.jpg", 7.8, "2022-03-04"),
+            ContentItem(
+                4,
+                "/poster4.jpg",
+                "Avatar: The Way of Water",
+                "/backdrop4.jpg",
+                7.6,
+                "2022",
+            ),
+            ContentItem(5, "/poster5.jpg", "Top Gun: Maverick", "/backdrop5.jpg", 8.2, "2022-05-27"),
+        )
+        .toImmutableList()
 
 private fun previewContentUiState(category: MovieListCategory) =
     ContentUiState(

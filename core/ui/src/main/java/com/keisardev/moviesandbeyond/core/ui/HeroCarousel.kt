@@ -50,6 +50,8 @@ import com.keisardev.moviesandbeyond.core.ui.loading.shimmerBrush
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.RatingBadgeSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 private val HeroGradientBrush =
     Brush.verticalGradient(
@@ -85,7 +87,7 @@ data class HeroCarouselItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaHeroCarousel(
-    items: List<HeroCarouselItem>,
+    items: ImmutableList<HeroCarouselItem>,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -250,7 +252,7 @@ private fun HeroCarouselItemContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaPosterCarousel(
-    items: List<ContentItem>,
+    items: ImmutableList<ContentItem>,
     onItemClick: (Int) -> Unit,
     posterSize: PosterSize,
     modifier: Modifier = Modifier,
@@ -377,52 +379,53 @@ fun ShimmerHeroCarousel(modifier: Modifier = Modifier) {
 
 private val previewItems =
     listOf(
-        HeroCarouselItem(
-            id = 1,
-            title = "Dune: Part Two",
-            posterPath = "/poster1.jpg",
-            backdropPath = "/backdrop1.jpg",
-            rating = 8.5,
-            releaseYear = "2024",
-            overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge.",
-        ),
-        HeroCarouselItem(
-            id = 2,
-            title = "Oppenheimer",
-            posterPath = "/poster2.jpg",
-            backdropPath = "/backdrop2.jpg",
-            rating = 8.3,
-            releaseYear = "2023",
-            overview = "The story of American scientist J. Robert Oppenheimer.",
-        ),
-        HeroCarouselItem(
-            id = 3,
-            title = "The Batman",
-            posterPath = "/poster3.jpg",
-            backdropPath = "/backdrop3.jpg",
-            rating = 7.8,
-            releaseYear = "2022",
-            overview = "Batman investigates when a serial killer targets Gotham's elite.",
-        ),
-        HeroCarouselItem(
-            id = 4,
-            title = "Avatar: The Way of Water",
-            posterPath = "/poster4.jpg",
-            backdropPath = "/backdrop4.jpg",
-            rating = 7.6,
-            releaseYear = "2022",
-            overview = "Jake Sully lives with his newfound family on Pandora.",
-        ),
-        HeroCarouselItem(
-            id = 5,
-            title = "Top Gun: Maverick",
-            posterPath = "/poster5.jpg",
-            backdropPath = "/backdrop5.jpg",
-            rating = 8.2,
-            releaseYear = "2022",
-            overview = "Maverick is still pushing the envelope as a top naval aviator.",
-        ),
-    )
+            HeroCarouselItem(
+                id = 1,
+                title = "Dune: Part Two",
+                posterPath = "/poster1.jpg",
+                backdropPath = "/backdrop1.jpg",
+                rating = 8.5,
+                releaseYear = "2024",
+                overview = "Paul Atreides unites with Chani and the Fremen while seeking revenge.",
+            ),
+            HeroCarouselItem(
+                id = 2,
+                title = "Oppenheimer",
+                posterPath = "/poster2.jpg",
+                backdropPath = "/backdrop2.jpg",
+                rating = 8.3,
+                releaseYear = "2023",
+                overview = "The story of American scientist J. Robert Oppenheimer.",
+            ),
+            HeroCarouselItem(
+                id = 3,
+                title = "The Batman",
+                posterPath = "/poster3.jpg",
+                backdropPath = "/backdrop3.jpg",
+                rating = 7.8,
+                releaseYear = "2022",
+                overview = "Batman investigates when a serial killer targets Gotham's elite.",
+            ),
+            HeroCarouselItem(
+                id = 4,
+                title = "Avatar: The Way of Water",
+                posterPath = "/poster4.jpg",
+                backdropPath = "/backdrop4.jpg",
+                rating = 7.6,
+                releaseYear = "2022",
+                overview = "Jake Sully lives with his newfound family on Pandora.",
+            ),
+            HeroCarouselItem(
+                id = 5,
+                title = "Top Gun: Maverick",
+                posterPath = "/poster5.jpg",
+                backdropPath = "/backdrop5.jpg",
+                rating = 8.2,
+                releaseYear = "2022",
+                overview = "Maverick is still pushing the envelope as a top naval aviator.",
+            ),
+        )
+        .toImmutableList()
 
 @Preview(showBackground = true)
 @Composable

@@ -28,6 +28,7 @@ dependencies {
     // Navigation 3 contracts (NavKey, EntryProviderScope)
     api(libs.androidx.navigation3.runtime)
     api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.collections.immutable)
 
     // Color picker for theme customization
     api(libs.colorpicker.compose)

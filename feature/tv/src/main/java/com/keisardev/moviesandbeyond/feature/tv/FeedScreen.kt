@@ -30,6 +30,8 @@ import com.keisardev.moviesandbeyond.core.ui.ShimmerPosterCarousel
 import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.theme.PosterSize
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun FeedRoute(
@@ -100,17 +102,20 @@ internal fun FeedScreen(
                     if (popularTvShows.items.isNotEmpty()) {
                         val heroItems =
                             remember(popularTvShows.items) {
-                                popularTvShows.items.take(5).map { item ->
-                                    HeroCarouselItem(
-                                        id = item.id,
-                                        title = item.name,
-                                        posterPath = item.imagePath,
-                                        backdropPath = item.backdropPath,
-                                        rating = item.rating,
-                                        releaseYear = item.releaseDate?.take(4),
-                                        overview = item.overview,
-                                    )
-                                }
+                                popularTvShows.items
+                                    .take(5)
+                                    .map { item ->
+                                        HeroCarouselItem(
+                                            id = item.id,
+                                            title = item.name,
+                                            posterPath = item.imagePath,
+                                            backdropPath = item.backdropPath,
+                                            rating = item.rating,
+                                            releaseYear = item.releaseDate?.take(4),
+                                            overview = item.overview,
+                                        )
+                                    }
+                                    .toImmutableList()
                             }
                         MediaHeroCarousel(items = heroItems, onItemClick = onCarouselItemClick)
                     } else {
@@ -170,7 +175,7 @@ internal fun FeedScreen(
 
 @Composable
 private fun CarouselSection(
-    items: List<ContentItem>,
+    items: ImmutableList<ContentItem>,
     isLoading: Boolean,
     sectionName: String,
     onItemClick: (Int) -> Unit,
@@ -202,12 +207,13 @@ private fun CarouselSection(
 
 private val previewItems =
     listOf(
-        ContentItem(1, "/poster1.jpg", "Breaking Bad", "/backdrop1.jpg", 9.5, "2008-01-20"),
-        ContentItem(2, "/poster2.jpg", "Game of Thrones", "/backdrop2.jpg", 8.4, "2011-04-17"),
-        ContentItem(3, "/poster3.jpg", "The Last of Us", "/backdrop3.jpg", 8.8, "2023-01-15"),
-        ContentItem(4, "/poster4.jpg", "Stranger Things", "/backdrop4.jpg", 8.7, "2016-07-15"),
-        ContentItem(5, "/poster5.jpg", "The Mandalorian", "/backdrop5.jpg", 8.5, "2019-11-12"),
-    )
+            ContentItem(1, "/poster1.jpg", "Breaking Bad", "/backdrop1.jpg", 9.5, "2008-01-20"),
+            ContentItem(2, "/poster2.jpg", "Game of Thrones", "/backdrop2.jpg", 8.4, "2011-04-17"),
+            ContentItem(3, "/poster3.jpg", "The Last of Us", "/backdrop3.jpg", 8.8, "2023-01-15"),
+            ContentItem(4, "/poster4.jpg", "Stranger Things", "/backdrop4.jpg", 8.7, "2016-07-15"),
+            ContentItem(5, "/poster5.jpg", "The Mandalorian", "/backdrop5.jpg", 8.5, "2019-11-12"),
+        )
+        .toImmutableList()
 
 private fun previewContentUiState(category: TvShowListCategory) =
     ContentUiState(

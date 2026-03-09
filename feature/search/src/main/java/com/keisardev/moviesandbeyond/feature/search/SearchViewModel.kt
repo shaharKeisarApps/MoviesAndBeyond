@@ -10,6 +10,9 @@ import com.keisardev.moviesandbeyond.data.repository.SearchRepository
 import com.keisardev.moviesandbeyond.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,15 +52,15 @@ constructor(
         userRepository.userData.map { it.includeAdultResults }.distinctUntilChanged()
 
     /** Search suggestions that update reactively as the user types (200ms debounce). */
-    val searchSuggestions: StateFlow<List<SearchItem>> =
+    val searchSuggestions: StateFlow<ImmutableList<SearchItem>> =
         combine(_searchQuery, includeAdult) { query, adult -> query to adult }
             .mapLatest { (query, adult) ->
-                if (query.isEmpty()) return@mapLatest emptyList()
+                if (query.isEmpty()) return@mapLatest persistentListOf()
                 delay(200)
                 val result =
                     searchRepository.getSearchSuggestions(query = query, includeAdult = adult)
                 when (result) {
-                    is Result.Success -> result.data
+                    is Result.Success -> result.data.toImmutableList()
 
                     is Result.Error -> {
                         _errorMessage.update {
@@ -65,13 +68,13 @@ constructor(
                                 fallback = "Search failed. Please try again."
                             )
                         }
-                        emptyList()
+                        persistentListOf()
                     }
 
-                    is Result.Loading -> emptyList()
+                    is Result.Loading -> persistentListOf()
                 }
             }
-            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = persistentListOf())
 
     fun changeSearchQuery(query: String) {
         _searchQuery.update { query }

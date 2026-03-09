@@ -11,6 +11,9 @@ import com.keisardev.moviesandbeyond.data.repository.LibraryRepository
 import com.keisardev.moviesandbeyond.feature.you.LIBRARY_ITEM_TYPE_NAVIGATION_ARGUMENT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +69,7 @@ constructor(
             .stateInWhileSubscribed(scope = viewModelScope, initialValue = null)
 
     /** Reactive list of movie items for the current library type. */
-    val movieItems: StateFlow<List<LibraryItem>> =
+    val movieItems: StateFlow<ImmutableList<LibraryItem>> =
         libraryItemType
             .flatMapLatest { itemType ->
                 itemType?.let {
@@ -76,10 +79,11 @@ constructor(
                     }
                 } ?: flow { emit(emptyList()) }
             }
-            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
+            .map { it.toImmutableList() }
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = persistentListOf())
 
     /** Reactive list of TV show items for the current library type. */
-    val tvItems: StateFlow<List<LibraryItem>> =
+    val tvItems: StateFlow<ImmutableList<LibraryItem>> =
         libraryItemType
             .flatMapLatest { itemType ->
                 itemType?.let {
@@ -89,7 +93,8 @@ constructor(
                     }
                 } ?: flow { emit(emptyList()) }
             }
-            .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyList())
+            .map { it.toImmutableList() }
+            .stateInWhileSubscribed(scope = viewModelScope, initialValue = persistentListOf())
 
     fun deleteItem(libraryItem: LibraryItem) {
         viewModelScope.launch {

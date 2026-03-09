@@ -43,6 +43,7 @@ import com.keisardev.moviesandbeyond.core.ui.adaptiveFeedBottomPadding
 import com.keisardev.moviesandbeyond.core.ui.adaptiveSearchGridColumns
 import com.keisardev.moviesandbeyond.core.ui.theme.Dimens
 import com.keisardev.moviesandbeyond.core.ui.theme.Spacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun SearchRoute(navigateToDetail: (String) -> Unit, viewModel: SearchViewModel = hiltViewModel()) {
@@ -65,7 +66,7 @@ fun SearchRoute(navigateToDetail: (String) -> Unit, viewModel: SearchViewModel =
 internal fun SearchScreen(
     searchQuery: String,
     errorMessage: String?,
-    searchSuggestions: List<SearchItem>,
+    searchSuggestions: ImmutableList<SearchItem>,
     onSearchQueryChange: (String) -> Unit,
     onBack: () -> Unit,
     onSearchResultClick: (String) -> Unit,
