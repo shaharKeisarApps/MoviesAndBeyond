@@ -194,7 +194,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2.35.0
+        uses: reactivecircus/android-emulator-runner@v2.36.0
         with:
           api-level: 30
           arch: x86_64
@@ -241,7 +241,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Generate Baseline Profile
-        uses: reactivecircus/android-emulator-runner@v2.35.0
+        uses: reactivecircus/android-emulator-runner@v2.36.0
         with:
           api-level: 34
           arch: x86_64
