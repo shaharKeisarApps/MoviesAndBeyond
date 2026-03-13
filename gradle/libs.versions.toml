@@ -1,5 +1,5 @@
 [versions]
-activity-compose = "1.12.4"
+activity-compose = "1.13.0"
 store5 = "5.1.0-alpha08"
 agp = "9.1.0"
 androidx-core-splashscreen = "1.2.0"
