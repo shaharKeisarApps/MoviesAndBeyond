@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Get local.properties from secret
         run: echo "${{ secrets.LOCAL_PROPERTIES }}" > ./local.properties
@@ -39,7 +39,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Check code formatting (Spotless)
         run: ./gradlew spotlessCheck
@@ -76,7 +76,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Get local.properties from secret
         run: echo "${{ secrets.LOCAL_PROPERTIES }}" > ./local.properties
@@ -88,7 +88,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug
@@ -138,7 +138,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Get local.properties from secret
         run: echo "${{ secrets.LOCAL_PROPERTIES }}" > ./local.properties
@@ -150,7 +150,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Validate screenshot tests
         run: ./gradlew validateDebugScreenshotTest
@@ -173,7 +173,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Get local.properties from secret
         run: echo "${{ secrets.LOCAL_PROPERTIES }}" > ./local.properties
@@ -185,7 +185,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Enable KVM
         run: |
@@ -220,7 +220,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Get local.properties from secret
         run: echo "${{ secrets.LOCAL_PROPERTIES }}" > ./local.properties
@@ -232,7 +232,7 @@ jobs:
           distribution: 'zulu'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Enable KVM
         run: |
